@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>PKI – CRT Essentials</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ad07d867281efa6fce993ad9394079d2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">CRT Essentials</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./passwords.html"> 
+<span class="menu-text">Passwords</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./pki.html" aria-current="page"> 
+<span class="menu-text">PKI</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./email.html"> 
+<span class="menu-text">Email security</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./powershell.html"> 
+<span class="menu-text">PowerShell</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./dfir.html"> 
+<span class="menu-text">DFIR box</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./references.html"> 
+<span class="menu-text">References</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#public-key-infrastructure" id="toc-public-key-infrastructure" class="nav-link active" data-scroll-target="#public-key-infrastructure">Public key infrastructure</a></li>
+  <li><a href="#sample-files" id="toc-sample-files" class="nav-link" data-scroll-target="#sample-files">Sample files</a></li>
+  <li><a href="#whats-in-a-certificate" id="toc-whats-in-a-certificate" class="nav-link" data-scroll-target="#whats-in-a-certificate">What’s in a certificate?</a>
+  <ul class="collapse">
+  <li><a href="#field-reference" id="toc-field-reference" class="nav-link" data-scroll-target="#field-reference">Field reference</a></li>
+  <li><a href="#extensions-and-oids" id="toc-extensions-and-oids" class="nav-link" data-scroll-target="#extensions-and-oids">Extensions and OIDs</a></li>
+  </ul></li>
+  <li><a href="#inspecting-certificates" id="toc-inspecting-certificates" class="nav-link" data-scroll-target="#inspecting-certificates">Inspecting certificates</a>
+  <ul class="collapse">
+  <li><a href="#certutil-windows" id="toc-certutil-windows" class="nav-link" data-scroll-target="#certutil-windows">certutil (Windows)</a></li>
+  <li><a href="#powershell-and-.net" id="toc-powershell-and-.net" class="nav-link" data-scroll-target="#powershell-and-.net">PowerShell and .NET</a></li>
+  <li><a href="#openssl" id="toc-openssl" class="nav-link" data-scroll-target="#openssl">OpenSSL</a></li>
+  </ul></li>
+  <li><a href="#certificate-formats" id="toc-certificate-formats" class="nav-link" data-scroll-target="#certificate-formats">Certificate formats</a>
+  <ul class="collapse">
+  <li><a href="#converting" id="toc-converting" class="nav-link" data-scroll-target="#converting">Converting</a></li>
+  </ul></li>
+  <li><a href="#certificate-requests-and-issuance" id="toc-certificate-requests-and-issuance" class="nav-link" data-scroll-target="#certificate-requests-and-issuance">Certificate requests and issuance</a>
+  <ul class="collapse">
+  <li><a href="#certificate-signing-requests-pkcs-10" id="toc-certificate-signing-requests-pkcs-10" class="nav-link" data-scroll-target="#certificate-signing-requests-pkcs-10">Certificate signing requests (PKCS #10)</a></li>
+  <li><a href="#internal-cas-ad-cs-and-certificate-templates" id="toc-internal-cas-ad-cs-and-certificate-templates" class="nav-link" data-scroll-target="#internal-cas-ad-cs-and-certificate-templates">Internal CAs: AD CS and certificate templates</a></li>
+  <li><a href="#acme-and-automated-issuance" id="toc-acme-and-automated-issuance" class="nav-link" data-scroll-target="#acme-and-automated-issuance">ACME and automated issuance</a></li>
+  </ul></li>
+  <li><a href="#putting-a-certificate-to-use" id="toc-putting-a-certificate-to-use" class="nav-link" data-scroll-target="#putting-a-certificate-to-use">Putting a certificate to use</a></li>
+  <li><a href="#certificate-validation" id="toc-certificate-validation" class="nav-link" data-scroll-target="#certificate-validation">Certificate validation</a>
+  <ul class="collapse">
+  <li><a href="#validation-failures-reproduced" id="toc-validation-failures-reproduced" class="nav-link" data-scroll-target="#validation-failures-reproduced">Validation failures, reproduced</a></li>
+  <li><a href="#revocation-crls-and-ocsp" id="toc-revocation-crls-and-ocsp" class="nav-link" data-scroll-target="#revocation-crls-and-ocsp">Revocation: CRLs and OCSP</a></li>
+  </ul></li>
+  <li><a href="#renewal-and-maintenance" id="toc-renewal-and-maintenance" class="nav-link" data-scroll-target="#renewal-and-maintenance">Renewal and maintenance</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/dzampino/crt-essentials-2026/blob/main/pki.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/dzampino/crt-essentials-2026/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">PKI</h1>
+<p class="subtitle lead">Inspect a certificate, explain issuance, and name the validation check that fails.</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="public-key-infrastructure" class="level2">
+<h2 class="anchored" data-anchor-id="public-key-infrastructure">Public key infrastructure</h2>
+<ul>
+<li><strong>Public keys and private keys.</strong> A key pair is two related keys. What one does, only the other can undo: data encrypted to the public key needs the private key to decrypt, and a signature made with the private key verifies with the public key. The private key never needs to leave its owner.</li>
+<li><strong>What a certificate does and does not prove.</strong> A certificate is a signed statement from a certificate authority (CA): <em>this public key belongs to this name, for these uses, during this time</em>. It does not prove the site is safe, that the operator is who you assume, or that the private key has not been stolen since.</li>
+<li><strong>Certificate authorities and trust.</strong> You trust a CA because a trust store says to: the operating system’s, the browser’s, or one you configured. A certificate is only as trustworthy as the CA that signed it and the store that trusts that CA.</li>
+</ul>
+<p>The profile for certificates on the internet is <a href="https://www.rfc-editor.org/rfc/rfc5280.html">RFC 5280</a>.</p>
+</section>
+<section id="sample-files" class="level2">
+<h2 class="anchored" data-anchor-id="sample-files">Sample files</h2>
+<p>Fictional public certificate and CSR samples. <strong>Do not install the training root.</strong> No private keys are included. The private training CA’s lifetime is not a statement of public Web PKI issuance policy.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>File</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="files/samples/pki/training-root.pem">training-root.pem</a></td>
+<td>Self-signed root CA, <code>CN=CRT Fictional Training Root</code>, PEM</td>
+</tr>
+<tr class="even">
+<td><a href="files/samples/pki/training-leaf.pem">training-leaf.pem</a></td>
+<td>Server certificate for <code>training.example</code>, issued by the root, PEM</td>
+</tr>
+<tr class="odd">
+<td><a href="files/samples/pki/training-leaf.der">training-leaf.der</a></td>
+<td>The same leaf certificate, DER</td>
+</tr>
+<tr class="even">
+<td><a href="files/samples/pki/training-request.csr">training-request.csr</a></td>
+<td>The PKCS #10 request the leaf was issued from</td>
+</tr>
+</tbody>
+</table>
+<p>The chain is two levels: the root signs the leaf directly. Public CAs issue from an intermediate, as in the diagram below.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="files/images/certificate-chain.png" class="img-fluid figure-img" alt="Certificate chain diagram: root CA, intermediate CA, leaf certificate."></p>
+<figcaption>Root CA signs an intermediate, which signs the leaf. The client supplies the trust anchor; the server presents the leaf and intermediates.</figcaption>
+</figure>
+</div>
+</section>
+<section id="whats-in-a-certificate" class="level2">
+<h2 class="anchored" data-anchor-id="whats-in-a-certificate">What’s in a certificate?</h2>
+<p>Output of <code>openssl x509 -in training-leaf.pem -noout -text</code> (OpenSSL 3.5.7), modulus and signature trimmed:</p>
+<pre class="text"><code>Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            05:6d:6d:da:99:ef:6a:99:e4:fe:84:15:b9:c1:b4:08:c5:b6:0a:94
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN=CRT Fictional Training Root
+        Validity
+            Not Before: Oct  1 00:00:00 2026 GMT
+            Not After : Oct  1 00:00:00 2027 GMT
+        Subject: CN=training.example
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus: 00:c5:48:e6:ab:b4:b4:3d:34: ...
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: critical
+                CA:FALSE
+            X509v3 Subject Alternative Name:
+                DNS:training.example
+            X509v3 Extended Key Usage:
+                TLS Web Server Authentication
+    Signature Algorithm: sha256WithRSAEncryption
+    Signature Value: 98:6d:3b:4a:11:83:2e:2e: ...</code></pre>
+<p>The root has <code>Basic Constraints: critical, CA:TRUE, pathlen:0</code>: it may sign certificates, but no CA below it may.</p>
+<section id="field-reference" class="level3">
+<h3 class="anchored" data-anchor-id="field-reference">Field reference</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>What it holds</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Version</td>
+<td>3 for anything with extensions</td>
+<td>Shown as <code>3 (0x2)</code>; the encoded value is zero-based</td>
+</tr>
+<tr class="even">
+<td>Serial number</td>
+<td>Unique per issuing CA</td>
+<td>Used to identify the certificate in CRLs and OCSP</td>
+</tr>
+<tr class="odd">
+<td>Signature algorithm</td>
+<td>How the CA signed it</td>
+<td><code>sha256WithRSAEncryption</code>, <code>ecdsa-with-SHA256</code></td>
+</tr>
+<tr class="even">
+<td>Issuer</td>
+<td>The CA’s distinguished name</td>
+<td>Must match the subject of the issuing certificate</td>
+</tr>
+<tr class="odd">
+<td>Validity</td>
+<td>Not Before, Not After</td>
+<td>Always UTC in the certificate; tools may display local time</td>
+</tr>
+<tr class="even">
+<td>Subject</td>
+<td>Distinguished name of the holder</td>
+<td>For TLS, the name check uses the SAN, not the CN</td>
+</tr>
+<tr class="odd">
+<td>Subject public key info</td>
+<td>The public key and its algorithm</td>
+<td>The private key is never in the certificate</td>
+</tr>
+<tr class="even">
+<td>Extensions</td>
+<td>Everything else (below)</td>
+<td>A <strong>critical</strong> extension a client does not understand must cause rejection</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Distinguished names.</strong> A DN is a sequence of attributes such as <code>CN</code> (common name, 2.5.4.3), <code>O</code> (organization, 2.5.4.10), <code>OU</code>, <code>L</code>, <code>ST</code> and <code>C</code>. <a href="https://www.rfc-editor.org/rfc/rfc9525.html">RFC 9525</a> §2 is explicit that “The Common Name RDN MUST NOT be used to identify a service”; clients match the requested name against the subject alternative name.</p>
+</section>
+<section id="extensions-and-oids" class="level3">
+<h3 class="anchored" data-anchor-id="extensions-and-oids">Extensions and OIDs</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Extension</th>
+<th>OID</th>
+<th>What it says</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Subject Alternative Name</td>
+<td>2.5.29.17</td>
+<td>The names the certificate is valid for: <code>DNS:</code>, <code>IP:</code>, <code>email:</code>, <code>URI:</code></td>
+</tr>
+<tr class="even">
+<td>Basic Constraints</td>
+<td>2.5.29.19</td>
+<td><code>CA:TRUE</code> or <code>CA:FALSE</code>, and an optional path length limit</td>
+</tr>
+<tr class="odd">
+<td>Key Usage</td>
+<td>2.5.29.15</td>
+<td>Low-level operations: digitalSignature, keyEncipherment, keyCertSign, cRLSign</td>
+</tr>
+<tr class="even">
+<td>Extended Key Usage</td>
+<td>2.5.29.37</td>
+<td>Purposes: the OIDs below</td>
+</tr>
+<tr class="odd">
+<td>Subject Key Identifier</td>
+<td>2.5.29.14</td>
+<td>Hash identifying this certificate’s key</td>
+</tr>
+<tr class="even">
+<td>Authority Key Identifier</td>
+<td>2.5.29.35</td>
+<td>Identifies the issuer’s key; helps chain building</td>
+</tr>
+<tr class="odd">
+<td>CRL Distribution Points</td>
+<td>2.5.29.31</td>
+<td>Where to download the issuer’s CRL</td>
+</tr>
+<tr class="even">
+<td>Authority Information Access</td>
+<td>1.3.6.1.5.5.7.1.1</td>
+<td>Where to fetch the issuer certificate (caIssuers) and OCSP responder</td>
+</tr>
+<tr class="odd">
+<td>Certificate Policies</td>
+<td>2.5.29.32</td>
+<td>Policy OIDs the CA issued under</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Extended key usage</th>
+<th>OID</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>TLS server authentication</td>
+<td>1.3.6.1.5.5.7.3.1</td>
+</tr>
+<tr class="even">
+<td>TLS client authentication</td>
+<td>1.3.6.1.5.5.7.3.2</td>
+</tr>
+<tr class="odd">
+<td>Code signing</td>
+<td>1.3.6.1.5.5.7.3.3</td>
+</tr>
+<tr class="even">
+<td>Email protection (S/MIME)</td>
+<td>1.3.6.1.5.5.7.3.4</td>
+</tr>
+<tr class="odd">
+<td>Time stamping</td>
+<td>1.3.6.1.5.5.7.3.8</td>
+</tr>
+<tr class="even">
+<td>OCSP signing</td>
+<td>1.3.6.1.5.5.7.3.9</td>
+</tr>
+<tr class="odd">
+<td>Smart card logon (Microsoft)</td>
+<td>1.3.6.1.4.1.311.20.2.2</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="inspecting-certificates" class="level2">
+<h2 class="anchored" data-anchor-id="inspecting-certificates">Inspecting certificates</h2>
+<section id="certutil-windows" class="level3">
+<h3 class="anchored" data-anchor-id="certutil-windows">certutil (Windows)</h3>
+<p><code>certutil -dump</code> reads PEM or DER without being told which:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>certutil <span class="op">-</span>dump training-leaf<span class="op">.</span><span class="fu">pem</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>certutil <span class="op">-</span>dump training-leaf<span class="op">.</span><span class="fu">der</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre class="text"><code>X509 Certificate:
+Version: 3
+Serial Number: 056d6dda99ef6a99e4fe8415b9c1b408c5b60a94
+Signature Algorithm:
+    Algorithm ObjectId: 1.2.840.113549.1.1.11 sha256RSA
+Issuer:
+    CN=CRT Fictional Training Root
+
+ NotBefore: 2026-09-30 7:00 PM
+ NotAfter: 2027-09-30 7:00 PM
+
+Subject:
+    CN=training.example
+...
+Cert Hash(sha256): 3b44016743845b84ff7681a3637e88400658df7f2080e72c4c44dfbd295417e2</code></pre>
+<div class="output-note">
+<p>certutil shows validity in local time (here US Central, UTC−5): <code>2026-09-30 7:00 PM</code> is <code>Oct 1 00:00:00 2026 GMT</code>. When you compare timestamps across tools, check the time zone.</p>
+</div>
+</section>
+<section id="powershell-and-.net" class="level3">
+<h3 class="anchored" data-anchor-id="powershell-and-.net">PowerShell and .NET</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">$Cert</span> <span class="op">=</span> <span class="op">[</span>System<span class="op">.</span><span class="fu">Security</span><span class="op">.</span><span class="fu">Cryptography</span><span class="op">.</span><span class="fu">X509Certificates</span><span class="op">.</span><span class="fu">X509Certificate2</span><span class="op">]::</span>new<span class="op">((</span><span class="fu">Resolve-Path</span> <span class="op">.</span>\training-leaf<span class="op">.</span><span class="fu">pem</span><span class="op">).</span><span class="fu">Path</span><span class="op">)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="va">$Cert</span> <span class="op">|</span> <span class="fu">Format-List</span> Subject<span class="op">,</span> Issuer<span class="op">,</span> NotBefore<span class="op">,</span> NotAfter<span class="op">,</span> Thumbprint<span class="op">,</span> SerialNumber</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="va">$Cert</span><span class="op">.</span><span class="fu">Extensions</span> <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="st">'{0} ({1}): {2}'</span> <span class="op">-</span>f <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">FriendlyName</span><span class="op">,</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">Value</span><span class="op">,</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Format</span><span class="op">(</span><span class="va">$false</span><span class="op">)</span> <span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre class="text"><code>Subject      : CN=training.example
+Issuer       : CN=CRT Fictional Training Root
+NotBefore    : 2026-09-30 19:00:00
+NotAfter     : 2027-09-30 19:00:00
+Thumbprint   : EE6B4D73DBA5B6B92816C12DEC4B6539ADBC2830
+SerialNumber : 056D6DDA99EF6A99E4FE8415B9C1B408C5B60A94
+
+Basic Constraints (2.5.29.19): Subject Type=End Entity, Path Length Constraint=None
+Subject Alternative Name (2.5.29.17): DNS Name=training.example
+Enhanced Key Usage (2.5.29.37): Server Authentication (1.3.6.1.5.5.7.3.1)</code></pre>
+<p>The Windows <strong>thumbprint</strong> is the SHA-1 hash of the DER certificate. It identifies a certificate in a store; it is not a security property.</p>
+<p>Certificates already installed on a machine are in the <code>Cert:</code> drive:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> Cert<span class="op">:</span>\LocalMachine\My <span class="op">|</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> Subject<span class="op">,</span> NotAfter<span class="op">,</span> Thumbprint<span class="op">,</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        @<span class="op">{</span> n <span class="op">=</span> <span class="st">'San'</span><span class="op">;</span> e <span class="op">=</span> <span class="op">{</span> <span class="op">(</span><span class="va">$_</span><span class="op">.</span><span class="fu">Extensions</span> <span class="op">|</span> <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">Value</span> <span class="op">-eq</span> <span class="st">'2.5.29.17'</span> <span class="op">}).</span><span class="fu">Format</span><span class="op">(</span><span class="va">$false</span><span class="op">)</span> <span class="op">}</span> <span class="op">}</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> Cert<span class="op">:</span>\LocalMachine\My <span class="op">-</span>ExpiringInDays <span class="dv">30</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="openssl" class="level3">
+<h3 class="anchored" data-anchor-id="openssl">OpenSSL</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem <span class="at">-noout</span> <span class="at">-subject</span> <span class="at">-issuer</span> <span class="at">-dates</span> <span class="at">-ext</span> subjectAltName</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem <span class="at">-noout</span> <span class="at">-fingerprint</span> <span class="at">-sha256</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.der <span class="at">-inform</span> der <span class="at">-noout</span> <span class="at">-fingerprint</span> <span class="at">-sha256</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> asn1parse <span class="at">-in</span> training-leaf.pem        <span class="co"># the raw ASN.1 structure</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> s_client <span class="at">-connect</span> example.com:443 <span class="at">-servername</span> example.com <span class="at">-showcerts</span> <span class="op">&lt;</span>/dev/null   <span class="co"># what a live server presents</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>OpenSSL is included with Git for Windows (<code>C:\Program Files\Git\mingw64\bin\openssl.exe</code>).</p>
+</section>
+</section>
+<section id="certificate-formats" class="level2">
+<h2 class="anchored" data-anchor-id="certificate-formats">Certificate formats</h2>
+<ul>
+<li><strong>ASN.1</strong> describes the structure. <strong>DER</strong> is the binary encoding of that structure.</li>
+<li><strong>PEM</strong> is Base64 DER between <code>-----BEGIN ...-----</code> and <code>-----END ...-----</code> lines (<a href="https://www.rfc-editor.org/rfc/rfc7468.html">RFC 7468</a>). The label says what is inside: <code>CERTIFICATE</code>, <code>CERTIFICATE REQUEST</code>, <code>PRIVATE KEY</code>, <code>PKCS7</code>.</li>
+<li>A file extension does not necessarily tell you what’s inside.</li>
+</ul>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Extension</th>
+<th>Usually holds</th>
+<th>Contains a private key?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>.cer</code>, <code>.crt</code></td>
+<td>One certificate, DER or PEM</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><code>.pem</code></td>
+<td>Anything PEM: certificates, chains, keys, CSRs</td>
+<td>Possibly; look at the labels</td>
+</tr>
+<tr class="odd">
+<td><code>.key</code></td>
+<td>A private key, usually PEM</td>
+<td>Yes</td>
+</tr>
+<tr class="even">
+<td><code>.p7b</code>, <code>.p7c</code></td>
+<td>PKCS #7 / CMS bundle of certificates (<a href="https://www.rfc-editor.org/rfc/rfc5652.html">RFC 5652</a>)</td>
+<td>No</td>
+</tr>
+<tr class="odd">
+<td><code>.pfx</code>, <code>.p12</code></td>
+<td>PKCS #12 archive: certificate, chain and private key, password protected (<a href="https://www.rfc-editor.org/rfc/rfc7292.html">RFC 7292</a>)</td>
+<td>Usually yes</td>
+</tr>
+<tr class="even">
+<td><code>.csr</code>, <code>.req</code></td>
+<td>PKCS #10 certificate request</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Same certificate, two encodings.</strong> <code>training-leaf.pem</code> and <code>training-leaf.der</code> are the same certificate. Their certificate fingerprints match:</p>
+<pre class="text"><code>sha256 Fingerprint=3B:44:01:67:43:84:5B:84:FF:76:81:A3:63:7E:88:40:06:58:DF:7F:20:80:E7:2C:4C:44:DF:BD:29:54:17:E2</code></pre>
+<p>The SHA-256 <strong>file</strong> hash of the DER file is the same value, because a certificate fingerprint is the hash of its DER encoding. The PEM file’s hash differs, because it is text.</p>
+<section id="converting" class="level3">
+<h3 class="anchored" data-anchor-id="converting">Converting</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.der <span class="at">-inform</span> der <span class="at">-out</span> leaf.pem          <span class="co"># DER to PEM</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem <span class="at">-outform</span> der <span class="at">-out</span> leaf.der         <span class="co"># PEM to DER</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> pkcs7 <span class="at">-in</span> bundle.p7b <span class="at">-print_certs</span> <span class="at">-out</span> bundle.pem             <span class="co"># PKCS #7 to PEM certificates</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> pkcs12 <span class="at">-in</span> server.pfx <span class="at">-nokeys</span> <span class="at">-out</span> server-certs.pem           <span class="co"># certificates out of a PFX</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>certutil <span class="op">-</span>encode training-leaf<span class="op">.</span><span class="fu">der</span> leaf<span class="op">.</span><span class="fu">pem</span>     <span class="co"># DER to PEM (Base64)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>certutil <span class="op">-</span>decode training-leaf<span class="op">.</span><span class="fu">pem</span> leaf<span class="op">.</span><span class="fu">der</span>     <span class="co"># PEM to DER</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="certificate-requests-and-issuance" class="level2">
+<h2 class="anchored" data-anchor-id="certificate-requests-and-issuance">Certificate requests and issuance</h2>
+<section id="certificate-signing-requests-pkcs-10" class="level3">
+<h3 class="anchored" data-anchor-id="certificate-signing-requests-pkcs-10">Certificate signing requests (PKCS #10)</h3>
+<p>A CSR (<a href="https://www.rfc-editor.org/rfc/rfc2986.html">RFC 2986</a>) carries the public key, the requested subject and requested extensions, signed with the matching private key. The signature proves the requester holds the private key; it proves nothing about whether they should get the name. That is the CA’s job.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req <span class="at">-in</span> training-request.csr <span class="at">-noout</span> <span class="at">-text</span> <span class="at">-verify</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre class="text"><code>Certificate request self-signature verify OK
+Certificate Request:
+    Data:
+        Version: 1 (0x0)
+        Subject: CN=training.example
+        ...
+        Attributes:
+            Requested Extensions:
+                X509v3 Subject Alternative Name:
+                    DNS:training.example</code></pre>
+<p>The CSR and the issued certificate carry the same public key:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req  <span class="at">-in</span> training-request.csr <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem    <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># both: 134be2713def98d2edbb81406cfa5b70c49a0468d22d1ffc4514d4cb1ff32798</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Creating a key pair and request with OpenSSL (the key stays with you):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req <span class="at">-new</span> <span class="at">-newkey</span> rsa:2048 <span class="at">-nodes</span> <span class="at">-keyout</span> server.key <span class="at">-out</span> server.csr <span class="dt">\</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">-subj</span> <span class="st">"/CN=training.example"</span> <span class="at">-addext</span> <span class="st">"subjectAltName=DNS:training.example"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="internal-cas-ad-cs-and-certificate-templates" class="level3">
+<h3 class="anchored" data-anchor-id="internal-cas-ad-cs-and-certificate-templates">Internal CAs: AD CS and certificate templates</h3>
+<p>Active Directory Certificate Services issues against <strong>certificate templates</strong>, which set key usage, EKU, validity, who may enroll and whether the subject comes from the request or from AD. Request with <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certreq_1"><code>certreq</code></a> and an INF file:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[NewRequest]</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Subject </span><span class="ot">=</span><span class="st"> "CN=training.example"</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="dt">KeyAlgorithm </span><span class="ot">=</span><span class="st"> RSA</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="dt">KeyLength </span><span class="ot">=</span><span class="st"> </span><span class="dv">2048</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Exportable </span><span class="ot">=</span><span class="st"> </span><span class="kw">FALSE</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="dt">MachineKeySet </span><span class="ot">=</span><span class="st"> </span><span class="kw">TRUE</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="dt">RequestType </span><span class="ot">=</span><span class="st"> PKCS10</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="kw">[Extensions]</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="dt">2.5.29.17 </span><span class="ot">=</span><span class="st"> "{text}"</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="dt">_continue_ </span><span class="ot">=</span><span class="st"> "dns=training.example&amp;"</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="kw">[RequestAttributes]</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="dt">CertificateTemplate </span><span class="ot">=</span><span class="st"> WebServer</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>certreq <span class="op">-</span>new request<span class="op">.</span><span class="fu">inf</span> request<span class="op">.</span><span class="fu">csr</span>        <span class="co"># create the key pair and request</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>certreq <span class="op">-</span>submit <span class="op">-</span>config <span class="st">"CA01\Contoso Issuing CA"</span> request<span class="op">.</span><span class="fu">csr</span> server<span class="op">.</span><span class="fu">cer</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>certreq <span class="op">-</span>accept server<span class="op">.</span><span class="fu">cer</span>                  <span class="co"># install, pairing with the pending private key</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>CA01\Contoso Issuing CA</code> is a placeholder for your <code>CAHost\CA name</code>. The <code>CertificateTemplate</code> line needs a domain-joined machine that can see the template; without one, <code>certreq -new</code> reports “Template not found.” This INF was tested on PowerShell 7.6 / Windows 11 with <code>MachineKeySet = FALSE</code> and the template line removed, and produced a valid PKCS #10 request with the SAN.</p>
+<p>Template settings that let the requester supply the subject name, combined with a client authentication EKU and broad enrollment rights, are a well-known AD CS privilege escalation path (“ESC1” in SpecterOps’ <a href="https://specterops.io/wp-content/uploads/sites/3/2022/06/Certified_Pre-Owned.pdf">Certified Pre-Owned</a>). Review who can enroll in such templates.</p>
+</section>
+<section id="acme-and-automated-issuance" class="level3">
+<h3 class="anchored" data-anchor-id="acme-and-automated-issuance">ACME and automated issuance</h3>
+<p>ACME (<a href="https://www.rfc-editor.org/rfc/rfc8555.html">RFC 8555</a>) automates the whole cycle: create an account, place an order for names, prove control of each name, send a CSR, download the certificate, renew before expiry. Proof of control is a <strong>challenge</strong>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Challenge</th>
+<th>How control is proven</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>http-01</code></td>
+<td>Serve a token at <code>http://&lt;name&gt;/.well-known/acme-challenge/&lt;token&gt;</code> on port 80</td>
+<td>No wildcards</td>
+</tr>
+<tr class="even">
+<td><code>dns-01</code></td>
+<td>Publish a TXT record at <code>_acme-challenge.&lt;name&gt;</code></td>
+<td>Works for wildcards and internal-only hosts with public DNS</td>
+</tr>
+<tr class="odd">
+<td><code>tls-alpn-01</code></td>
+<td>Present a special certificate on port 443 (<a href="https://www.rfc-editor.org/rfc/rfc8737.html">RFC 8737</a>)</td>
+<td>No wildcards</td>
+</tr>
+</tbody>
+</table>
+<p>The CA checks control of the name, then issues; it does not check who you are. That is domain validation.</p>
+</section>
+</section>
+<section id="putting-a-certificate-to-use" class="level2">
+<h2 class="anchored" data-anchor-id="putting-a-certificate-to-use">Putting a certificate to use</h2>
+<p>A service needs three things:</p>
+<ol type="1">
+<li><strong>The certificate.</strong></li>
+<li><strong>The private key</strong> that matches it.</li>
+<li><strong>The intermediate certificates</strong> between it and a root clients trust.</li>
+</ol>
+<p>The certificate presented by a service is separate from the trust configured on a client. The server sends its leaf and intermediates; the client supplies the root from its own store. A server that omits its intermediate can work in one browser, which has the intermediate cached or fetches it from the AIA URL, and fail in another client, such as a script, an appliance or a mail server, that does neither.</p>
+<p>On Windows the private key lives with the certificate in the store (or in a <code>.pfx</code>). On Linux it is usually a separate PEM file. Check that a certificate and key match by comparing public keys:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> server.crt <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> pkey <span class="at">-in</span> server.key <span class="at">-pubout</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="certificate-validation" class="level2">
+<h2 class="anchored" data-anchor-id="certificate-validation">Certificate validation</h2>
+<p><a href="https://www.rfc-editor.org/rfc/rfc5280.html">RFC 5280</a> §6 defines path validation; <a href="https://www.rfc-editor.org/rfc/rfc9525.html">RFC 9525</a> defines name matching for TLS. A client checks:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Check</th>
+<th>Question</th>
+<th>Fails when</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Name</td>
+<td>Does a SAN entry match the name I asked for?</td>
+<td>Wrong host, missing SAN, CN-only certificate</td>
+</tr>
+<tr class="even">
+<td>Dates</td>
+<td>Is now between Not Before and Not After, for every certificate in the chain?</td>
+<td>Expired, not yet valid, wrong clock</td>
+</tr>
+<tr class="odd">
+<td>Chain</td>
+<td>Can I build a path to a certificate in my trust store, with valid signatures?</td>
+<td>Missing intermediate, untrusted or private root</td>
+</tr>
+<tr class="even">
+<td>Constraints</td>
+<td>Is every issuer a CA, within its path length?</td>
+<td><code>CA:FALSE</code> certificate used as an issuer</td>
+</tr>
+<tr class="odd">
+<td>Usage</td>
+<td>Do key usage and EKU permit this purpose?</td>
+<td>Server certificate used for client authentication</td>
+</tr>
+<tr class="even">
+<td>Revocation</td>
+<td>Has the CA revoked anything in the chain?</td>
+<td>Revoked; or, depending on client, status unavailable</td>
+</tr>
+</tbody>
+</table>
+<section id="validation-failures-reproduced" class="level3">
+<h3 class="anchored" data-anchor-id="validation-failures-reproduced">Validation failures, reproduced</h3>
+<p>Each of these was run against the sample files with OpenSSL 3.5.7.</p>
+<p><strong>Untrusted root</strong> (the root is not in any trust store):</p>
+<pre class="text"><code>$ openssl verify training-leaf.pem
+CN=training.example
+error 20 at 0 depth lookup: unable to get local issuer certificate
+error training-leaf.pem: verification failed</code></pre>
+<p>Supplying the root as a trust anchor makes it pass: <code>openssl verify -CAfile training-root.pem training-leaf.pem</code> returns <code>training-leaf.pem: OK</code>.</p>
+<p><strong>Incorrect name:</strong></p>
+<pre class="text"><code>$ openssl verify -CAfile training-root.pem -verify_hostname www.training.example training-leaf.pem
+CN=training.example
+error 62 at 0 depth lookup: hostname mismatch
+error training-leaf.pem: verification failed</code></pre>
+<p><code>training.example</code> passes; <code>www.training.example</code> does not, because the SAN lists only <code>training.example</code>. A wildcard <code>*.training.example</code> would match <code>www.training.example</code> but not <code>training.example</code> or <code>a.b.training.example</code> (RFC 9525 §6.3).</p>
+<p><strong>Expired</strong> (checking as of December 1, 2027):</p>
+<pre class="text"><code>$ openssl verify -CAfile training-root.pem -attime 1827619200 training-leaf.pem
+CN=training.example
+error 10 at 0 depth lookup: certificate has expired
+error training-leaf.pem: verification failed</code></pre>
+<p>Checking as of September 1, 2026 reports <code>error 9 at 1 depth lookup: certificate is not yet valid</code>: depth 1 is the root, which was not yet valid either.</p>
+<p><strong>Wrong usage</strong> (the leaf’s EKU is server authentication only):</p>
+<pre class="text"><code>$ openssl verify -CAfile training-root.pem -purpose sslclient training-leaf.pem
+CN=training.example
+error 26 at 0 depth lookup: unsuitable certificate purpose
+error training-leaf.pem: verification failed</code></pre>
+<p><strong>Windows view of the untrusted root.</strong> <code>certutil -verify training-leaf.pem</code> on a machine without the training root:</p>
+<pre class="text"><code>A certificate chain could not be built to a trusted root authority. 0x800b010a (-2146762486 CERT_E_CHAINING)
+------------------------------------
+Incomplete certificate chain
+Cannot find certificate:
+    CN=CRT Fictional Training Root
+Cert is an End Entity certificate
+
+ERROR: Verifying leaf certificate revocation status returned The revocation function was unable to check revocation because the revocation server was offline. 0x80092013 (-2146885613 CRYPT_E_REVOCATION_OFFLINE)
+
+CertUtil: -verify command completed successfully.</code></pre>
+<p>Note the last line: certutil reports the <em>command</em> completed, not that the certificate is valid. Read the errors above it. <code>certutil -verify -urlfetch</code> also retrieves AIA and CRL URLs and reports each one, which is the quickest way to find a broken CRL distribution point on an internal CA.</p>
+</section>
+<section id="revocation-crls-and-ocsp" class="level3">
+<h3 class="anchored" data-anchor-id="revocation-crls-and-ocsp">Revocation: CRLs and OCSP</h3>
+<ul>
+<li><strong>CRL</strong> (Certificate Revocation List): a signed list of revoked serial numbers the CA publishes at the URL in the CRL Distribution Points extension. Clients download and cache it.</li>
+<li><strong>OCSP</strong> (Online Certificate Status Protocol): ask the CA’s responder about one certificate. Responses can be <strong>stapled</strong> by the server so the client does not have to ask.</li>
+</ul>
+<p>Client behavior varies, and is the part people get wrong:</p>
+<ul>
+<li><strong>Browsers mostly do not check online.</strong> Chrome relies on <a href="https://www.chromium.org/Home/chromium-security/crlsets/">CRLSets</a>, a curated list pushed with updates, rather than fetching CRLs or OCSP for most certificates. Other browsers have their own approaches, so test the client you care about.</li>
+<li><strong>Public CAs are moving away from OCSP.</strong> Let’s Encrypt ended its OCSP service on August 6, 2025 and now publishes revocation only through CRLs (<a href="https://letsencrypt.org/2025/08/06/ocsp-service-has-reached-end-of-life">announcement</a>).</li>
+<li><strong>Windows</strong> (CryptoAPI) checks CRLs and OCSP and caches results. Whether “revocation server offline” is fatal depends on the application: some fail closed, many fail open.</li>
+<li><strong>Internal CAs</strong> most often break here: an expired CRL or an unreachable CDP URL causes failures in clients that do enforce revocation, such as smart card logon on domain controllers and some VPNs.</li>
+</ul>
+</section>
+</section>
+<section id="renewal-and-maintenance" class="level2">
+<h2 class="anchored" data-anchor-id="renewal-and-maintenance">Renewal and maintenance</h2>
+<p>Expiration is the most common certificate incident, and public certificate lifetimes are getting shorter. The CA/Browser Forum’s Baseline Requirements (§1.2.2, from ballot SC-081v3, passed April 2025) set the maximum validity of publicly trusted TLS certificates:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Issued on or after</th>
+<th style="text-align: right;">Maximum validity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>March 15, 2026</td>
+<td style="text-align: right;">200 days</td>
+</tr>
+<tr class="even">
+<td>March 15, 2027</td>
+<td style="text-align: right;">100 days</td>
+</tr>
+<tr class="odd">
+<td>March 15, 2029</td>
+<td style="text-align: right;">47 days</td>
+</tr>
+</tbody>
+</table>
+<p>Source: <a href="https://cabforum.org/working-groups/server/baseline-requirements/requirements/">CA/Browser Forum TLS Baseline Requirements</a>. These limits do not apply to private internal CAs, which set their own policy.</p>
+<p>What renewal involves, and what tends to be missed:</p>
+<ul>
+<li><strong>An inventory.</strong> Know which certificates exist, where they are deployed, and when they expire. For Windows, <code>Get-ChildItem Cert:\LocalMachine\My -ExpiringInDays 30</code> on each server; for anything listening on TLS, scan it.</li>
+<li><strong>Replacing, not just renewing.</strong> A renewed certificate must be installed and bound everywhere the old one was: load balancers, IIS bindings, RDP, LDAPS, appliances, and anything that pinned the old one.</li>
+<li><strong>The new chain.</strong> A renewal can come from a different intermediate. Deploy the chain the CA gives you with the new certificate.</li>
+<li><strong>Automation.</strong> At 47 days, renewing by hand stops being realistic. ACME clients, AD CS autoenrollment and vendor integrations do the work; monitoring confirms it happened.</li>
+</ul>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc5280.html">RFC 5280</a></td>
+<td>Internet X.509 PKI Certificate and CRL Profile</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.rfc-editor.org/rfc/rfc9525.html">RFC 9525</a></td>
+<td>Service Identity in TLS (obsoletes RFC 6125)</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc2986.html">RFC 2986</a></td>
+<td>PKCS #10: Certification Request Syntax</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.rfc-editor.org/rfc/rfc8555.html">RFC 8555</a></td>
+<td>Automatic Certificate Management Environment (ACME)</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc8737.html">RFC 8737</a></td>
+<td>ACME TLS-ALPN-01 challenge</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.rfc-editor.org/rfc/rfc7468.html">RFC 7468</a></td>
+<td>Textual encodings (PEM)</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc7292.html">RFC 7292</a></td>
+<td>PKCS #12</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.rfc-editor.org/rfc/rfc5652.html">RFC 5652</a></td>
+<td>Cryptographic Message Syntax (PKCS #7)</td>
+</tr>
+<tr class="odd">
+<td><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certreq_1">certreq</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.chromium.org/Home/chromium-security/crlsets/">CRLSets</a></td>
+<td>Chromium</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/dzampino\.github\.io\/crt-essentials-2026\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>CRT Annual Training Conference 2026</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/dzampino/crt-essentials-2026/blob/main/pki.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/dzampino/crt-essentials-2026/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Wisconsin Cyber Response Team</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>PowerShell – CRT Essentials</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ad07d867281efa6fce993ad9394079d2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">CRT Essentials</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./passwords.html"> 
+<span class="menu-text">Passwords</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pki.html"> 
+<span class="menu-text">PKI</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./email.html"> 
+<span class="menu-text">Email security</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./powershell.html" aria-current="page"> 
+<span class="menu-text">PowerShell</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./dfir.html"> 
+<span class="menu-text">DFIR box</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./references.html"> 
+<span class="menu-text">References</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#why-powershell" id="toc-why-powershell" class="nav-link active" data-scroll-target="#why-powershell">Why PowerShell?</a></li>
+  <li><a href="#finding-commands" id="toc-finding-commands" class="nav-link" data-scroll-target="#finding-commands">Finding commands</a>
+  <ul class="collapse">
+  <li><a href="#figure-out-what-a-command-returns" id="toc-figure-out-what-a-command-returns" class="nav-link" data-scroll-target="#figure-out-what-a-command-returns">Figure out what a command returns</a></li>
+  </ul></li>
+  <li><a href="#objects-and-the-pipeline" id="toc-objects-and-the-pipeline" class="nav-link" data-scroll-target="#objects-and-the-pipeline">Objects and the pipeline</a></li>
+  <li><a href="#working-with-data" id="toc-working-with-data" class="nav-link" data-scroll-target="#working-with-data">Working with data</a></li>
+  <li><a href="#example-tasks" id="toc-example-tasks" class="nav-link" data-scroll-target="#example-tasks">Example tasks</a>
+  <ul class="collapse">
+  <li><a href="#working-with-an-existing-collection-of-files" id="toc-working-with-an-existing-collection-of-files" class="nav-link" data-scroll-target="#working-with-an-existing-collection-of-files">Working with an existing collection of files</a></li>
+  <li><a href="#looking-at-collected-windows-event-logs-with-get-winevent" id="toc-looking-at-collected-windows-event-logs-with-get-winevent" class="nav-link" data-scroll-target="#looking-at-collected-windows-event-logs-with-get-winevent">Looking at collected Windows event logs with <code>Get-WinEvent</code></a></li>
+  </ul></li>
+  <li><a href="#making-a-script-reusable" id="toc-making-a-script-reusable" class="nav-link" data-scroll-target="#making-a-script-reusable">Making a script reusable</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#shouldprocess" id="toc-shouldprocess" class="nav-link" data-scroll-target="#shouldprocess"><code>-WhatIf</code>, <code>-Confirm</code> and <code>ShouldProcess</code></a></li>
+  <li><a href="#error-handling" id="toc-error-handling" class="nav-link" data-scroll-target="#error-handling">Error handling</a></li>
+  <li><a href="#building-collections" id="toc-building-collections" class="nav-link" data-scroll-target="#building-collections">Building collections</a></li>
+  </ul></li>
+  <li><a href="#scripts" id="toc-scripts" class="nav-link" data-scroll-target="#scripts">Scripts</a></li>
+  <li><a href="#windows-powershell-5.1-and-powershell-7" id="toc-windows-powershell-5.1-and-powershell-7" class="nav-link" data-scroll-target="#windows-powershell-5.1-and-powershell-7">Windows PowerShell 5.1 and PowerShell 7</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/dzampino/crt-essentials-2026/blob/main/powershell.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/dzampino/crt-essentials-2026/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">PowerShell</h1>
+<p class="subtitle lead">Show how PowerShell can make administrative and incident-response tasks easier to repeat and automate.</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="why-powershell" class="level2">
+<h2 class="anchored" data-anchor-id="why-powershell">Why PowerShell?</h2>
+<ul>
+<li>Administration, automation, and analysis.</li>
+<li>Turning a repetitive task into something repeatable.</li>
+</ul>
+<p>PowerShell commands return <strong>objects</strong>, not text. A file has a <code>Length</code> and a <code>LastWriteTimeUtc</code>; an event has an <code>Id</code> and a <code>TimeCreated</code>. You filter and sort on those properties directly instead of cutting columns out of text, and the result is the same whether the output is 10 lines or 10 million.</p>
+<p>Everything on this page runs in Windows PowerShell 5.1 and PowerShell 7 unless noted. Examples were tested in PowerShell 7.6.7 and Windows PowerShell 5.1.26100 on Windows 11.</p>
+</section>
+<section id="finding-commands" class="level2">
+<h2 class="anchored" data-anchor-id="finding-commands">Finding commands</h2>
+<p><code>Get-Command</code> finds commands; <code>Get-Help</code> explains them. Commands are named Verb-Noun, so search by either half.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Command</span> <span class="op">-</span>Noun WinEvent                       <span class="co"># everything that works on event logs</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Command</span> <span class="op">-</span>Verb Export                         <span class="co"># every way to write something out</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Command</span> <span class="op">*</span>hash<span class="op">*</span>                               <span class="co"># wildcards work too</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Help</span> <span class="fu">Get-WinEvent</span> <span class="op">-</span>Examples</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Help</span> <span class="fu">Get-WinEvent</span> <span class="op">-</span>Parameter FilterHashtable</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Command</span> Get-FileHash <span class="op">-</span>Syntax                 <span class="co"># parameter sets at a glance</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="fu">Get-Command</span> Get-FileHash<span class="op">).</span><span class="fu">OutputType</span>            <span class="co"># what it returns</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Local help is minimal until you run <code>Update-Help</code> (from an elevated prompt in Windows PowerShell 5.1). <code>Get-Help &lt;command&gt; -Online</code> opens the current Microsoft Learn page instead.</p>
+<section id="figure-out-what-a-command-returns" class="level3">
+<h3 class="anchored" data-anchor-id="figure-out-what-a-command-returns">Figure out what a command returns</h3>
+<p>Pipe it to <code>Get-Member</code>. The first line is the type; the list is what you can select, filter and sort on.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Item</span> C<span class="op">:</span>\Windows\notepad<span class="op">.</span><span class="fu">exe</span> <span class="op">|</span> <span class="fu">Get-Member</span> <span class="op">-</span>MemberType Property</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre class="text"><code>   TypeName: System.IO.FileInfo
+
+Name              MemberType Definition
+----              ---------- ----------
+Attributes        Property   System.IO.FileAttributes Attributes {get;set;}
+CreationTime      Property   datetime CreationTime {get;set;}
+CreationTimeUtc   Property   datetime CreationTimeUtc {get;set;}
+...
+Length            Property   long Length {get;}
+Name              Property   string Name {get;}</code></pre>
+</section>
+</section>
+<section id="objects-and-the-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="objects-and-the-pipeline">Objects and the pipeline</h2>
+<p>The pipeline passes objects from one command to the next (<a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines">about_Pipelines</a>). The default table view shows only some properties; <code>Select-Object</code> chooses which, and <code>Format-List *</code> shows all of them.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Item</span> C<span class="op">:</span>\Windows\notepad<span class="op">.</span><span class="fu">exe</span> <span class="op">|</span> <span class="fu">Format-List</span> <span class="op">*</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Item</span> C<span class="op">:</span>\Windows\notepad<span class="op">.</span><span class="fu">exe</span> <span class="op">|</span> <span class="fu">Select-Object</span> Name<span class="op">,</span> Length<span class="op">,</span> LastWriteTime<span class="op">,</span> VersionInfo</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A <strong>calculated property</strong> adds a column computed from each object:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="op">.</span>\Case <span class="op">-</span>File <span class="op">|</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> Name<span class="op">,</span> @<span class="op">{</span> n <span class="op">=</span> <span class="st">'SizeMB'</span><span class="op">;</span> e <span class="op">=</span> <span class="op">{</span> <span class="op">[</span>math<span class="op">]::</span>Round<span class="op">(</span><span class="va">$_</span><span class="op">.</span><span class="fu">Length</span> <span class="op">/</span> 1MB<span class="op">,</span> <span class="dv">2</span><span class="op">)</span> <span class="op">}</span> <span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Parameters bind from the pipeline <strong>by value</strong> (the whole object) or <strong>by property name</strong>. That is why <code>Get-ChildItem | Get-FileHash</code> works: <code>Get-FileHash</code> accepts the file’s path from each object.</p>
+</section>
+<section id="working-with-data" class="level2">
+<h2 class="anchored" data-anchor-id="working-with-data">Working with data</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Where-Object</code></td>
+<td>Keep objects that match: <code>Where-Object Length -gt 10MB</code>, <code>Where-Object { $_.Name -like '*.ps1' -and $_.Length -lt 1KB }</code></td>
+</tr>
+<tr class="even">
+<td><code>Sort-Object</code></td>
+<td>Order by one or more properties: <code>Sort-Object Length -Descending</code></td>
+</tr>
+<tr class="odd">
+<td><code>Group-Object</code></td>
+<td>Count by a property: <code>Group-Object Extension</code></td>
+</tr>
+<tr class="even">
+<td><code>Measure-Object</code></td>
+<td>Count, sum, minimum, maximum: <code>Measure-Object Length -Sum -Maximum</code></td>
+</tr>
+<tr class="odd">
+<td><code>Select-Object</code></td>
+<td>Choose properties; <code>-First</code>, <code>-Last</code>, <code>-Unique</code>, <code>-ExpandProperty</code></td>
+</tr>
+<tr class="even">
+<td><code>Export-Csv</code></td>
+<td>Write objects to CSV for Excel or Timeline Explorer</td>
+</tr>
+<tr class="odd">
+<td><code>ConvertTo-Json</code></td>
+<td>Write objects to JSON</td>
+</tr>
+<tr class="even">
+<td><code>Out-GridView</code></td>
+<td>Interactive, filterable window (Windows only)</td>
+</tr>
+</tbody>
+</table>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="op">.</span>\Case <span class="op">-</span>Recurse <span class="op">-</span>File <span class="op">|</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> Length <span class="op">-gt</span> 10MB <span class="op">|</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Length <span class="op">-</span>Descending <span class="op">|</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> FullName<span class="op">,</span> Length<span class="op">,</span> LastWriteTimeUtc <span class="op">|</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Export-Csv</span> <span class="op">.</span>\LargeFiles<span class="op">.</span><span class="fu">csv</span> <span class="op">-</span>NoTypeInformation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Filter as far left as you can. <code>Get-ChildItem -Filter *.evtx</code> and <code>Get-WinEvent -FilterHashtable</code> filter at the source; <code>Where-Object</code> sees every object first.</p>
+</section>
+<section id="example-tasks" class="level2">
+<h2 class="anchored" data-anchor-id="example-tasks">Example tasks</h2>
+<section id="working-with-an-existing-collection-of-files" class="level3">
+<h3 class="anchored" data-anchor-id="working-with-an-existing-collection-of-files">Working with an existing collection of files</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What is here, by type</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="op">.</span>\Case <span class="op">-</span>Recurse <span class="op">-</span>File <span class="op">|</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Group-Object</span> Extension <span class="op">|</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Count <span class="op">-</span>Descending <span class="op">|</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> Count<span class="op">,</span> Name</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Hash everything</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="op">.</span>\Case <span class="op">-</span>Recurse <span class="op">-</span>File <span class="op">|</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    Get-FileHash <span class="op">-</span>Algorithm SHA256 <span class="op">|</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> Hash<span class="op">,</span> Path <span class="op">|</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Export-Csv</span> <span class="op">.</span>\Hashes<span class="op">.</span><span class="fu">csv</span> <span class="op">-</span>NoTypeInformation</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Files modified in a window (UTC)</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="va">$Start</span> <span class="op">=</span> <span class="op">[</span>datetime<span class="op">]</span><span class="st">'2026-10-01T00:00:00Z'</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="va">$End</span> <span class="op">=</span> <span class="op">[</span>datetime<span class="op">]</span><span class="st">'2026-10-08T00:00:00Z'</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="op">.</span>\Case <span class="op">-</span>Recurse <span class="op">-</span>File <span class="op">|</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">LastWriteTimeUtc</span> <span class="op">-ge</span> <span class="va">$Start</span><span class="op">.</span><span class="fu">ToUniversalTime</span><span class="op">()</span> <span class="op">-and</span> <span class="va">$_</span><span class="op">.</span><span class="fu">LastWriteTimeUtc</span> <span class="op">-lt</span> <span class="va">$End</span><span class="op">.</span><span class="fu">ToUniversalTime</span><span class="op">()</span> <span class="op">}</span> <span class="op">|</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> LastWriteTimeUtc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <a href="#scripts"><code>Get-FileInventory.ps1</code></a> script combines these into one inventory.</p>
+</section>
+<section id="looking-at-collected-windows-event-logs-with-get-winevent" class="level3">
+<h3 class="anchored" data-anchor-id="looking-at-collected-windows-event-logs-with-get-winevent">Looking at collected Windows event logs with <code>Get-WinEvent</code></h3>
+<p>Query the <strong>copied</strong> <code>.evtx</code> file with <code>-Path</code>, not the live log on the analysis machine (<a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent">Get-WinEvent</a>).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What providers and IDs are in this log, and how many</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-WinEvent</span> <span class="op">-</span>Path <span class="op">.</span>\Case\Logs\System<span class="op">.</span><span class="fu">evtx</span> <span class="op">|</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Group-Object</span> ProviderName<span class="op">,</span> Id <span class="op">|</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Count <span class="op">-</span>Descending <span class="op">|</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> <span class="op">-</span>First <span class="dv">15</span> Count<span class="op">,</span> Name</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Logons and failed logons, filtered at the source</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-WinEvent</span> <span class="op">-</span>FilterHashtable @<span class="op">{</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    Path <span class="op">=</span> <span class="st">'.\Case\Logs\Security.evtx'</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    Id <span class="op">=</span> <span class="dv">4624</span><span class="op">,</span> <span class="dv">4625</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    StartTime <span class="op">=</span> <span class="op">[</span>datetime<span class="op">]</span><span class="st">'2026-10-01'</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="op">|</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Group-Object</span> Id <span class="op">|</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> Count<span class="op">,</span> Name</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Event properties hold the event’s data fields. To get named fields (for example <code>TargetUserName</code> and <code>IpAddress</code> in a 4624), read the event XML:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-WinEvent</span> <span class="op">-</span>FilterHashtable @<span class="op">{</span> Path <span class="op">=</span> <span class="st">'.\Case\Logs\Security.evtx'</span><span class="op">;</span> Id <span class="op">=</span> <span class="dv">4624</span> <span class="op">}</span> <span class="op">-</span>MaxEvents <span class="dv">100</span> <span class="op">|</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">$Data</span> <span class="op">=</span> @<span class="op">{}</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">([</span>xml<span class="op">]</span><span class="va">$_</span><span class="op">.</span><span class="fu">ToXml</span><span class="op">()).</span><span class="fu">Event</span><span class="op">.</span><span class="fu">EventData</span><span class="op">.</span><span class="fu">Data</span> <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="va">$Data</span><span class="op">[</span><span class="va">$_</span><span class="op">.</span><span class="fu">Name</span><span class="op">]</span> <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="st">'#text'</span> <span class="op">}</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>pscustomobject<span class="op">]</span>@<span class="op">{</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>            TimeCreated <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">TimeCreated</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>            User <span class="op">=</span> <span class="st">'{0}\{1}'</span> <span class="op">-</span>f <span class="va">$Data</span><span class="op">.</span><span class="fu">TargetDomainName</span><span class="op">,</span> <span class="va">$Data</span><span class="op">.</span><span class="fu">TargetUserName</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>            LogonType <span class="op">=</span> <span class="va">$Data</span><span class="op">.</span><span class="fu">LogonType</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>            IpAddress <span class="op">=</span> <span class="va">$Data</span><span class="op">.</span><span class="fu">IpAddress</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>Get-WinEvent</code> throws “No events were found that match the specified selection criteria” when a filter matches nothing; scripts should treat that as an empty result, as <a href="#scripts"><code>Get-EvtxSummary.ps1</code></a> does.</p>
+</section>
+</section>
+<section id="making-a-script-reusable" class="level2">
+<h2 class="anchored" data-anchor-id="making-a-script-reusable">Making a script reusable</h2>
+<ul>
+<li>Parameters instead of hard-coded values.</li>
+<li>Functions, <code>-Verbose</code>, <code>-WhatIf</code> where applicable.</li>
+<li>An example of automating part of the DFIR box build: see the <a href="./dfir.html#build-automation">DFIR box build scripts</a>.</li>
+</ul>
+<section id="parameters" class="level3">
+<h3 class="anchored" data-anchor-id="parameters">Parameters</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">[</span>CmdletBinding<span class="op">()]</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">param</span><span class="op">(</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>ValidateScript<span class="op">({</span> Test-Path -Path <span class="va">$_</span> -PathType Container <span class="op">})]</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Path</span><span class="op">,</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>ValidateSet<span class="op">(</span><span class="st">'SHA1'</span><span class="op">,</span> <span class="st">'SHA256'</span><span class="op">,</span> <span class="st">'SHA512'</span><span class="op">)]</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Algorithm</span> <span class="op">=</span> <span class="st">'SHA256'</span><span class="op">,</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="dt">switch</span><span class="op">]</span><span class="va">$IncludeHidden</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>[CmdletBinding()]</code> makes a script or function an <strong>advanced function</strong>: it gets <code>-Verbose</code>, <code>-Debug</code>, <code>-ErrorAction</code> and the other common parameters for free. Validation attributes reject bad input before your code runs.</p>
+</section>
+<section id="shouldprocess" class="level3">
+<h3 class="anchored" data-anchor-id="shouldprocess"><code>-WhatIf</code>, <code>-Confirm</code> and <code>ShouldProcess</code></h3>
+<p>Anything that changes state should support <code>-WhatIf</code>. Declare <code>SupportsShouldProcess</code> and wrap each change in <code>$PSCmdlet.ShouldProcess()</code> (<a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute">about_Functions_CmdletBindingAttribute</a>):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> New-CaseFolder <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>CmdletBinding<span class="op">(</span>SupportsShouldProcess<span class="op">)]</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span><span class="op">(</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$CaseRoot</span><span class="op">,</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$CaseNumber</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">$CasePath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="op">-</span>Path <span class="va">$CaseRoot</span> <span class="op">-</span>ChildPath <span class="va">$CaseNumber</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Collected'</span><span class="op">,</span> <span class="st">'Output'</span><span class="op">,</span> <span class="st">'Notes'</span> <span class="op">|</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="fu">Join-Path</span> <span class="op">-</span>Path <span class="va">$CasePath</span> <span class="op">-</span>ChildPath <span class="va">$_</span> <span class="op">}</span> <span class="op">|</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">Where-Object</span> <span class="op">{</span> <span class="op">-not</span> <span class="op">(</span><span class="fu">Test-Path</span> <span class="op">-</span>Path <span class="va">$_</span><span class="op">)</span> <span class="op">}</span> <span class="op">|</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span><span class="va">$PSCmdlet</span><span class="op">.</span><span class="fu">ShouldProcess</span><span class="op">(</span><span class="va">$_</span><span class="op">,</span> <span class="st">'Create folder'</span><span class="op">))</span> <span class="op">{</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>                <span class="fu">New-Item</span> <span class="op">-</span>Path <span class="va">$_</span> <span class="op">-</span>ItemType Directory <span class="op">|</span> <span class="fu">Out-Null</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>                <span class="fu">Write-Verbose</span> <span class="st">"Created </span><span class="va">$_</span><span class="st">"</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>New-CaseFolder <span class="op">-</span>CaseRoot E<span class="op">:</span>\Cases <span class="op">-</span>CaseNumber <span class="dv">2026</span><span class="op">-</span><span class="dv">0142</span> <span class="op">-</span>WhatIf</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre class="text"><code>What if: Performing the operation "Create folder" on target "E:\Cases\2026-0142\Collected".
+What if: Performing the operation "Create folder" on target "E:\Cases\2026-0142\Output".
+What if: Performing the operation "Create folder" on target "E:\Cases\2026-0142\Notes".</code></pre>
+<p>Commands you call inside inherit <code>-WhatIf</code>, so <code>New-Item</code> inside a function run with <code>-WhatIf</code> would not create anything either; the explicit <code>ShouldProcess</code> call gives a clear message and covers non-cmdlet work such as <code>winget</code> or registry edits.</p>
+</section>
+<section id="error-handling" class="level3">
+<h3 class="anchored" data-anchor-id="error-handling">Error handling</h3>
+<p>PowerShell has <strong>non-terminating</strong> errors (the command reports and keeps going: one unreadable file in a recursive listing) and <strong>terminating</strong> errors (the command stops). <code>try</code>/<code>catch</code> only catches terminating errors, so add <code>-ErrorAction Stop</code> where you want to handle a failure:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span> <span class="op">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Events</span> <span class="op">=</span> <span class="fu">Get-WinEvent</span> <span class="op">-</span>FilterHashtable <span class="va">$Filter</span> <span class="op">-</span>ErrorAction Stop</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="cf">catch</span> <span class="op">{</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span><span class="va">$_</span><span class="op">.</span><span class="fu">FullyQualifiedErrorId</span> <span class="op">-like</span> <span class="st">'NoMatchingEventsFound*'</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">$Events</span> <span class="op">=</span> <span class="op">@()</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To collect non-terminating errors without stopping, use <code>-ErrorAction SilentlyContinue -ErrorVariable Problems</code> and report <code>$Problems</code> afterward, as <code>Get-FileInventory.ps1</code> does for files it cannot read.</p>
+</section>
+<section id="building-collections" class="level3">
+<h3 class="anchored" data-anchor-id="building-collections">Building collections</h3>
+<p>Let the pipeline build arrays. <code>$Results = foreach (...) { [pscustomobject]@{...} }</code> and <code>$Results = ... | ForEach-Object { ... }</code> collect output efficiently; appending with <code>$Results += $Item</code> copies the whole array on every addition and gets slow with large data. When you do need to add items one by one, use <code>[System.Collections.Generic.List[object]]::new()</code> and <code>.Add()</code>.</p>
+</section>
+</section>
+<section id="scripts" class="level2">
+<h2 class="anchored" data-anchor-id="scripts">Scripts</h2>
+<p>Analysis of existing files and logs, not evidence acquisition. Download, read, then run. Source is also on <a href="https://github.com/dzampino/crt-essentials-2026/tree/main/scripts">GitHub</a>.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Script</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="files/scripts/Get-FileInventory.ps1">Get-FileInventory.ps1</a></td>
+<td>Relative path, extension, size, UTC timestamps and hash for every file under a folder; optional CSV with <code>-WhatIf</code> support</td>
+</tr>
+<tr class="even">
+<td><a href="files/scripts/Get-EvtxSummary.ps1">Get-EvtxSummary.ps1</a></td>
+<td>Counts by provider and event ID, with first and last time, for collected <code>.evtx</code> files; <code>-Detail</code> returns the events</td>
+</tr>
+</tbody>
+</table>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Get-FileInventory<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected <span class="op">|</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Length <span class="op">-</span>Descending <span class="op">|</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> <span class="op">-</span>First <span class="dv">10</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Get-FileInventory<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected <span class="op">-</span>OutputPath D<span class="op">:</span>\Case\Output\Inventory<span class="op">.</span><span class="fu">csv</span> <span class="op">-</span>Verbose</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Get-EvtxSummary<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected\Logs <span class="op">|</span> <span class="fu">Format-Table</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Get-EvtxSummary<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected\Logs\Security<span class="op">.</span><span class="fu">evtx</span> <span class="op">-</span>Id <span class="dv">4624</span><span class="op">,</span> <span class="dv">4625</span> <span class="op">-</span>Detail <span class="op">|</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Export-Csv</span> D<span class="op">:</span>\Case\Output\Logons<span class="op">.</span><span class="fu">csv</span> <span class="op">-</span>NoTypeInformation</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> D<span class="op">:</span>\Case\Collected <span class="op">-</span>Filter <span class="op">*.</span><span class="fu">evtx</span> <span class="op">-</span>Recurse <span class="op">|</span> <span class="op">.</span>\Get-EvtxSummary<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Id <span class="dv">7045</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sample output of <code>Get-EvtxSummary.ps1</code> against a week of an exported System log:</p>
+<pre class="text"><code>File        ProviderName                            Id Count First               Last
+----        ------------                            -- ----- -----               ----
+System.evtx Microsoft-Windows-WindowsUpdateClient   44  1148 2026-10-09 15:51:20 2026-10-16 06:43:23
+System.evtx Microsoft-Windows-Kernel-General        16    98 2026-10-09 15:53:25 2026-10-16 14:32:46
+System.evtx Service Control Manager               7040    75 2026-10-09 15:54:14 2026-10-16 15:21:15</code></pre>
+<p>Downloaded scripts carry a mark of the web. If the execution policy blocks them, read them first, then <code>Unblock-File .\Get-FileInventory.ps1</code>.</p>
+</section>
+<section id="windows-powershell-5.1-and-powershell-7" class="level2">
+<h2 class="anchored" data-anchor-id="windows-powershell-5.1-and-powershell-7">Windows PowerShell 5.1 and PowerShell 7</h2>
+<p>They install side by side: <code>powershell.exe</code> is Windows PowerShell 5.1 (built into Windows, .NET Framework), <code>pwsh.exe</code> is PowerShell 7 (installed separately, current .NET, cross-platform). Microsoft’s list: <a href="https://learn.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell">Differences between Windows PowerShell 5.1 and PowerShell 7.x</a>.</p>
+<p>Differences observed while testing this page:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Behavior</th>
+<th>Windows PowerShell 5.1</th>
+<th>PowerShell 7.6</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Out-File</code> default encoding</td>
+<td>UTF-16 LE with BOM</td>
+<td>UTF-8, no BOM</td>
+</tr>
+<tr class="even">
+<td><code>Set-Content</code> default encoding</td>
+<td>System ANSI code page (<code>é</code> became byte <code>E9</code>)</td>
+<td>UTF-8, no BOM</td>
+</tr>
+<tr class="odd">
+<td><code>Export-Csv</code> first line</td>
+<td><code>#TYPE System.Management.Automation.PSCustomObject</code> unless <code>-NoTypeInformation</code></td>
+<td>No type line</td>
+</tr>
+<tr class="even">
+<td><code>ForEach-Object -Parallel</code></td>
+<td>Not available</td>
+<td>Available</td>
+</tr>
+<tr class="odd">
+<td><code>Get-WmiObject</code></td>
+<td>Built in</td>
+<td>Only through the Windows PowerShell compatibility proxy; use <code>Get-CimInstance</code></td>
+</tr>
+<tr class="even">
+<td><code>&amp;&amp;</code>, <code>\|\|</code>, ternary <code>? :</code>, <code>??</code></td>
+<td>Not available</td>
+<td>Available</td>
+</tr>
+<tr class="odd">
+<td>X509 <code>DnsNameList</code> property</td>
+<td>Present</td>
+<td>Not present; read the SAN extension instead</td>
+</tr>
+</tbody>
+</table>
+<p>For scripts shared between both, specify <code>-Encoding UTF8</code> (or <code>utf8NoBOM</code> in 7 only) when writing files other tools will read, always pass <code>-NoTypeInformation</code> to <code>Export-Csv</code>, and use CIM cmdlets (<code>Get-CimInstance</code>) rather than WMI cmdlets.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines">about_Pipelines</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="even">
+<td><a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute">about_Functions_CmdletBindingAttribute</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="odd">
+<td><a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent">Get-WinEvent</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="even">
+<td><a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/export-csv">Export-Csv</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="odd">
+<td><a href="https://learn.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell">Differences from Windows PowerShell</a></td>
+<td>Microsoft Learn</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/dzampino\.github\.io\/crt-essentials-2026\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>CRT Annual Training Conference 2026</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/dzampino/crt-essentials-2026/blob/main/powershell.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/dzampino/crt-essentials-2026/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Wisconsin Cyber Response Team</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -1,0 +1,31 @@
+Return-Path: <bounce-7731@mailer.esp.example>
+Received: from mx1.example.net (mx1.example.net [198.51.100.25])
+	by mbox1.example.net (Postfix) with ESMTPS id 4F2A11C0042
+	for <pat@example.net>; Fri, 16 Oct 2026 14:02:11 -0500 (CDT)
+Authentication-Results: mx1.example.net;
+	spf=pass smtp.mailfrom=mailer.esp.example;
+	dkim=pass header.d=example.org header.s=esp2026 header.b=Qx3fK9aL;
+	dmarc=pass header.from=example.org
+Received: from out-12.esp.example (out-12.esp.example [203.0.113.40])
+	by mx1.example.net (Postfix) with ESMTPS id 9C77E2A0011
+	for <pat@example.net>; Fri, 16 Oct 2026 14:02:10 -0500 (CDT)
+Authentication-Results: out-12.esp.example; dkim=pass header.d=example.org; dmarc=pass
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=example.org;
+	s=esp2026; t=1792177329; h=from:to:subject:date:message-id;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=Qx3fK9aL...
+Received: from app01.example.org (app01.example.org [192.0.2.17])
+	by out-12.esp.example (Postfix) with ESMTPSA id 0B1D4400A3
+	for <pat@example.net>; Fri, 16 Oct 2026 19:02:09 +0000 (UTC)
+From: "Example County IT" <it-alerts@example.org>
+Reply-To: helpdesk@example.org
+To: pat@example.net
+Subject: Scheduled maintenance this weekend
+Date: Fri, 16 Oct 2026 14:02:08 -0500
+Message-ID: <20261016190208.12345@app01.example.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Constructed example for CRT Essentials. All names use reserved example
+domains (RFC 2606) and all addresses are documentation ranges (RFC 5737).
+The DKIM signature value is truncated and will not verify.

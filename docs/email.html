@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Email security – CRT Essentials</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ad07d867281efa6fce993ad9394079d2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">CRT Essentials</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./passwords.html"> 
+<span class="menu-text">Passwords</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pki.html"> 
+<span class="menu-text">PKI</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./email.html" aria-current="page"> 
+<span class="menu-text">Email security</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./powershell.html"> 
+<span class="menu-text">PowerShell</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./dfir.html"> 
+<span class="menu-text">DFIR box</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./references.html"> 
+<span class="menu-text">References</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#how-email-works" id="toc-how-email-works" class="nav-link active" data-scroll-target="#how-email-works">How email works</a></li>
+  <li><a href="#the-envelope-versus-the-message" id="toc-the-envelope-versus-the-message" class="nav-link" data-scroll-target="#the-envelope-versus-the-message">The envelope versus the message</a></li>
+  <li><a href="#reading-email-headers" id="toc-reading-email-headers" class="nav-link" data-scroll-target="#reading-email-headers">Reading email headers</a>
+  <ul class="collapse">
+  <li><a href="#received-headers-and-the-path-a-message-took" id="toc-received-headers-and-the-path-a-message-took" class="nav-link" data-scroll-target="#received-headers-and-the-path-a-message-took"><code>Received</code> headers and the path a message took</a></li>
+  <li><a href="#authentication-results-and-which-system-added-them" id="toc-authentication-results-and-which-system-added-them" class="nav-link" data-scroll-target="#authentication-results-and-which-system-added-them"><code>Authentication-Results</code> and which system added them</a></li>
+  <li><a href="#which-headers-can-be-trusted" id="toc-which-headers-can-be-trusted" class="nav-link" data-scroll-target="#which-headers-can-be-trusted">Which headers can be trusted?</a></li>
+  <li><a href="#pulling-headers-apart-in-powershell" id="toc-pulling-headers-apart-in-powershell" class="nav-link" data-scroll-target="#pulling-headers-apart-in-powershell">Pulling headers apart in PowerShell</a></li>
+  </ul></li>
+  <li><a href="#spf" id="toc-spf" class="nav-link" data-scroll-target="#spf">SPF</a></li>
+  <li><a href="#dkim" id="toc-dkim" class="nav-link" data-scroll-target="#dkim">DKIM</a></li>
+  <li><a href="#dmarc" id="toc-dmarc" class="nav-link" data-scroll-target="#dmarc">DMARC</a>
+  <ul class="collapse">
+  <li><a href="#dmarc-tags-rfc-9989-4.7" id="toc-dmarc-tags-rfc-9989-4.7" class="nav-link" data-scroll-target="#dmarc-tags-rfc-9989-4.7">DMARC tags (RFC 9989 §4.7)</a></li>
+  <li><a href="#alignment-checker" id="toc-alignment-checker" class="nav-link" data-scroll-target="#alignment-checker">Alignment checker</a></li>
+  <li><a href="#work-through-email-headers" id="toc-work-through-email-headers" class="nav-link" data-scroll-target="#work-through-email-headers">Work through email headers</a></li>
+  </ul></li>
+  <li><a href="#dns-records-lookups-and-troubleshooting" id="toc-dns-records-lookups-and-troubleshooting" class="nav-link" data-scroll-target="#dns-records-lookups-and-troubleshooting">DNS records: lookups and troubleshooting</a></li>
+  <li><a href="#dmarc-reporting-and-the-2026-rfcs" id="toc-dmarc-reporting-and-the-2026-rfcs" class="nav-link" data-scroll-target="#dmarc-reporting-and-the-2026-rfcs">DMARC reporting and the 2026 RFCs</a>
+  <ul class="collapse">
+  <li><a href="#aggregate-reports-rfc-9990" id="toc-aggregate-reports-rfc-9990" class="nav-link" data-scroll-target="#aggregate-reports-rfc-9990">Aggregate reports (RFC 9990)</a></li>
+  <li><a href="#failure-reports-rfc-9991" id="toc-failure-reports-rfc-9991" class="nav-link" data-scroll-target="#failure-reports-rfc-9991">Failure reports (RFC 9991)</a></li>
+  <li><a href="#what-changed-from-rfc-7489" id="toc-what-changed-from-rfc-7489" class="nav-link" data-scroll-target="#what-changed-from-rfc-7489">What changed from RFC 7489</a></li>
+  </ul></li>
+  <li><a href="#other-email-security-mechanisms" id="toc-other-email-security-mechanisms" class="nav-link" data-scroll-target="#other-email-security-mechanisms">Other email security mechanisms</a>
+  <ul class="collapse">
+  <li><a href="#mta-sts-and-tls-reporting" id="toc-mta-sts-and-tls-reporting" class="nav-link" data-scroll-target="#mta-sts-and-tls-reporting">MTA-STS and TLS reporting</a></li>
+  <li><a href="#sender-id-historical" id="toc-sender-id-historical" class="nav-link" data-scroll-target="#sender-id-historical">Sender ID (historical)</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/dzampino/crt-essentials-2026/blob/main/email.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/dzampino/crt-essentials-2026/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Email security</h1>
+<p class="subtitle lead">Understand how email moves, which identities are being authenticated, and how to determine whether a message passes DMARC.</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="how-email-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-email-works">How email works</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="files/images/email-flow.png" class="img-fluid figure-img" alt="Mail flow: author's MUA submits to an MSA, which relays to a sending MTA, which uses SMTP to the receiving MX, which delivers through an MDA to the recipient's MUA. DNS supplies MX and policy records."></p>
+<figcaption>Each hop adds a Received header. One server can perform several roles.</figcaption>
+</figure>
+</div>
+<p>The roles come from <a href="https://www.rfc-editor.org/rfc/rfc5598.html">RFC 5598</a>, Internet Mail Architecture:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Role</th>
+<th>What it does</th>
+<th>Typical protocol and port</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>MUA</strong>, Mail User Agent</td>
+<td>The author’s or recipient’s client: Outlook, a phone, a web client</td>
+<td>Submission out, IMAP/POP/HTTPS in</td>
+</tr>
+<tr class="even">
+<td><strong>MSA</strong>, Mail Submission Agent</td>
+<td>Accepts mail from authenticated users</td>
+<td>SMTP submission, 587 (STARTTLS) or 465 (implicit TLS)</td>
+</tr>
+<tr class="odd">
+<td><strong>MTA</strong>, Mail Transfer Agent</td>
+<td>Relays between servers; the receiving one is the <strong>MX</strong></td>
+<td>SMTP, port 25</td>
+</tr>
+<tr class="even">
+<td><strong>MDA</strong>, Mail Delivery Agent</td>
+<td>Puts the message in the mailbox</td>
+<td>Local</td>
+</tr>
+</tbody>
+</table>
+<p>A sending MTA finds where to deliver by looking up the recipient domain’s <strong>MX</strong> records in DNS, then connects to port 25 on the lowest-preference host that answers. In Microsoft 365 or Google Workspace, one service performs every role; the distinctions still show up in the headers.</p>
+</section>
+<section id="the-envelope-versus-the-message" class="level2">
+<h2 class="anchored" data-anchor-id="the-envelope-versus-the-message">The envelope versus the message</h2>
+<p>SMTP (<a href="https://www.rfc-editor.org/rfc/rfc5321.html">RFC 5321</a>) carries a message (<a href="https://www.rfc-editor.org/rfc/rfc5322.html">RFC 5322</a>) the way an envelope carries a letter. They have separate addresses, and they do not have to agree.</p>
+<pre class="text"><code>S: 220 mx1.example.net ESMTP
+C: EHLO out-12.esp.example
+S: 250-mx1.example.net
+C: MAIL FROM:&lt;bounce-7731@mailer.esp.example&gt;      &lt;- envelope sender (RFC5321.MailFrom)
+S: 250 2.1.0 Ok
+C: RCPT TO:&lt;pat@example.net&gt;                         &lt;- envelope recipient
+S: 250 2.1.5 Ok
+C: DATA
+S: 354 End data with &lt;CR&gt;&lt;LF&gt;.&lt;CR&gt;&lt;LF&gt;
+C: From: "Example County IT" &lt;it-alerts@example.org&gt;   &lt;- message author (RFC5322.From)
+C: To: pat@example.net
+C: Subject: Scheduled maintenance this weekend
+C:
+C: ...
+C: .
+S: 250 2.0.0 Ok: queued</code></pre>
+<div class="output-note">
+<p>Constructed transcript with reserved example names. The two <code>From</code> addresses are different on purpose: this is how every email service provider and mailing list works.</p>
+</div>
+<ul>
+<li><code>MAIL FROM</code> and <code>RCPT TO</code> are SMTP commands, not message headers. <code>RCPT TO</code> is why Bcc works: the recipient is on the envelope, not in the message.</li>
+<li><strong><code>From</code></strong> is the author. It is what the user sees, and it is what DMARC protects.</li>
+<li><strong><code>Sender</code></strong> names who actually sent the message on the author’s behalf, when that differs (RFC 5322 §3.6.2). Few clients show it.</li>
+<li><strong><code>Return-Path</code></strong> is added by the final delivering server, recording the <code>MAIL FROM</code> address (RFC 5321 §4.4). Bounces go there.</li>
+<li><strong><code>Reply-To</code></strong> is where replies go. A mismatched <code>Reply-To</code> is common in business email compromise.</li>
+</ul>
+</section>
+<section id="reading-email-headers" class="level2">
+<h2 class="anchored" data-anchor-id="reading-email-headers">Reading email headers</h2>
+<p>Download the <a href="files/samples/email/constructed-headers.eml">constructed sample message</a> to follow along. It uses reserved names (RFC 2606) and documentation addresses (RFC 5737).</p>
+<pre class="text"><code>Return-Path: &lt;bounce-7731@mailer.esp.example&gt;
+Received: from mx1.example.net (mx1.example.net [198.51.100.25])
+    by mbox1.example.net (Postfix) with ESMTPS id 4F2A11C0042
+    for &lt;pat@example.net&gt;; Fri, 16 Oct 2026 14:02:11 -0500 (CDT)
+Authentication-Results: mx1.example.net;
+    spf=pass smtp.mailfrom=mailer.esp.example;
+    dkim=pass header.d=example.org header.s=esp2026 header.b=Qx3fK9aL;
+    dmarc=pass header.from=example.org
+Received: from out-12.esp.example (out-12.esp.example [203.0.113.40])
+    by mx1.example.net (Postfix) with ESMTPS id 9C77E2A0011
+    for &lt;pat@example.net&gt;; Fri, 16 Oct 2026 14:02:10 -0500 (CDT)
+Authentication-Results: out-12.esp.example; dkim=pass header.d=example.org; dmarc=pass
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=example.org;
+    s=esp2026; t=1792177329; h=from:to:subject:date:message-id;
+    bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+    b=Qx3fK9aL...
+Received: from app01.example.org (app01.example.org [192.0.2.17])
+    by out-12.esp.example (Postfix) with ESMTPSA id 0B1D4400A3
+    for &lt;pat@example.net&gt;; Fri, 16 Oct 2026 19:02:09 +0000 (UTC)
+From: "Example County IT" &lt;it-alerts@example.org&gt;
+Reply-To: helpdesk@example.org
+To: pat@example.net
+Subject: Scheduled maintenance this weekend
+Date: Fri, 16 Oct 2026 14:02:08 -0500
+Message-ID: &lt;20261016190208.12345@app01.example.org&gt;</code></pre>
+<section id="received-headers-and-the-path-a-message-took" class="level3">
+<h3 class="anchored" data-anchor-id="received-headers-and-the-path-a-message-took"><code>Received</code> headers and the path a message took</h3>
+<p>Each server prepends a <code>Received</code> header, so the newest is at the top. Read from the bottom up:</p>
+<ol type="1">
+<li><code>app01.example.org [192.0.2.17]</code> submitted to the provider <code>out-12.esp.example</code> with <strong>ESMTPSA</strong>: SMTP with TLS (S) and authentication (A).</li>
+<li><code>out-12.esp.example [203.0.113.40]</code> relayed to the recipient’s MX, <code>mx1.example.net</code>. <strong>This is the connection SPF evaluated</strong>: 203.0.113.40 is the IP the receiver saw.</li>
+<li><code>mx1.example.net</code> handed it to the mailbox server.</li>
+</ol>
+<p>Compare timestamps across hops (converting time zones) to find delays. The <code>from</code> name in a <code>Received</code> header is what the connecting host claimed in <code>EHLO</code>; the name and IP in parentheses are what the receiving server observed.</p>
+</section>
+<section id="authentication-results-and-which-system-added-them" class="level3">
+<h3 class="anchored" data-anchor-id="authentication-results-and-which-system-added-them"><code>Authentication-Results</code> and which system added them</h3>
+<p><a href="https://datatracker.ietf.org/doc/html/rfc8601">RFC 8601</a> defines <code>Authentication-Results</code>. The first token is the <strong>authserv-id</strong>: the system that did the checking. This message has two. Only <code>mx1.example.net</code> is the recipient’s own boundary; the one from <code>out-12.esp.example</code> was added by the sender’s provider and proves nothing to the recipient.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Result</th>
+<th>Identity checked</th>
+<th>Value here</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>spf=pass</code></td>
+<td><code>smtp.mailfrom</code>, the envelope domain</td>
+<td><code>mailer.esp.example</code></td>
+</tr>
+<tr class="even">
+<td><code>dkim=pass</code></td>
+<td><code>header.d</code>, the signing domain, with <code>header.s</code> the selector</td>
+<td><code>example.org</code>, selector <code>esp2026</code></td>
+</tr>
+<tr class="odd">
+<td><code>dmarc=pass</code></td>
+<td><code>header.from</code>, the author domain</td>
+<td><code>example.org</code></td>
+</tr>
+</tbody>
+</table>
+<p>SPF passed for the provider’s domain, which does not align with <code>example.org</code>. DMARC still passes, because DKIM passed <strong>and</strong> its <code>d=</code> matches the <code>From</code> domain.</p>
+</section>
+<section id="which-headers-can-be-trusted" class="level3">
+<h3 class="anchored" data-anchor-id="which-headers-can-be-trusted">Which headers can be trusted?</h3>
+<p>Only those added by systems you control: everything at and above your own boundary MX’s first <code>Received</code> header. Anything below it was written by the sender or by servers you do not operate, and can be forged, including <code>Received</code> and <code>Authentication-Results</code> headers. A well-behaved receiver removes <code>Authentication-Results</code> headers that claim its own authserv-id before adding its own.</p>
+<p>Forwarding and mailing lists break SPF (a new IP) and often DKIM (a modified subject or footer). ARC (<a href="https://www.rfc-editor.org/rfc/rfc8617.html">RFC 8617</a>, Experimental) lets intermediaries record the results they saw; receivers decide whether to trust a given intermediary.</p>
+</section>
+<section id="pulling-headers-apart-in-powershell" class="level3">
+<h3 class="anchored" data-anchor-id="pulling-headers-apart-in-powershell">Pulling headers apart in PowerShell</h3>
+<p>Header lines are folded: a line beginning with a space or tab continues the previous header. Unfold first, then parse:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> Get-MailHeader <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>CmdletBinding<span class="op">()]</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span><span class="op">(</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Path</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Raw</span> <span class="op">=</span> <span class="fu">Get-Content</span> <span class="op">-</span>LiteralPath <span class="va">$Path</span> <span class="op">-</span>Raw</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">$HeaderBlock</span> <span class="op">=</span> <span class="op">(</span><span class="va">$Raw</span> <span class="op">-split</span> <span class="st">"\r?\n\r?\n"</span><span class="op">,</span> <span class="dv">2</span><span class="op">)[</span><span class="dv">0</span><span class="op">]</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Unfolded</span> <span class="op">=</span> <span class="va">$HeaderBlock</span> <span class="op">-replace</span> <span class="st">'\r?\n[ \t]+'</span><span class="op">,</span> <span class="st">' '</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Order</span> <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Unfolded</span> <span class="op">-split</span> <span class="st">'\r?\n'</span> <span class="op">|</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>            <span class="va">$Name</span><span class="op">,</span> <span class="va">$Value</span> <span class="op">=</span> <span class="va">$_</span> <span class="op">-split</span> <span class="st">':\s*'</span><span class="op">,</span> <span class="dv">2</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            <span class="op">[</span>pscustomobject<span class="op">]</span>@<span class="op">{</span> Order <span class="op">=</span> <span class="va">$Order</span><span class="op">++;</span> Name <span class="op">=</span> <span class="va">$Name</span><span class="op">;</span> Value <span class="op">=</span> <span class="va">$Value</span> <span class="op">}</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Path, oldest hop first</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>Get-MailHeader <span class="op">-</span>Path <span class="op">.</span>\constructed-headers<span class="op">.</span><span class="fu">eml</span> <span class="op">|</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> Name <span class="op">-eq</span> <span class="st">'Received'</span> <span class="op">|</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Order <span class="op">-</span>Descending <span class="op">|</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Format-Table</span> Order<span class="op">,</span> Value <span class="op">-</span>Wrap</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>Get-MailHeader <span class="op">-</span>Path <span class="op">.</span>\constructed-headers<span class="op">.</span><span class="fu">eml</span> <span class="op">|</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> Name <span class="op">-</span>in <span class="st">'Return-Path'</span><span class="op">,</span> <span class="st">'From'</span><span class="op">,</span> <span class="st">'Reply-To'</span><span class="op">,</span> <span class="st">'Authentication-Results'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="spf" class="level2">
+<h2 class="anchored" data-anchor-id="spf">SPF</h2>
+<p><strong>What SPF checks:</strong> is the connecting IP allowed to send mail for the <strong>envelope</strong> domain? <a href="https://www.rfc-editor.org/rfc/rfc7208.html">RFC 7208</a> evaluates the <code>MAIL FROM</code> domain, or the <code>HELO</code>/<code>EHLO</code> name when <code>MAIL FROM</code> is empty (bounces). It never looks at the <code>From</code> header.</p>
+<pre class="text"><code>example.org.  TXT  "v=spf1 ip4:192.0.2.0/24 include:_spf.esp.example -all"</code></pre>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Mechanism</th>
+<th>Matches when the IP…</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ip4:</code>, <code>ip6:</code></td>
+<td>is in the address or range</td>
+</tr>
+<tr class="even">
+<td><code>a</code>, <code>mx</code></td>
+<td>is an A/AAAA address of the domain, or of its MX hosts</td>
+</tr>
+<tr class="odd">
+<td><code>include:</code></td>
+<td>passes the SPF policy of another domain</td>
+</tr>
+<tr class="even">
+<td><code>exists:</code></td>
+<td>makes a constructed name resolve (advanced)</td>
+</tr>
+<tr class="odd">
+<td><code>all</code></td>
+<td>always; used last</td>
+</tr>
+<tr class="even">
+<td><code>ptr</code></td>
+<td>reverse DNS matches; “SHOULD NOT” be used</td>
+</tr>
+</tbody>
+</table>
+<p>Each mechanism takes a qualifier: <code>+</code> pass (default), <code>-</code> fail, <code>~</code> softfail, <code>?</code> neutral. Results are <code>pass</code>, <code>fail</code>, <code>softfail</code>, <code>neutral</code>, <code>none</code>, <code>temperror</code> and <code>permerror</code>.</p>
+<p><strong>Limits that cause real outages:</strong> at most <strong>10</strong> mechanisms and modifiers that need DNS lookups (<code>include</code>, <code>a</code>, <code>mx</code>, <code>ptr</code>, <code>exists</code>, <code>redirect</code>) per evaluation, counting nested includes, and at most 2 lookups that return nothing (RFC 7208 §4.6.4). Exceeding them is a <code>permerror</code>, which DMARC treats as not passing. Only one SPF record per name is allowed; two is also a <code>permerror</code>.</p>
+<p><strong>SPF pass does not necessarily mean DMARC pass.</strong> It passes for the envelope domain. If that is a provider’s bounce domain, SPF is not aligned with the <code>From</code> domain.</p>
+</section>
+<section id="dkim" class="level2">
+<h2 class="anchored" data-anchor-id="dkim">DKIM</h2>
+<p><strong>What DKIM signs and verifies:</strong> a signature over chosen header fields and the body, made with the signing domain’s private key. The receiver fetches the public key from DNS and verifies. <a href="https://www.rfc-editor.org/rfc/rfc6376.html">RFC 6376</a>.</p>
+<pre class="text"><code>DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=example.org;
+    s=esp2026; t=1792177329; h=from:to:subject:date:message-id;
+    bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=; b=Qx3fK9aL...
+
+esp2026._domainkey.example.org.  TXT  "v=DKIM1; k=rsa; p=MIIBIjANBgkqh..."</code></pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Tag</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>d=</code></td>
+<td>Signing domain: the identity DKIM authenticates, and what DMARC compares</td>
+</tr>
+<tr class="even">
+<td><code>s=</code></td>
+<td>Selector: the key is at <code>&lt;s&gt;._domainkey.&lt;d&gt;</code></td>
+</tr>
+<tr class="odd">
+<td><code>a=</code></td>
+<td>Algorithm, <code>rsa-sha256</code> or <code>ed25519-sha256</code></td>
+</tr>
+<tr class="even">
+<td><code>h=</code></td>
+<td>Header fields covered; <code>from</code> is required</td>
+</tr>
+<tr class="odd">
+<td><code>bh=</code></td>
+<td>Hash of the canonicalized body</td>
+</tr>
+<tr class="even">
+<td><code>b=</code></td>
+<td>The signature</td>
+</tr>
+<tr class="odd">
+<td><code>c=</code></td>
+<td>Canonicalization for header/body, <code>simple</code> or <code>relaxed</code>: how tolerant it is of whitespace changes</td>
+</tr>
+<tr class="even">
+<td><code>t=</code>, <code>x=</code></td>
+<td>Signature time and optional expiry</td>
+</tr>
+<tr class="odd">
+<td><code>l=</code></td>
+<td>Body length signed; anything after it is unsigned, so avoid it</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>d=</code> domain does not have to match the <code>From</code> domain; DKIM only says “this domain took responsibility for this message.” DMARC is what requires a match. An empty <code>p=</code> in the key record means the key was revoked.</p>
+</section>
+<section id="dmarc" class="level2">
+<h2 class="anchored" data-anchor-id="dmarc">DMARC</h2>
+<p>DMARC (<a href="https://www.rfc-editor.org/rfc/rfc9989.html">RFC 9989</a>, May 2026) ties SPF and DKIM to the domain the user sees.</p>
+<ol type="1">
+<li><strong>Start with the domain in the message <code>From</code> header.</strong> Look up <code>_dmarc.&lt;that domain&gt;</code>, walking up toward the organizational domain if there is no record.</li>
+<li><strong>A message passes DMARC if SPF or DKIM passes <em>and</em> is aligned</strong> with that domain. One is enough.</li>
+<li><strong>Alignment.</strong> <em>Strict</em> (<code>s</code>): the domains are identical. <em>Relaxed</em> (<code>r</code>, the default): they share an organizational domain, so <code>mail.example.org</code> aligns with <code>example.org</code>.</li>
+<li><strong>Policy and reporting.</strong> If DMARC fails, the domain owner’s policy asks receivers to do nothing (<code>none</code>), treat it as suspicious (<code>quarantine</code>) or <code>reject</code> it, and where to send reports.</li>
+</ol>
+<pre class="text"><code>_dmarc.example.org.  TXT  "v=DMARC1; p=quarantine; rua=mailto:dmarc-reports@example.org"</code></pre>
+<section id="dmarc-tags-rfc-9989-4.7" class="level3">
+<h3 class="anchored" data-anchor-id="dmarc-tags-rfc-9989-4.7">DMARC tags (RFC 9989 §4.7)</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Tag</th>
+<th>Meaning</th>
+<th>Values</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>v</code></td>
+<td>Version; must be first</td>
+<td><code>DMARC1</code></td>
+<td>required</td>
+</tr>
+<tr class="even">
+<td><code>p</code></td>
+<td>Policy for the domain</td>
+<td><code>none</code>, <code>quarantine</code>, <code>reject</code></td>
+<td><code>none</code> if absent</td>
+</tr>
+<tr class="odd">
+<td><code>sp</code></td>
+<td>Policy for existing subdomains</td>
+<td>as <code>p</code></td>
+<td><code>p</code></td>
+</tr>
+<tr class="even">
+<td><code>np</code></td>
+<td>Policy for <strong>non-existent</strong> subdomains</td>
+<td>as <code>p</code></td>
+<td><code>sp</code>, then <code>p</code></td>
+</tr>
+<tr class="odd">
+<td><code>adkim</code></td>
+<td>DKIM alignment</td>
+<td><code>r</code>, <code>s</code></td>
+<td><code>r</code></td>
+</tr>
+<tr class="even">
+<td><code>aspf</code></td>
+<td>SPF alignment</td>
+<td><code>r</code>, <code>s</code></td>
+<td><code>r</code></td>
+</tr>
+<tr class="odd">
+<td><code>t</code></td>
+<td>Test mode: asks receivers not to apply the policy</td>
+<td><code>y</code>, <code>n</code></td>
+<td><code>n</code></td>
+</tr>
+<tr class="even">
+<td><code>rua</code></td>
+<td>Aggregate report destinations</td>
+<td>URIs</td>
+<td>none</td>
+</tr>
+<tr class="odd">
+<td><code>ruf</code></td>
+<td>Failure report destinations</td>
+<td>URIs</td>
+<td>none</td>
+</tr>
+<tr class="even">
+<td><code>fo</code></td>
+<td>Which failures generate failure reports</td>
+<td><code>0</code>, <code>1</code>, <code>d</code>, <code>s</code></td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>psd</code></td>
+<td>Whether this is a public suffix domain</td>
+<td><code>y</code>, <code>n</code>, <code>u</code></td>
+<td><code>u</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="alignment-checker" class="level3">
+<h3 class="anchored" data-anchor-id="alignment-checker">Alignment checker</h3>
+<p>Enter the identities from a message, or load one of the worked examples. The organizational domain is filled in as the last two labels of the <code>From</code> domain; that is an approximation. Real receivers find it with the DNS tree walk in RFC 9989 §4.10, so correct it for names like <code>example.k12.wi.us</code>.</p>
+<div class="tool" id="dmarc-tool">
+<div class="tool-controls">
+<label>Load example
+<select id="dm-preset">
+<option value="">—</option>
+<option value="1">learndmarc example 1</option>
+<option value="2">learndmarc example 2</option>
+<option value="3">learndmarc example 3</option>
+<option value="4">Constructed sample message</option>
+</select></label>
+</div>
+<div class="tool-controls">
+<label>From header domain (RFC5322.From)<input id="dm-from" value="blue.secondary.com"></label>
+<label>Organizational domain of From<input id="dm-org" value="secondary.com"></label>
+<label>MAIL FROM domain (RFC5321.MailFrom)<input id="dm-mailfrom" value="red.secondary.com"></label>
+<label>SPF result
+<select id="dm-spf"><option>pass</option><option selected="">fail</option><option>softfail</option><option>neutral</option><option>none</option><option>temperror</option><option>permerror</option></select></label>
+</div>
+<div class="tool-controls">
+<label>DKIM d= domain<input id="dm-dkimd" value="primary.com"></label>
+<label>DKIM result
+<select id="dm-dkim"><option selected="">pass</option><option>fail</option><option>none</option></select></label>
+<label>aspf<select id="dm-aspf"><option value="r" selected="">r (relaxed)</option><option value="s">s (strict)</option></select></label>
+<label>adkim<select id="dm-adkim"><option value="r" selected="">r (relaxed)</option><option value="s">s (strict)</option></select></label>
+<label>p<select id="dm-p"><option>none</option><option selected="">quarantine</option><option>reject</option></select></label>
+<label>t<select id="dm-t"><option value="n">n</option><option value="y" selected="">y (test mode)</option></select></label>
+</div>
+<div id="dm-verdict" class="verdict"></div>
+<ul id="dm-reasons" class="tool-note" style="font-size:0.92rem;color:#1A1D23"></ul>
+</div>
+</section>
+<section id="work-through-email-headers" class="level3">
+<h3 class="anchored" data-anchor-id="work-through-email-headers">Work through email headers</h3>
+<p>These three exercises are from <a href="https://www.learndmarc.com/">learndmarc.com</a>, which builds and sends a test message and shows each step. Transcripts are reproduced as text. For each one, identify the sender identities, the SPF and DKIM results, and whether the message passes DMARC, and why.</p>
+<section id="example-1" class="level4">
+<h4 class="anchored" data-anchor-id="example-1">Example 1</h4>
+<pre class="text"><code>. 220 smtp.learndmarc.com ESMTP Postfix
+&gt; HELO red.secondary.com
+. 250 smtp.learndmarc.com Hello red.secondary.com &lt;153.112.107.49&gt;
+&gt; MAIL FROM: &lt;gina@red.secondary.com&gt;
+. 250 Ok
+&gt; RCPT TO: &lt;someone@yahoo.com&gt;
+&gt; DATA
+&gt; From: "Gina" &lt;gina@blue.secondary.com&gt;
+&gt; DKIM-Signature: v=1; a=rsa-sha256; d=primary.com; s=selector; (DKIM Auth Result: PASS)
+&gt; Subject: Who reads the subject anyway?
+
+Policies:
+DMARC policy _dmarc.blue.secondary.com: "v=DMARC1; p=quarantine; t=y;"
+SPF policy red.secondary.com: "v=spf1 ip4:182.107.92.190 -all"
+SPF policy blue.secondary.com: "v=spf1 ip4:24.121.50.128 ~all"</code></pre>
+<details>
+<summary>
+Answer
+</summary>
+<p><strong>DMARC fails, the message will NOT be treated as suspicious.</strong></p>
+<ul>
+<li>Domain part <code>red.secondary.com</code> from the RFC5321.MailFrom address (MAIL FROM:) is used to retrieve the SPF policy.</li>
+<li>Domain part <code>blue.secondary.com</code> from the RFC5322.From address (From:) is used to check DMARC alignment.</li>
+<li>The message is signed with a DKIM signature and passed validation.</li>
+<li>SPF failed because source IP address 153.112.107.49 is NOT allowed to send on behalf of <code>red.secondary.com</code>.</li>
+<li>Having <code>t=y</code> in a DMARC policy signals that the Domain Owner is in test mode and requests that mail receivers not apply the stated handling policies (p, sp, or np) to messages that fail validation checks.</li>
+<li>The DMARC alignment policy is ‘relaxed’. This is because the ‘aspf’ and ‘adkim’ elements were not specified or had an ‘r’ value. This means that only the organizational domains have to be in alignment.</li>
+<li>DKIM passed validation but there is NO alignment (<code>primary.com</code> != <code>secondary.com</code>).</li>
+<li>DMARC failed because neither SPF or DKIM passed validation and have alignment.</li>
+</ul>
+<em>Note:</em> had SPF passed, <code>red.secondary.com</code> would have aligned with <code>blue.secondary.com</code> under relaxed alignment: both have the organizational domain <code>secondary.com</code>.
+</details>
+</section>
+<section id="example-2" class="level4">
+<h4 class="anchored" data-anchor-id="example-2">Example 2</h4>
+<pre class="text"><code>. 220 smtp.learndmarc.com ESMTP Postfix
+&gt; HELO red.primary.com
+. 250 smtp.learndmarc.com Hello red.primary.com &lt;97.196.174.88&gt;
+&gt; MAIL FROM: &lt;terry@red.primary.com&gt;
+. 250 Ok
+&gt; RCPT TO: &lt;someone@hotmail.com&gt;
+&gt; DATA
+&gt; From: "Terry" &lt;terry@blue.primary.com&gt;
+&gt; DKIM-Signature: v=1; a=rsa-sha256; d=secondary.com; s=selector; (DKIM Auth Result: FAIL)
+&gt; Subject: I'll let myself out
+
+Policies:
+DMARC policy _dmarc.blue.primary.com: "v=DMARC1; p=quarantine; adkim=s; aspf=s;"
+SPF policy red.primary.com: "v=spf1 ip4:95.129.128.101 ~all"
+SPF policy blue.primary.com: "v=spf1 ip4:44.62.173.139 ~all"</code></pre>
+<details>
+<summary>
+Answer
+</summary>
+<p><strong>DMARC fails, the message will be quarantined.</strong></p>
+<ul>
+<li>Domain part <code>red.primary.com</code> from the RFC5321.MailFrom address (MAIL FROM:) is used to retrieve the SPF policy.</li>
+<li>Domain part <code>blue.primary.com</code> from the RFC5322.From address (From:) is used to check DMARC alignment.</li>
+<li>The message is signed with a DKIM signature but failed validation (auth result ‘fail’), the message has been altered.</li>
+<li>SPF failed because source IP address 97.196.174.88 is NOT allowed to send on behalf of <code>red.primary.com</code>.</li>
+<li>The DMARC alignment policy is ‘strict’. The ‘aspf’ and ‘adkim’ elements have an ‘s’ value. This means that both domain and subdomain need to be an exact match.</li>
+<li>DMARC failed because neither SPF or DKIM passed validation and have alignment.</li>
+<li>DMARC failed and the policy is set to ‘quarantine’ so the requested action is to quarantine the message.</li>
+</ul>
+<em>Note:</em> the SPF record ends in <code>~all</code>, so learndmarc’s “failed” is strictly an SPF <strong>softfail</strong>. For DMARC the distinction does not matter: only <code>pass</code> counts.
+</details>
+</section>
+<section id="example-3" class="level4">
+<h4 class="anchored" data-anchor-id="example-3">Example 3</h4>
+<pre class="text"><code>. 220 smtp.learndmarc.com ESMTP Postfix
+&gt; HELO blue.secondary.com
+. 250 smtp.learndmarc.com Hello blue.secondary.com &lt;156.157.23.197&gt;
+&gt; MAIL FROM: &lt;ray@blue.secondary.com&gt;
+. 250 Ok
+&gt; RCPT TO: &lt;someone@gmail.com&gt;
+&gt; DATA
+&gt; From: "Ray" &lt;ray@red.primary.com&gt;
+&gt; DKIM-Signature: v=1; a=rsa-sha256; d=blue.primary.com; s=selector; (DKIM Auth Result: PASS)
+&gt; Subject: DMARC test
+
+Policies:
+DMARC policy _dmarc.red.primary.com: "v=DMARC1; p=none; adkim=s; aspf=s;"
+SPF policy blue.secondary.com: "v=spf1 ip4:62.165.120.61 ~all"
+SPF policy red.primary.com: "v=spf1 ip4:156.157.23.197 -all"</code></pre>
+<details>
+<summary>
+Answer
+</summary>
+<p><strong>DMARC fails, the message will NOT be treated as suspicious.</strong></p>
+<ul>
+<li>Domain part <code>blue.secondary.com</code> from the RFC5321.MailFrom address (MAIL FROM:) is used to retrieve the SPF policy.</li>
+<li>Domain part <code>red.primary.com</code> from the RFC5322.From address (From:) is used to check DMARC alignment.</li>
+<li>The message is signed with a DKIM signature and passed validation.</li>
+<li>SPF failed because source IP address 156.157.23.197 is NOT allowed to send on behalf of <code>blue.secondary.com</code>.</li>
+<li>The DMARC alignment policy is ‘strict’. The ‘aspf’ and ‘adkim’ elements have an ‘s’ value. This means that both domain and subdomain need to be an exact match.</li>
+<li>DKIM passed validation but there is NO alignment (<code>blue.primary.com</code> != <code>red.primary.com</code>).</li>
+<li>DMARC failed because neither SPF or DKIM passed validation and have alignment.</li>
+<li>DMARC failed but the policy is set to ‘none’ so no action will be taken.</li>
+</ul>
+<em>Notes:</em> the sending IP <strong>is</strong> listed in <code>red.primary.com</code>’s SPF record, which is a trap: SPF is evaluated for the <code>MAIL FROM</code> domain, not the <code>From</code> domain. And under relaxed alignment, the DKIM signature from <code>blue.primary.com</code> would have aligned with <code>red.primary.com</code>.
+</details>
+<p>The answers above are learndmarc’s explanations; the notes are additions for this guide.</p>
+</section>
+</section>
+</section>
+<section id="dns-records-lookups-and-troubleshooting" class="level2">
+<h2 class="anchored" data-anchor-id="dns-records-lookups-and-troubleshooting">DNS records: lookups and troubleshooting</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name example<span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type MX</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name example<span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT <span class="op">|</span> <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Strings</span> <span class="op">-match</span> <span class="st">'^v=spf1'</span> <span class="op">}</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name esp2026<span class="op">.</span><span class="fu">_domainkey</span><span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name _dmarc<span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name _mta-sts<span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name _smtp<span class="op">.</span><span class="fu">_tls</span><span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dig</span> +short MX example.org</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dig</span> +short TXT _dmarc.example.org</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">nslookup</span> <span class="at">-type</span><span class="op">=</span>txt _dmarc.example.org</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Common problems:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symptom</th>
+<th>Likely cause</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>SPF <code>permerror</code></td>
+<td>Two SPF records, a syntax error, or more than 10 DNS-lookup mechanisms after nested includes</td>
+</tr>
+<tr class="even">
+<td>SPF passes, DMARC fails</td>
+<td>The envelope domain is the provider’s, so SPF is not aligned; set up DKIM with your domain as <code>d=</code>, or a custom return-path domain</td>
+</tr>
+<tr class="odd">
+<td>DKIM <code>fail</code> for one sender only</td>
+<td>Wrong selector published, key rotated without DNS update, or a gateway that modifies messages after signing</td>
+</tr>
+<tr class="even">
+<td>DKIM passes, DMARC fails</td>
+<td>The provider signs with its own domain; configure signing with your domain</td>
+</tr>
+<tr class="odd">
+<td>Legitimate mail quarantined after moving to <code>p=quarantine</code></td>
+<td>A sender that was never inventoried; the aggregate reports would have shown it</td>
+</tr>
+<tr class="even">
+<td>Forwarded mail fails</td>
+<td>Forwarding breaks SPF; DKIM survives only if the forwarder does not modify the message</td>
+</tr>
+</tbody>
+</table>
+<p>Look up the DKIM selector from a real message’s <code>DKIM-Signature</code> (<code>s=</code>), not by guessing.</p>
+</section>
+<section id="dmarc-reporting-and-the-2026-rfcs" class="level2">
+<h2 class="anchored" data-anchor-id="dmarc-reporting-and-the-2026-rfcs">DMARC reporting and the 2026 RFCs</h2>
+<section id="aggregate-reports-rfc-9990" class="level3">
+<h3 class="anchored" data-anchor-id="aggregate-reports-rfc-9990">Aggregate reports (RFC 9990)</h3>
+<p>Receivers send daily-ish XML summaries to the <code>rua</code> address: for each sending IP, how many messages, the SPF and DKIM results, whether each aligned, and the disposition applied. <a href="https://www.rfc-editor.org/rfc/rfc9990.html">RFC 9990</a> defines the format. Reports are usually gzip-compressed attachments. This is how you find every service sending as your domain before you move from <code>p=none</code> to enforcement.</p>
+<p><strong>Sending reports to another domain</strong> (a vendor or a CRT-run mailbox) requires the destination to agree. For <code>_dmarc.example.org</code> with <code>rua=mailto:reports@dmarc.vendor.example</code>, receivers check for:</p>
+<pre class="text"><code>example.org._report._dmarc.dmarc.vendor.example.  TXT  "v=DMARC1"</code></pre>
+<p>Without it they ignore that <code>rua</code> URI. This stops a domain from flooding a victim with reports.</p>
+</section>
+<section id="failure-reports-rfc-9991" class="level3">
+<h3 class="anchored" data-anchor-id="failure-reports-rfc-9991">Failure reports (RFC 9991)</h3>
+<p>Per-message reports to the <code>ruf</code> address, controlled by <code>fo</code>. <a href="https://www.rfc-editor.org/rfc/rfc9991.html">RFC 9991</a> warns they can contain full headers and content, including personal information; many large receivers do not send them. Aggregate reports are the recommended default.</p>
+</section>
+<section id="what-changed-from-rfc-7489" class="level3">
+<h3 class="anchored" data-anchor-id="what-changed-from-rfc-7489">What changed from RFC 7489</h3>
+<p>RFC 9989 obsoletes RFC 7489 and RFC 9091 and moves DMARC to the Standards Track (Appendix C):</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Change</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pct</code> removed</td>
+<td>Partial enforcement by percentage is gone; <code>t=y</code> replaces part of its function</td>
+</tr>
+<tr class="even">
+<td><code>t</code> added</td>
+<td>Test mode: request that receivers not apply the policy</td>
+</tr>
+<tr class="odd">
+<td><code>np</code> added</td>
+<td>Policy for non-existent subdomains (from RFC 9091)</td>
+</tr>
+<tr class="even">
+<td><code>psd</code> added</td>
+<td>Flags public suffix domains</td>
+</tr>
+<tr class="odd">
+<td><code>rf</code>, <code>ri</code> removed</td>
+<td>Report format and interval tags</td>
+</tr>
+<tr class="even">
+<td>Organizational domain</td>
+<td>Found by a <strong>DNS tree walk</strong> of <code>_dmarc</code> records (at most 8 queries) instead of the Public Suffix List</td>
+</tr>
+<tr class="odd">
+<td>Reporting split out</td>
+<td>Aggregate reporting is RFC 9990, failure reporting RFC 9991</td>
+</tr>
+<tr class="even">
+<td>Terminology</td>
+<td>“Domain Owner Assessment Policy,” “Enforcement,” “Monitoring Mode”; “Report Receiver” became “Report Consumer”</td>
+</tr>
+</tbody>
+</table>
+<p>Existing <code>v=DMARC1</code> records keep working; unknown tags are ignored, so a leftover <code>pct=</code> does no harm but no longer does anything for receivers that follow RFC 9989.</p>
+</section>
+</section>
+<section id="other-email-security-mechanisms" class="level2">
+<h2 class="anchored" data-anchor-id="other-email-security-mechanisms">Other email security mechanisms</h2>
+<section id="mta-sts-and-tls-reporting" class="level3">
+<h3 class="anchored" data-anchor-id="mta-sts-and-tls-reporting">MTA-STS and TLS reporting</h3>
+<p>SMTP between servers uses opportunistic STARTTLS: an attacker on the path can strip it, and senders do not validate certificates by default. <strong>MTA-STS</strong> (<a href="https://www.rfc-editor.org/rfc/rfc8461.html">RFC 8461</a>) lets a domain publish that its MX hosts support TLS with valid certificates, and that senders should refuse to deliver otherwise.</p>
+<pre class="text"><code>_mta-sts.example.org.  TXT  "v=STSv1; id=20261016T000000;"</code></pre>
+<p>The policy is served over HTTPS at <code>https://mta-sts.example.org/.well-known/mta-sts.txt</code>:</p>
+<pre class="text"><code>version: STSv1
+mode: enforce
+mx: mail.example.org
+max_age: 604800</code></pre>
+<p>Start with <code>mode: testing</code>, and change <code>id</code> whenever the policy changes so senders refetch it.</p>
+<p><strong>TLS-RPT</strong> (<a href="https://www.rfc-editor.org/rfc/rfc8460.html">RFC 8460</a>) asks senders to report TLS negotiation failures, which is how you find out MTA-STS (or an expired MX certificate) is blocking mail:</p>
+<pre class="text"><code>_smtp._tls.example.org.  TXT  "v=TLSRPTv1; rua=mailto:tlsrpt@example.org"</code></pre>
+</section>
+<section id="sender-id-historical" class="level3">
+<h3 class="anchored" data-anchor-id="sender-id-historical">Sender ID (historical)</h3>
+<p>Microsoft’s Sender ID (RFC 4406) checked a “purported responsible address” taken from the message headers rather than the envelope, and reused <code>v=spf2.0</code> records. The IETF experiment was concluded in <a href="https://www.rfc-editor.org/rfc/rfc6686.html">RFC 6686</a> (2012), which found SPF in wide use and Sender ID not. If you find <code>spf2.0/pra</code> records, they are leftovers.</p>
+</section>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc5598.html">RFC 5598</a></td>
+<td>Internet Mail Architecture</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.rfc-editor.org/rfc/rfc5321.html">RFC 5321</a></td>
+<td>Simple Mail Transfer Protocol</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc5322.html">RFC 5322</a></td>
+<td>Internet Message Format</td>
+</tr>
+<tr class="even">
+<td><a href="https://datatracker.ietf.org/doc/html/rfc8601">RFC 8601</a></td>
+<td>Authentication-Results header field</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc7208.html">RFC 7208</a></td>
+<td>SPF</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.rfc-editor.org/rfc/rfc6376.html">RFC 6376</a></td>
+<td>DKIM</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc9989.html">RFC 9989</a></td>
+<td>DMARC</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.rfc-editor.org/rfc/rfc9990.html">RFC 9990</a></td>
+<td>DMARC aggregate reporting</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc9991.html">RFC 9991</a></td>
+<td>DMARC failure reporting</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.rfc-editor.org/rfc/rfc8617.html">RFC 8617</a></td>
+<td>ARC</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc8461.html">RFC 8461</a></td>
+<td>MTA-STS</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.rfc-editor.org/rfc/rfc8460.html">RFC 8460</a></td>
+<td>SMTP TLS reporting</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc6686.html">RFC 6686</a></td>
+<td>Resolution of the SPF and Sender ID experiments</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.learndmarc.com/">learndmarc.com</a></td>
+<td>Source of the three worked examples</td>
+</tr>
+</tbody>
+</table>
+<script src="js/dmarc.js"></script>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/dzampino\.github\.io\/crt-essentials-2026\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>CRT Annual Training Conference 2026</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/dzampino/crt-essentials-2026/blob/main/email.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/dzampino/crt-essentials-2026/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Wisconsin Cyber Response Team</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

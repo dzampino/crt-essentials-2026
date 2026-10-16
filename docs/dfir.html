@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Building a Windows DFIR box – CRT Essentials</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ad07d867281efa6fce993ad9394079d2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">CRT Essentials</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./passwords.html"> 
+<span class="menu-text">Passwords</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./pki.html"> 
+<span class="menu-text">PKI</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./email.html"> 
+<span class="menu-text">Email security</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./powershell.html"> 
+<span class="menu-text">PowerShell</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./dfir.html" aria-current="page"> 
+<span class="menu-text">DFIR box</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./references.html"> 
+<span class="menu-text">References</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#what-were-building" id="toc-what-were-building" class="nav-link active" data-scroll-target="#what-were-building">What we’re building</a></li>
+  <li><a href="#disposablenonpersistent-virtual-machine" id="toc-disposablenonpersistent-virtual-machine" class="nav-link" data-scroll-target="#disposablenonpersistent-virtual-machine">Disposable/nonpersistent virtual machine</a></li>
+  <li><a href="#build-automation" id="toc-build-automation" class="nav-link" data-scroll-target="#build-automation">Automating the build</a></li>
+  <li><a href="#configuring-windows-for-analysis" id="toc-configuring-windows-for-analysis" class="nav-link" data-scroll-target="#configuring-windows-for-analysis">Configuring Windows for analysis</a>
+  <ul class="collapse">
+  <li><a href="#uac" id="toc-uac" class="nav-link" data-scroll-target="#uac">UAC</a></li>
+  <li><a href="#other-settings-to-decide" id="toc-other-settings-to-decide" class="nav-link" data-scroll-target="#other-settings-to-decide">Other settings to decide</a></li>
+  </ul></li>
+  <li><a href="#tools-for-analysis" id="toc-tools-for-analysis" class="nav-link" data-scroll-target="#tools-for-analysis">Tools for analysis</a>
+  <ul class="collapse">
+  <li><a href="#processing-an-existing-artifact-set-with-kape-modules" id="toc-processing-an-existing-artifact-set-with-kape-modules" class="nav-link" data-scroll-target="#processing-an-existing-artifact-set-with-kape-modules">Processing an existing artifact set with KAPE modules</a></li>
+  </ul></li>
+  <li><a href="#using-and-resetting-the-box" id="toc-using-and-resetting-the-box" class="nav-link" data-scroll-target="#using-and-resetting-the-box">Using and resetting the box</a></li>
+  <li><a href="#open-decisions" id="toc-open-decisions" class="nav-link" data-scroll-target="#open-decisions">Open decisions</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/dzampino/crt-essentials-2026/blob/main/dfir.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/dzampino/crt-essentials-2026/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Building a Windows DFIR box</h1>
+<p class="subtitle lead">Build a repeatable Windows workstation for analyzing evidence that has already been collected.</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Status
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Several implementation choices are still open: Windows version, hypervisor, networking, UAC and Defender configuration, reset method, persistent case storage, and the tool list. They are listed at the <a href="#open-decisions">end of this page</a>. Where this page shows a specific tool or setting, it is an example of the approach, not a selection.</p>
+</div>
+</div>
+<section id="what-were-building" class="level2">
+<h2 class="anchored" data-anchor-id="what-were-building">What we’re building</h2>
+<ul>
+<li>A Windows analysis machine, not an evidence acquisition machine.</li>
+<li>Evidence is already collected; memory acquisition is handled separately (Magnet in our workflow).</li>
+</ul>
+<p>The box takes collected artifacts (triage collections, event logs, registry hives, disk images) and produces analysis output: parsed CSVs, timelines, notes. It never touches the client’s systems.</p>
+</section>
+<section id="disposablenonpersistent-virtual-machine" class="level2">
+<h2 class="anchored" data-anchor-id="disposablenonpersistent-virtual-machine">Disposable/nonpersistent virtual machine</h2>
+<ul>
+<li>Return the machine to a known state.</li>
+<li>Keep case data and analysis output separate from what gets reset.</li>
+</ul>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Lives where</th>
+<th>On reset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Windows, settings, installed tools</td>
+<td>The VM’s system disk</td>
+<td>Returned to the clean snapshot</td>
+</tr>
+<tr class="even">
+<td>Temporary files, caches, tool state</td>
+<td>The VM’s system disk</td>
+<td>Discarded</td>
+</tr>
+<tr class="odd">
+<td>Evidence (read-only working copy)</td>
+<td>Persistent case storage</td>
+<td>Kept</td>
+</tr>
+<tr class="even">
+<td>Analysis output, tool logs, notes</td>
+<td>Persistent case storage</td>
+<td>Kept</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why disposable.</strong> Analysis tools open hostile files. Each case starts from the same known-good image, nothing carries over from the previous client, and “what version of the tool did we use” has one answer.</p>
+<p><strong>How the reset can work</strong> (the method is an open decision):</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Option</th>
+<th>How it resets</th>
+<th>Keeping case data out of the reset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hyper-V checkpoint</td>
+<td>Apply the clean checkpoint</td>
+<td>Checkpoints cover the VM’s virtual disks, so keep case data on a share or storage outside the VM</td>
+</tr>
+<tr class="even">
+<td>VMware Workstation snapshot</td>
+<td>Revert to snapshot</td>
+<td>A disk in <strong>independent-persistent</strong> mode is not included in snapshots</td>
+</tr>
+<tr class="odd">
+<td>Differencing disk over a clean parent</td>
+<td>Delete and recreate the child disk</td>
+<td>Case data on a separate disk or share</td>
+</tr>
+<tr class="even">
+<td>Windows Sandbox</td>
+<td>Every session starts clean</td>
+<td>Map a host folder in the <code>.wsb</code> configuration; tools must be installed each session</td>
+</tr>
+</tbody>
+</table>
+<p>Whatever the method, verify it: write a test file to the case storage, reset, and confirm the file is still there and the system disk change is gone. <code>Test-DfirBox.ps1</code> (below) does the first half.</p>
+</section>
+<section id="build-automation" class="level2">
+<h2 class="anchored" data-anchor-id="build-automation">Automating the build</h2>
+<ul>
+<li>Decide on the Windows image and tool list.</li>
+<li>Make setup repeatable rather than configuring it by hand each time.</li>
+</ul>
+<p>The pattern: a clean Windows image, then scripts that install and configure everything from a data file, then a snapshot. Rebuilding for a new tool version means editing the data file and rerunning, not remembering clicks.</p>
+<ol type="1">
+<li>Create the VM from the chosen Windows image. Microsoft’s Evaluation Center publishes time-limited Windows Enterprise evaluation images; a licensed image is the alternative.</li>
+<li>Copy the scripts into the VM and review <code>DfirTools.psd1</code>.</li>
+<li>Run with <code>-WhatIf</code> to see every change, then for real with <code>-Verbose</code>.</li>
+<li>Run <code>Test-DfirBox.ps1</code>, then shut down and take the <strong>clean</strong> snapshot.</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Set-Location</span> C<span class="op">:</span>\Build</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Install-DfirTools<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>WhatIf</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Install-DfirTools<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Verbose</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Set-DfirAnalysisSettings<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>UacMode NoPrompt <span class="op">-</span>DefenderExclusionPath C<span class="op">:</span>\Tools <span class="op">-</span>WhatIf</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Test-DfirBox<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>CaseRoot E<span class="op">:</span>\Cases <span class="op">|</span> <span class="fu">Format-Table</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>File</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="files/scripts/DfirTools.psd1">DfirTools.psd1</a></td>
+<td>The tool manifest: tool folder, winget package IDs and optional pinned versions. <strong>Example entries only.</strong></td>
+</tr>
+<tr class="even">
+<td><a href="files/scripts/Install-DfirTools.ps1">Install-DfirTools.ps1</a></td>
+<td>Installs each package with winget, optionally downloads Eric Zimmerman’s tools with his <code>Get-ZimmermanTools.ps1</code>, and writes <code>ToolInventory.csv</code> with installed versions. Supports <code>-WhatIf</code>.</td>
+</tr>
+<tr class="odd">
+<td><a href="files/scripts/Set-DfirAnalysisSettings.ps1">Set-DfirAnalysisSettings.ps1</a></td>
+<td>Sets UAC prompt behavior and optional Defender exclusions for this VM. Supports <code>-WhatIf</code> and <code>-Confirm</code>.</td>
+</tr>
+<tr class="even">
+<td><a href="files/scripts/Test-DfirBox.ps1">Test-DfirBox.ps1</a></td>
+<td>Checks case storage exists, is writable and is not on the system drive; lists files retained; checks tool folder and free space. Read-only apart from a temporary marker file.</td>
+</tr>
+</tbody>
+</table>
+<p><code>-WhatIf</code> output from <code>Install-DfirTools.ps1</code> with the example manifest:</p>
+<pre class="text"><code>What if: Performing the operation "Create tool folder" on target "C:\Tools".
+What if: Performing the operation "winget install" on target "7-Zip".
+What if: Performing the operation "winget install" on target "Sysinternals Suite".
+What if: Performing the operation "winget install" on target "PowerShell 7".
+What if: Performing the operation "Download Eric Zimmerman's tools (.NET 9)" on target "C:\Tools\EZTools".
+What if: Performing the operation "Write tool inventory" on target "C:\Tools\ToolInventory.csv".</code></pre>
+<p>Pin versions in the manifest (<code>Version = '26.04'</code>) once the tool list is settled; an unpinned build installs whatever is current that day. The winget package IDs in the example manifest were confirmed with <code>winget show --id &lt;id&gt; --exact</code> on October 16, 2026.</p>
+</section>
+<section id="configuring-windows-for-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="configuring-windows-for-analysis">Configuring Windows for analysis</h2>
+<ul>
+<li>Tools that need to run as administrator.</li>
+<li>UAC: normally I don’t disable security features, but this is a disposable VM and reducing friction matters.</li>
+<li>Other Windows security settings as decisions specific to this machine, not general recommendations.</li>
+</ul>
+<section id="uac" class="level3">
+<h3 class="anchored" data-anchor-id="uac">UAC</h3>
+<p>Two registry values under <code>HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</code> control it:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 28%">
+<col style="width: 28%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><code>-UacMode</code></th>
+<th style="text-align: right;"><code>EnableLUA</code></th>
+<th style="text-align: right;"><code>ConsentPromptBehaviorAdmin</code></th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>NoPrompt</code></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td>UAC stays on; programs still start with a standard token, and elevation happens without a prompt.</td>
+</tr>
+<tr class="even">
+<td><code>Disabled</code></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td>Admin Approval Mode off; administrators run everything elevated. Needs a restart.</td>
+</tr>
+<tr class="odd">
+<td><code>Default</code></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5</td>
+<td>Windows default: prompt for consent for non-Windows binaries.</td>
+</tr>
+</tbody>
+</table>
+<p><code>NoPrompt</code> removes the friction while keeping the elevation boundary visible to tools that check for it. See Microsoft’s <a href="https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/settings-and-configuration">User Account Control settings and configuration</a>.</p>
+<pre class="text"><code>PS&gt; .\Set-DfirAnalysisSettings.ps1 -UacMode NoPrompt -DefenderExclusionPath C:\Tools -WhatIf -Verbose
+VERBOSE: EnableLUA is already 1
+What if: Performing the operation "Set from 2 to 0" on target "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorAdmin".
+What if: Performing the operation "Add Microsoft Defender exclusion" on target "C:\Tools".</code></pre>
+</section>
+<section id="other-settings-to-decide" class="level3">
+<h3 class="anchored" data-anchor-id="other-settings-to-decide">Other settings to decide</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Setting</th>
+<th>Consideration</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Microsoft Defender</td>
+<td>Real-time scanning can quarantine evidence files and slow parsers; turning it off removes a safety net on a machine that opens hostile files. Options include excluding the tool folder only, excluding the case folder, or leaving it on and scanning evidence deliberately.</td>
+</tr>
+<tr class="even">
+<td>Network</td>
+<td>Analysis rarely needs the internet; installs and tool updates do. Options: networked during build only, host-only network during cases, or a controlled egress path.</td>
+</tr>
+<tr class="odd">
+<td>Windows Update</td>
+<td>Updates during a case change the system mid-analysis; updating the clean image periodically keeps it patched.</td>
+</tr>
+<tr class="even">
+<td>SmartScreen and Mark of the Web</td>
+<td>Tools downloaded during the build carry Mark of the Web; scripted installs avoid repeated prompts.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="tools-for-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="tools-for-analysis">Tools for analysis</h2>
+<ul>
+<li>Select the tools and versions.</li>
+<li>KAPE modules for processing already-collected artifacts (intended tool name to be confirmed).</li>
+</ul>
+<p>The tool list is open. Record the version of every tool used for a case in the case notes; <code>ToolInventory.csv</code> from the build is a starting point.</p>
+<section id="processing-an-existing-artifact-set-with-kape-modules" class="level3">
+<h3 class="anchored" data-anchor-id="processing-an-existing-artifact-set-with-kape-modules">Processing an existing artifact set with KAPE modules</h3>
+<p>KAPE has two halves: <strong>targets</strong> collect files from a system, and <strong>modules</strong> run programs against files already collected. For this box only modules apply. Modules are defined in <code>.mkape</code> files; the community set is maintained in <a href="https://github.com/EricZimmerman/KapeFiles">KapeFiles</a>, which includes the compound module <code>!EZParser</code> (runs Eric Zimmerman’s parsers over a collection).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Module source is a collection that already exists; output goes to case storage.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\kape<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>msource E<span class="op">:</span>\Cases\<span class="dv">2026</span><span class="op">-</span><span class="dv">0142</span>\Collected\C <span class="op">--</span>mdest E<span class="op">:</span>\Cases\<span class="dv">2026</span><span class="op">-</span><span class="dv">0142</span>\Output\EZParser <span class="op">--</span>module <span class="op">!</span>EZParser</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Check the switches against <code>kape.exe --help</code> and the <a href="https://ericzimmerman.github.io/KapeDocs/">KAPE documentation</a> for the version you install.</p>
+<p><strong>Licensing.</strong> Kroll’s KAPE terms distinguish free use from uses that require an enterprise license, including use on third-party networks or as part of a paid engagement. Confirm which applies to CRT work before selecting it: <a href="https://www.kroll.com/en/kape-license-agreement">KAPE license agreement</a>.</p>
+</section>
+</section>
+<section id="using-and-resetting-the-box" class="level2">
+<h2 class="anchored" data-anchor-id="using-and-resetting-the-box">Using and resetting the box</h2>
+<ul>
+<li>Run tools against existing artifacts.</li>
+<li>Retain the results and relevant logs.</li>
+<li>Verify the environment and reset it for the next case.</li>
+</ul>
+<p>A per-case checklist (proposed):</p>
+<ol type="1">
+<li>Start from the clean snapshot. Run <code>Test-DfirBox.ps1 -CaseRoot &lt;case storage&gt;</code>; every check should pass except “Files retained” on a new case.</li>
+<li>Create the case folders (<code>Collected</code>, <code>Output</code>, <code>Notes</code>; see <code>New-CaseFolder</code> on the <a href="./powershell.html#shouldprocess">PowerShell page</a>) and copy the evidence in. Hash it on arrival with <code>Get-FileInventory.ps1</code>.</li>
+<li>Run tools against <code>Collected</code>, writing to <code>Output</code>. Keep each tool’s console log or log file in <code>Output</code>.</li>
+<li>Before reset: run <code>Get-FileInventory.ps1 -Path &lt;case&gt;\Output -OutputPath &lt;case&gt;\Notes\OutputInventory.csv</code> and <code>Test-DfirBox.ps1</code> again, and confirm the output is on case storage.</li>
+<li>Revert to the clean snapshot. Confirm case storage is still intact from the next session.</li>
+</ol>
+</section>
+<section id="open-decisions" class="level2">
+<h2 class="anchored" data-anchor-id="open-decisions">Open decisions</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Decision</th>
+<th>Options under consideration</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Windows version and image</td>
+<td>Windows 11 Enterprise or Pro; evaluation versus licensed image</td>
+</tr>
+<tr class="even">
+<td>Hypervisor</td>
+<td>Hyper-V, VMware Workstation, other</td>
+</tr>
+<tr class="odd">
+<td>Networking</td>
+<td>Build-time only, host-only, controlled egress</td>
+</tr>
+<tr class="even">
+<td>UAC</td>
+<td><code>NoPrompt</code> or <code>Disabled</code></td>
+</tr>
+<tr class="odd">
+<td>Defender</td>
+<td>On, tool-folder exclusion, case-folder exclusion, off</td>
+</tr>
+<tr class="even">
+<td>Reset method</td>
+<td>Checkpoint or snapshot, differencing disk, Windows Sandbox</td>
+</tr>
+<tr class="odd">
+<td>Persistent case storage</td>
+<td>Host share, separate persistent virtual disk, storage server</td>
+</tr>
+<tr class="even">
+<td>Tool list and versions</td>
+<td>Open until selected; confirm KAPE licensing</td>
+</tr>
+</tbody>
+</table>
+<p>These are also tracked in the project <a href="https://github.com/dzampino/crt-essentials-2026#remaining-decisions">README</a>.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/dzampino\.github\.io\/crt-essentials-2026\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>CRT Annual Training Conference 2026</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/dzampino/crt-essentials-2026/blob/main/dfir.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/dzampino/crt-essentials-2026/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Wisconsin Cyber Response Team</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
