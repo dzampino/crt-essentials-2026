@@ -1,0 +1,1 @@
+Convert .png files into matching rich text for inclusion in PowerPoint. All "learndmarc-" files are sourced from leardmarc.com

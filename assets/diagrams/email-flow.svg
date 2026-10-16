@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Segoe UI, Arial, sans-serif">
+	<title>Email flow: the author's MUA submits to an MSA, MTAs relay using DNS MX records, an MDA delivers, and the recipient's MUA retrieves the message</title>
+	<rect width="1600" height="900" fill="#ffffff"/>
+	<defs>
+		<marker id="Arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5A6472"/></marker>
+	</defs>
+	<g font-size="32" text-anchor="middle">
+		<g>
+			<rect x="40" y="250" width="200" height="150" rx="14" fill="#0C2454"/>
+			<text x="140" y="320" fill="#ffffff" font-weight="600" font-size="40">MUA</text>
+			<text x="140" y="365" fill="#D6DEEA" font-size="26">author's client</text>
+		</g>
+		<g>
+			<rect x="340" y="250" width="200" height="150" rx="14" fill="#ffffff" stroke="#0C2454" stroke-width="4"/>
+			<text x="440" y="320" fill="#0C2454" font-weight="600" font-size="40">MSA</text>
+			<text x="440" y="365" fill="#5A6472" font-size="26">submission</text>
+		</g>
+		<g>
+			<rect x="640" y="250" width="200" height="150" rx="14" fill="#ffffff" stroke="#0C2454" stroke-width="4"/>
+			<text x="740" y="320" fill="#0C2454" font-weight="600" font-size="40">MTA</text>
+			<text x="740" y="365" fill="#5A6472" font-size="26">sending relay</text>
+		</g>
+		<g>
+			<rect x="960" y="250" width="200" height="150" rx="14" fill="#ffffff" stroke="#D9383A" stroke-width="4"/>
+			<text x="1060" y="320" fill="#D9383A" font-weight="600" font-size="40">MTA</text>
+			<text x="1060" y="365" fill="#5A6472" font-size="26">receiving (MX)</text>
+		</g>
+		<g>
+			<rect x="1260" y="250" width="200" height="150" rx="14" fill="#ffffff" stroke="#0C2454" stroke-width="4"/>
+			<text x="1360" y="320" fill="#0C2454" font-weight="600" font-size="40">MDA</text>
+			<text x="1360" y="365" fill="#5A6472" font-size="26">delivery</text>
+		</g>
+		<g>
+			<rect x="1260" y="560" width="200" height="150" rx="14" fill="#0C2454"/>
+			<text x="1360" y="630" fill="#ffffff" font-weight="600" font-size="40">MUA</text>
+			<text x="1360" y="675" fill="#D6DEEA" font-size="26">recipient's client</text>
+		</g>
+		<g>
+			<rect x="590" y="560" width="300" height="150" rx="14" fill="#EEF1F5"/>
+			<text x="740" y="630" fill="#0C2454" font-weight="600" font-size="40">DNS</text>
+			<text x="740" y="675" fill="#5A6472" font-size="26">MX, SPF, DKIM, DMARC</text>
+		</g>
+
+		<line x1="240" y1="325" x2="335" y2="325" stroke="#5A6472" stroke-width="4" marker-end="url(#Arrow)"/>
+		<line x1="540" y1="325" x2="635" y2="325" stroke="#5A6472" stroke-width="4" marker-end="url(#Arrow)"/>
+		<line x1="840" y1="325" x2="955" y2="325" stroke="#5A6472" stroke-width="4" marker-end="url(#Arrow)"/>
+		<line x1="1160" y1="325" x2="1255" y2="325" stroke="#5A6472" stroke-width="4" marker-end="url(#Arrow)"/>
+		<line x1="1360" y1="400" x2="1360" y2="555" stroke="#5A6472" stroke-width="4" marker-end="url(#Arrow)"/>
+		<line x1="740" y1="555" x2="740" y2="405" stroke="#5A6472" stroke-width="4" stroke-dasharray="10 8" marker-end="url(#Arrow)"/>
+		<line x1="890" y1="600" x2="1010" y2="405" stroke="#5A6472" stroke-width="4" stroke-dasharray="10 8" marker-end="url(#Arrow)"/>
+
+		<text x="290" y="300" fill="#1A1D23" font-size="26">submit</text>
+		<text x="590" y="300" fill="#1A1D23" font-size="26">relay</text>
+		<text x="900" y="300" fill="#1A1D23" font-size="26">SMTP</text>
+		<text x="1210" y="300" fill="#1A1D23" font-size="26">deliver</text>
+		<text x="1380" y="490" fill="#1A1D23" font-size="26" text-anchor="start">access</text>
+		<text x="755" y="490" fill="#5A6472" font-size="26" text-anchor="start">MX lookup</text>
+		<text x="975" y="540" fill="#5A6472" font-size="26" text-anchor="start">policy lookups</text>
+
+		<rect x="40" y="790" width="1520" height="80" rx="12" fill="#EEF1F5"/>
+		<text x="800" y="842" fill="#1A1D23" font-size="30">Each hop adds a Received header. One server can perform several roles.</text>
+	</g>
+</svg>

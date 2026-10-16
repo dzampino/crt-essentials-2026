@@ -1,0 +1,13 @@
+.tools/
+node_modules/
+.quarto/
+*.log
+*.tmp
+output/*.csv
+output/*Rebuilt.pptx
+cases/
+evidence/
+*.pfx
+*.p12
+*.key
+.build/

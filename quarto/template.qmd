@@ -1,0 +1,138 @@
+---
+title: "CRT Essentials"
+subtitle: "The Dave Zampino Power Hour"
+author: "David Zampino"
+date: 2026-10-18
+format: wicrt-pptx
+---
+
+<!--
+Outline rules
+  # Heading           section divider (navy slide)
+  ## Heading          new content slide
+  - point             bullet; indent two spaces for a sub-point
+  1. step             numbered list
+  ::: notes           speaker notes for the slide above it
+  :::: columns        two columns side by side
+  text, then a table or image on one slide   caption on the left, content on the right
+  ![](images/file.png)   image
+Comments like this one do not appear in the deck.
+-->
+
+## Agenda
+
+1. First topic
+2. Second topic
+3. Third topic
+
+## Objectives
+
+By the end of this session you will be able to:
+
+- First objective
+- Second objective
+- Third objective
+
+# Section Title
+
+## Slide Title
+
+- Main point
+  - Supporting detail
+  - Supporting detail
+- Main point
+- Main point
+
+::: notes
+Speaker notes for this slide.
+:::
+
+## Two-Column Slide
+
+:::: columns
+::: column
+**Left heading**
+
+- Point
+- Point
+:::
+
+::: column
+**Right heading**
+
+- Point
+- Point
+:::
+::::
+
+## Comparison Slide
+
+:::: columns
+::: column
+Left heading
+
+| Item | Detail |
+|------|--------|
+| A    | Detail |
+| B    | Detail |
+:::
+
+::: column
+Right heading
+
+| Item | Detail |
+|------|--------|
+| C    | Detail |
+| D    | Detail |
+:::
+::::
+
+## Table Slide
+
+| Column | Column | Column |
+|--------|--------|--------|
+| Cell   | Cell   | Cell   |
+| Cell   | Cell   | Cell   |
+| Cell   | Cell   | Cell   |
+
+## Caption Slide
+
+One or two sentences explaining the table or image on the right.
+
+| Column | Column |
+|--------|--------|
+| Cell   | Cell   |
+| Cell   | Cell   |
+
+## Code Slide
+
+```powershell
+Get-Process |
+	Sort-Object CPU -Descending |
+	Select-Object -First 5 Name, CPU
+```
+
+## Lab: Exercise Title
+
+**Objective:** what participants will accomplish.
+
+1. First step
+2. Second step
+3. Third step
+
+Allow 15 minutes.
+
+# Wrap-Up
+
+## Key Takeaways
+
+- First takeaway
+- Second takeaway
+- Third takeaway
+
+## References
+
+- Source one
+- Source two
+
+# Questions
