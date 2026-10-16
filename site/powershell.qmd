@@ -1,0 +1,306 @@
+---
+title: "PowerShell"
+subtitle: "Show how PowerShell can make administrative and incident-response tasks easier to repeat and automate."
+---
+
+## Why PowerShell?
+
+- Administration, automation, and analysis.
+- Turning a repetitive task into something repeatable.
+
+PowerShell commands return **objects**, not text. A file has a `Length` and a `LastWriteTimeUtc`; an event has an `Id` and a `TimeCreated`. You filter and sort on those properties directly instead of cutting columns out of text, and the result is the same whether the output is 10 lines or 10 million.
+
+Everything on this page runs in Windows PowerShell 5.1 and PowerShell 7 unless noted. Examples were tested in PowerShell 7.6.7 and Windows PowerShell 5.1.26100 on Windows 11.
+
+## Finding commands
+
+`Get-Command` finds commands; `Get-Help` explains them. Commands are named Verb-Noun, so search by either half.
+
+```powershell
+Get-Command -Noun WinEvent                       # everything that works on event logs
+Get-Command -Verb Export                         # every way to write something out
+Get-Command *hash*                               # wildcards work too
+Get-Help Get-WinEvent -Examples
+Get-Help Get-WinEvent -Parameter FilterHashtable
+Get-Command Get-FileHash -Syntax                 # parameter sets at a glance
+(Get-Command Get-FileHash).OutputType            # what it returns
+```
+
+Local help is minimal until you run `Update-Help` (from an elevated prompt in Windows PowerShell 5.1). `Get-Help <command> -Online` opens the current Microsoft Learn page instead.
+
+### Figure out what a command returns
+
+Pipe it to `Get-Member`. The first line is the type; the list is what you can select, filter and sort on.
+
+```powershell
+Get-Item C:\Windows\notepad.exe | Get-Member -MemberType Property
+```
+
+```text
+   TypeName: System.IO.FileInfo
+
+Name              MemberType Definition
+----              ---------- ----------
+Attributes        Property   System.IO.FileAttributes Attributes {get;set;}
+CreationTime      Property   datetime CreationTime {get;set;}
+CreationTimeUtc   Property   datetime CreationTimeUtc {get;set;}
+...
+Length            Property   long Length {get;}
+Name              Property   string Name {get;}
+```
+
+## Objects and the pipeline
+
+The pipeline passes objects from one command to the next ([about_Pipelines](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines)). The default table view shows only some properties; `Select-Object` chooses which, and `Format-List *` shows all of them.
+
+```powershell
+Get-Item C:\Windows\notepad.exe | Format-List *
+Get-Item C:\Windows\notepad.exe | Select-Object Name, Length, LastWriteTime, VersionInfo
+```
+
+A **calculated property** adds a column computed from each object:
+
+```powershell
+Get-ChildItem -Path .\Case -File |
+	Select-Object Name, @{ n = 'SizeMB'; e = { [math]::Round($_.Length / 1MB, 2) } }
+```
+
+Parameters bind from the pipeline **by value** (the whole object) or **by property name**. That is why `Get-ChildItem | Get-FileHash` works: `Get-FileHash` accepts the file's path from each object.
+
+## Working with data
+
+| Command | Use |
+| --- | --- |
+| `Where-Object` | Keep objects that match: `Where-Object Length -gt 10MB`, `Where-Object { $_.Name -like '*.ps1' -and $_.Length -lt 1KB }` |
+| `Sort-Object` | Order by one or more properties: `Sort-Object Length -Descending` |
+| `Group-Object` | Count by a property: `Group-Object Extension` |
+| `Measure-Object` | Count, sum, minimum, maximum: `Measure-Object Length -Sum -Maximum` |
+| `Select-Object` | Choose properties; `-First`, `-Last`, `-Unique`, `-ExpandProperty` |
+| `Export-Csv` | Write objects to CSV for Excel or Timeline Explorer |
+| `ConvertTo-Json` | Write objects to JSON |
+| `Out-GridView` | Interactive, filterable window (Windows only) |
+
+```powershell
+Get-ChildItem -Path .\Case -Recurse -File |
+	Where-Object Length -gt 10MB |
+	Sort-Object Length -Descending |
+	Select-Object FullName, Length, LastWriteTimeUtc |
+	Export-Csv .\LargeFiles.csv -NoTypeInformation
+```
+
+Filter as far left as you can. `Get-ChildItem -Filter *.evtx` and `Get-WinEvent -FilterHashtable` filter at the source; `Where-Object` sees every object first.
+
+## Example tasks
+
+### Working with an existing collection of files
+
+```powershell
+# What is here, by type
+Get-ChildItem -Path .\Case -Recurse -File |
+	Group-Object Extension |
+	Sort-Object Count -Descending |
+	Select-Object Count, Name
+
+# Hash everything
+Get-ChildItem -Path .\Case -Recurse -File |
+	Get-FileHash -Algorithm SHA256 |
+	Select-Object Hash, Path |
+	Export-Csv .\Hashes.csv -NoTypeInformation
+
+# Files modified in a window (UTC)
+$Start = [datetime]'2026-10-01T00:00:00Z'
+$End = [datetime]'2026-10-08T00:00:00Z'
+Get-ChildItem -Path .\Case -Recurse -File |
+	Where-Object { $_.LastWriteTimeUtc -ge $Start.ToUniversalTime() -and $_.LastWriteTimeUtc -lt $End.ToUniversalTime() } |
+	Sort-Object LastWriteTimeUtc
+```
+
+The [`Get-FileInventory.ps1`](#scripts) script combines these into one inventory.
+
+### Looking at collected Windows event logs with `Get-WinEvent`
+
+Query the **copied** `.evtx` file with `-Path`, not the live log on the analysis machine ([Get-WinEvent](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent)).
+
+```powershell
+# What providers and IDs are in this log, and how many
+Get-WinEvent -Path .\Case\Logs\System.evtx |
+	Group-Object ProviderName, Id |
+	Sort-Object Count -Descending |
+	Select-Object -First 15 Count, Name
+
+# Logons and failed logons, filtered at the source
+Get-WinEvent -FilterHashtable @{
+	Path = '.\Case\Logs\Security.evtx'
+	Id = 4624, 4625
+	StartTime = [datetime]'2026-10-01'
+} |
+	Group-Object Id |
+	Select-Object Count, Name
+```
+
+Event properties hold the event's data fields. To get named fields (for example `TargetUserName` and `IpAddress` in a 4624), read the event XML:
+
+```powershell
+Get-WinEvent -FilterHashtable @{ Path = '.\Case\Logs\Security.evtx'; Id = 4624 } -MaxEvents 100 |
+	ForEach-Object {
+		$Data = @{}
+		([xml]$_.ToXml()).Event.EventData.Data | ForEach-Object { $Data[$_.Name] = $_.'#text' }
+		[pscustomobject]@{
+			TimeCreated = $_.TimeCreated
+			User = '{0}\{1}' -f $Data.TargetDomainName, $Data.TargetUserName
+			LogonType = $Data.LogonType
+			IpAddress = $Data.IpAddress
+		}
+	}
+```
+
+`Get-WinEvent` throws "No events were found that match the specified selection criteria" when a filter matches nothing; scripts should treat that as an empty result, as [`Get-EvtxSummary.ps1`](#scripts) does.
+
+## Making a script reusable
+
+- Parameters instead of hard-coded values.
+- Functions, `-Verbose`, `-WhatIf` where applicable.
+- An example of automating part of the DFIR box build: see the [DFIR box build scripts](dfir.qmd#build-automation).
+
+### Parameters
+
+```powershell
+[CmdletBinding()]
+param(
+	[Parameter(Mandatory)]
+	[ValidateScript({ Test-Path -Path $_ -PathType Container })]
+	[string]$Path,
+
+	[ValidateSet('SHA1', 'SHA256', 'SHA512')]
+	[string]$Algorithm = 'SHA256',
+
+	[switch]$IncludeHidden
+)
+```
+
+`[CmdletBinding()]` makes a script or function an **advanced function**: it gets `-Verbose`, `-Debug`, `-ErrorAction` and the other common parameters for free. Validation attributes reject bad input before your code runs.
+
+### `-WhatIf`, `-Confirm` and `ShouldProcess` {#shouldprocess}
+
+Anything that changes state should support `-WhatIf`. Declare `SupportsShouldProcess` and wrap each change in `$PSCmdlet.ShouldProcess()` ([about_Functions_CmdletBindingAttribute](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute)):
+
+```powershell
+function New-CaseFolder {
+	[CmdletBinding(SupportsShouldProcess)]
+	param(
+		[Parameter(Mandatory)]
+		[string]$CaseRoot,
+
+		[Parameter(Mandatory)]
+		[string]$CaseNumber
+	)
+	$CasePath = Join-Path -Path $CaseRoot -ChildPath $CaseNumber
+	'Collected', 'Output', 'Notes' |
+		ForEach-Object { Join-Path -Path $CasePath -ChildPath $_ } |
+		Where-Object { -not (Test-Path -Path $_) } |
+		ForEach-Object {
+			if ($PSCmdlet.ShouldProcess($_, 'Create folder')) {
+				New-Item -Path $_ -ItemType Directory | Out-Null
+				Write-Verbose "Created $_"
+			}
+		}
+}
+
+New-CaseFolder -CaseRoot E:\Cases -CaseNumber 2026-0142 -WhatIf
+```
+
+```text
+What if: Performing the operation "Create folder" on target "E:\Cases\2026-0142\Collected".
+What if: Performing the operation "Create folder" on target "E:\Cases\2026-0142\Output".
+What if: Performing the operation "Create folder" on target "E:\Cases\2026-0142\Notes".
+```
+
+Commands you call inside inherit `-WhatIf`, so `New-Item` inside a function run with `-WhatIf` would not create anything either; the explicit `ShouldProcess` call gives a clear message and covers non-cmdlet work such as `winget` or registry edits.
+
+### Error handling
+
+PowerShell has **non-terminating** errors (the command reports and keeps going: one unreadable file in a recursive listing) and **terminating** errors (the command stops). `try`/`catch` only catches terminating errors, so add `-ErrorAction Stop` where you want to handle a failure:
+
+```powershell
+try {
+	$Events = Get-WinEvent -FilterHashtable $Filter -ErrorAction Stop
+}
+catch {
+	if ($_.FullyQualifiedErrorId -like 'NoMatchingEventsFound*') {
+		$Events = @()
+	}
+	else {
+		throw
+	}
+}
+```
+
+To collect non-terminating errors without stopping, use `-ErrorAction SilentlyContinue -ErrorVariable Problems` and report `$Problems` afterward, as `Get-FileInventory.ps1` does for files it cannot read.
+
+### Building collections
+
+Let the pipeline build arrays. `$Results = foreach (...) { [pscustomobject]@{...} }` and `$Results = ... | ForEach-Object { ... }` collect output efficiently; appending with `$Results += $Item` copies the whole array on every addition and gets slow with large data. When you do need to add items one by one, use `[System.Collections.Generic.List[object]]::new()` and `.Add()`.
+
+## Scripts {#scripts}
+
+Analysis of existing files and logs, not evidence acquisition. Download, read, then run. Source is also on [GitHub](https://github.com/dzampino/crt-essentials-2026/tree/main/scripts).
+
+| Script | What it does |
+| --- | --- |
+| [Get-FileInventory.ps1](files/scripts/Get-FileInventory.ps1) | Relative path, extension, size, UTC timestamps and hash for every file under a folder; optional CSV with `-WhatIf` support |
+| [Get-EvtxSummary.ps1](files/scripts/Get-EvtxSummary.ps1) | Counts by provider and event ID, with first and last time, for collected `.evtx` files; `-Detail` returns the events |
+
+```powershell
+.\Get-FileInventory.ps1 -Path D:\Case\Collected |
+	Sort-Object Length -Descending |
+	Select-Object -First 10
+
+.\Get-FileInventory.ps1 -Path D:\Case\Collected -OutputPath D:\Case\Output\Inventory.csv -Verbose
+
+.\Get-EvtxSummary.ps1 -Path D:\Case\Collected\Logs | Format-Table
+
+.\Get-EvtxSummary.ps1 -Path D:\Case\Collected\Logs\Security.evtx -Id 4624, 4625 -Detail |
+	Export-Csv D:\Case\Output\Logons.csv -NoTypeInformation
+
+Get-ChildItem D:\Case\Collected -Filter *.evtx -Recurse | .\Get-EvtxSummary.ps1 -Id 7045
+```
+
+Sample output of `Get-EvtxSummary.ps1` against a week of an exported System log:
+
+```text
+File        ProviderName                            Id Count First               Last
+----        ------------                            -- ----- -----               ----
+System.evtx Microsoft-Windows-WindowsUpdateClient   44  1148 2026-10-09 15:51:20 2026-10-16 06:43:23
+System.evtx Microsoft-Windows-Kernel-General        16    98 2026-10-09 15:53:25 2026-10-16 14:32:46
+System.evtx Service Control Manager               7040    75 2026-10-09 15:54:14 2026-10-16 15:21:15
+```
+
+Downloaded scripts carry a mark of the web. If the execution policy blocks them, read them first, then `Unblock-File .\Get-FileInventory.ps1`.
+
+## Windows PowerShell 5.1 and PowerShell 7
+
+They install side by side: `powershell.exe` is Windows PowerShell 5.1 (built into Windows, .NET Framework), `pwsh.exe` is PowerShell 7 (installed separately, current .NET, cross-platform). Microsoft's list: [Differences between Windows PowerShell 5.1 and PowerShell 7.x](https://learn.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell).
+
+Differences observed while testing this page:
+
+| Behavior | Windows PowerShell 5.1 | PowerShell 7.6 |
+| --- | --- | --- |
+| `Out-File` default encoding | UTF-16 LE with BOM | UTF-8, no BOM |
+| `Set-Content` default encoding | System ANSI code page (`é` became byte `E9`) | UTF-8, no BOM |
+| `Export-Csv` first line | `#TYPE System.Management.Automation.PSCustomObject` unless `-NoTypeInformation` | No type line |
+| `ForEach-Object -Parallel` | Not available | Available |
+| `Get-WmiObject` | Built in | Only through the Windows PowerShell compatibility proxy; use `Get-CimInstance` |
+| `&&`, `\|\|`, ternary `? :`, `??` | Not available | Available |
+| X509 `DnsNameList` property | Present | Not present; read the SAN extension instead |
+
+For scripts shared between both, specify `-Encoding UTF8` (or `utf8NoBOM` in 7 only) when writing files other tools will read, always pass `-NoTypeInformation` to `Export-Csv`, and use CIM cmdlets (`Get-CimInstance`) rather than WMI cmdlets.
+
+## References
+
+| | |
+| --- | --- |
+| [about_Pipelines](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines) | Microsoft Learn |
+| [about_Functions_CmdletBindingAttribute](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute) | Microsoft Learn |
+| [Get-WinEvent](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent) | Microsoft Learn |
+| [Export-Csv](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/export-csv) | Microsoft Learn |
+| [Differences from Windows PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell) | Microsoft Learn |

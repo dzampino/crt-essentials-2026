@@ -1,0 +1,57 @@
+/* CRT Essentials companion site. Colors follow the WICRT PowerPoint template. */
+:root {
+	--crt-navy: #0C2454;
+	--crt-blue: #034BAB;
+	--crt-red: #E03E3B;
+	--crt-ink: #1A1D23;
+	--crt-muted: #5A6472;
+	--crt-line: #D5DAE1;
+	--crt-panel: #F3F5F8;
+}
+
+h1, h2, h3, .navbar-brand { color: var(--crt-navy); }
+a { color: var(--crt-blue); }
+.navbar .navbar-brand, .navbar .nav-link { color: #FFFFFF !important; }
+
+.lead-in { font-size: 1.1rem; color: var(--crt-muted); }
+
+/* Topic cards on the home page */
+.topic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin: 1rem 0 2rem; }
+.topic-card { border: 1px solid var(--crt-line); border-radius: 8px; padding: 1rem 1.1rem; background: #FFFFFF; }
+.topic-card h3 { margin-top: 0; font-size: 1.1rem; }
+.topic-card p { margin-bottom: 0.4rem; color: var(--crt-muted); font-size: 0.95rem; }
+
+/* Interactive tools */
+.tool { border: 1px solid var(--crt-line); border-radius: 8px; padding: 1rem 1.2rem; background: var(--crt-panel); margin: 1rem 0 1.5rem; }
+.tool-controls { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; align-items: end; margin-bottom: 0.75rem; }
+.tool-controls label { display: flex; flex-direction: column; font-size: 0.85rem; color: var(--crt-muted); gap: 0.2rem; }
+.tool-controls input, .tool-controls select { font-size: 0.95rem; padding: 0.3rem 0.4rem; border: 1px solid var(--crt-line); border-radius: 4px; background: #FFFFFF; color: var(--crt-ink); min-width: 7rem; }
+.tool-controls input[type=range] { min-width: 12rem; padding: 0; }
+.tool-readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; margin: 0.5rem 0; }
+.stat { background: #FFFFFF; border: 1px solid var(--crt-line); border-radius: 6px; padding: 0.5rem 0.7rem; }
+.stat .label { font-size: 0.78rem; color: var(--crt-muted); }
+.stat .value { font-size: 1.25rem; font-weight: 600; color: var(--crt-ink); font-variant-numeric: tabular-nums; }
+.tool-note { font-size: 0.82rem; color: var(--crt-muted); margin: 0.4rem 0 0; }
+.tool table { font-size: 0.9rem; background: #FFFFFF; font-variant-numeric: tabular-nums; }
+.tool table td.num, .tool table th.num { text-align: right; }
+
+/* Chart */
+.chart-wrap { position: relative; background: #FFFFFF; border: 1px solid var(--crt-line); border-radius: 6px; padding: 0.5rem; }
+.chart-wrap svg { width: 100%; height: auto; display: block; }
+.chart-wrap .axis text { font-size: 11px; fill: var(--crt-muted); }
+.chart-wrap .axis line, .chart-wrap .axis path { stroke: var(--crt-line); }
+.chart-wrap .grid line { stroke: #EEF1F5; }
+.chart-wrap .series-label { font-size: 12px; font-weight: 600; fill: var(--crt-ink); }
+.chart-tip { position: absolute; pointer-events: none; background: #FFFFFF; border: 1px solid var(--crt-line); border-radius: 6px; padding: 0.35rem 0.55rem; font-size: 0.8rem; box-shadow: 0 2px 6px rgba(12, 36, 84, 0.12); display: none; white-space: nowrap; }
+.chart-tip .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
+.legend { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--crt-ink); margin: 0.25rem 0 0.5rem; }
+.legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
+
+/* DMARC checker result */
+.verdict { font-weight: 600; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--crt-line); background: #FFFFFF; }
+.verdict.pass::before { content: "✔ "; color: #1E7B34; }
+.verdict.fail::before { content: "✖ "; color: var(--crt-red); }
+
+/* Field reference and command output */
+.output-note { font-size: 0.85rem; color: var(--crt-muted); margin-top: -0.5rem; }
+figure img { border: 1px solid var(--crt-line); border-radius: 6px; }

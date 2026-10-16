@@ -1,0 +1,67 @@
+---
+title: "References"
+subtitle: "Primary sources, reviewed October 16, 2026. These are links, not copied standards text."
+---
+
+## Passwords
+
+- NIST SP 800-63B-4, *Digital Identity Guidelines: Authentication and Authenticator Management*: <https://pages.nist.gov/800-63-4/sp800-63b.html>
+- xkcd 936, "Password Strength," Randall Munroe (CC BY-NC 2.5): <https://xkcd.com/936/>
+- OWASP Password Storage Cheat Sheet: <https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html>
+- Microsoft, Passwords technical overview: <https://learn.microsoft.com/en-us/windows-server/security/kerberos/passwords-technical-overview>
+- Have I Been Pwned, Pwned Passwords: <https://haveibeenpwned.com/Passwords>
+- EFF dice-generated passphrases and word lists: <https://www.eff.org/dice>
+- Hashcat 6.2.6 benchmark, RTX 5090 FE, Chick3nman (February 2025): <https://gist.github.com/Chick3nman/09bac0775e6393468c2925c1e1363d5c>
+- NVIDIA GeForce RTX 5090 specifications (575 W total graphics power): <https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/>
+- M. Tribus and E. C. McIrvine, "Energy and Information," *Scientific American* 225(3), 1971 (source of the Shannon quotation)
+
+## PKI
+
+- RFC 5280, Internet X.509 PKI Certificate and CRL Profile: <https://www.rfc-editor.org/rfc/rfc5280.html>
+- RFC 9525, Service Identity in TLS: <https://www.rfc-editor.org/rfc/rfc9525.html>
+- RFC 2986, PKCS #10 Certification Request Syntax: <https://www.rfc-editor.org/rfc/rfc2986.html>
+- RFC 7468, Textual Encodings of PKIX, PKCS, and CMS Structures: <https://www.rfc-editor.org/rfc/rfc7468.html>
+- RFC 7292, PKCS #12: <https://www.rfc-editor.org/rfc/rfc7292.html>
+- RFC 5652, Cryptographic Message Syntax: <https://www.rfc-editor.org/rfc/rfc5652.html>
+- RFC 8555, ACME: <https://www.rfc-editor.org/rfc/rfc8555.html>
+- RFC 8737, ACME TLS-ALPN-01: <https://www.rfc-editor.org/rfc/rfc8737.html>
+- Microsoft, certreq: <https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certreq_1>
+- Chromium, CRLSets: <https://www.chromium.org/Home/chromium-security/crlsets/>
+- Let's Encrypt, OCSP service has reached end of life (August 6, 2025): <https://letsencrypt.org/2025/08/06/ocsp-service-has-reached-end-of-life>
+- CA/Browser Forum, TLS Baseline Requirements (validity schedule in §1.2.2): <https://cabforum.org/working-groups/server/baseline-requirements/requirements/>
+- CA/Browser Forum, Ballot SC-081v3: <https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/>
+- SpecterOps, *Certified Pre-Owned* (AD CS abuse): <https://specterops.io/wp-content/uploads/sites/3/2022/06/Certified_Pre-Owned.pdf>
+
+## Email security
+
+- RFC 5321, SMTP: <https://www.rfc-editor.org/rfc/rfc5321.html>
+- RFC 5322, Internet Message Format: <https://www.rfc-editor.org/rfc/rfc5322.html>
+- RFC 5598, Internet Mail Architecture: <https://www.rfc-editor.org/rfc/rfc5598.html>
+- RFC 7208, SPF: <https://www.rfc-editor.org/rfc/rfc7208.html>
+- RFC 6376, DKIM: <https://www.rfc-editor.org/rfc/rfc6376.html>
+- RFC 9989, DMARC (May 2026): <https://www.rfc-editor.org/rfc/rfc9989.html>
+- RFC 9990, DMARC Aggregate Reporting: <https://www.rfc-editor.org/rfc/rfc9990.html>
+- RFC 9991, DMARC Failure Reporting: <https://www.rfc-editor.org/rfc/rfc9991.html>
+- RFC 8601, Authentication-Results: <https://datatracker.ietf.org/doc/html/rfc8601>
+- RFC 8617, ARC: <https://www.rfc-editor.org/rfc/rfc8617.html>
+- RFC 8461, MTA-STS: <https://www.rfc-editor.org/rfc/rfc8461.html>
+- RFC 8460, SMTP TLS Reporting: <https://www.rfc-editor.org/rfc/rfc8460.html>
+- RFC 6686, Resolution of the SPF and Sender ID Experiments: <https://www.rfc-editor.org/rfc/rfc6686.html>
+- learndmarc.com (source of the worked examples): <https://www.learndmarc.com/>
+
+## PowerShell
+
+- about_Pipelines: <https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines>
+- about_Functions_CmdletBindingAttribute: <https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute>
+- Export-Csv: <https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/export-csv>
+- Get-WinEvent: <https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent>
+- Differences between Windows PowerShell 5.1 and PowerShell 7.x: <https://learn.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell>
+
+## Windows DFIR box
+
+- KAPE documentation: <https://ericzimmerman.github.io/KapeDocs/>
+- KapeFiles (targets and modules): <https://github.com/EricZimmerman/KapeFiles>
+- Kroll, KAPE license agreement: <https://www.kroll.com/en/kape-license-agreement>
+- Kroll, Detecting and analyzing timestomping with KAPE: <https://www.kroll.com/en/publications/cyber/anti-forensic-tactics/detecting-analyzing-timestomping-with-kape>
+- Eric Zimmerman's tools: <https://ericzimmerman.github.io/>
+- Microsoft, User Account Control settings and configuration: <https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/settings-and-configuration>

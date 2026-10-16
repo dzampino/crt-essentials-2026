@@ -1,0 +1,164 @@
+---
+title: "Building a Windows DFIR box"
+subtitle: "Build a repeatable Windows workstation for analyzing evidence that has already been collected."
+---
+
+::: {.callout-note}
+## Status
+Several implementation choices are still open: Windows version, hypervisor, networking, UAC and Defender configuration, reset method, persistent case storage, and the tool list. They are listed at the [end of this page](#open-decisions). Where this page shows a specific tool or setting, it is an example of the approach, not a selection.
+:::
+
+## What we're building
+
+- A Windows analysis machine, not an evidence acquisition machine.
+- Evidence is already collected; memory acquisition is handled separately (Magnet in our workflow).
+
+The box takes collected artifacts (triage collections, event logs, registry hives, disk images) and produces analysis output: parsed CSVs, timelines, notes. It never touches the client's systems.
+
+## Disposable/nonpersistent virtual machine
+
+- Return the machine to a known state.
+- Keep case data and analysis output separate from what gets reset.
+
+| | Lives where | On reset |
+| --- | --- | --- |
+| Windows, settings, installed tools | The VM's system disk | Returned to the clean snapshot |
+| Temporary files, caches, tool state | The VM's system disk | Discarded |
+| Evidence (read-only working copy) | Persistent case storage | Kept |
+| Analysis output, tool logs, notes | Persistent case storage | Kept |
+
+**Why disposable.** Analysis tools open hostile files. Each case starts from the same known-good image, nothing carries over from the previous client, and "what version of the tool did we use" has one answer.
+
+**How the reset can work** (the method is an open decision):
+
+| Option | How it resets | Keeping case data out of the reset |
+| --- | --- | --- |
+| Hyper-V checkpoint | Apply the clean checkpoint | Checkpoints cover the VM's virtual disks, so keep case data on a share or storage outside the VM |
+| VMware Workstation snapshot | Revert to snapshot | A disk in **independent-persistent** mode is not included in snapshots |
+| Differencing disk over a clean parent | Delete and recreate the child disk | Case data on a separate disk or share |
+| Windows Sandbox | Every session starts clean | Map a host folder in the `.wsb` configuration; tools must be installed each session |
+
+Whatever the method, verify it: write a test file to the case storage, reset, and confirm the file is still there and the system disk change is gone. `Test-DfirBox.ps1` (below) does the first half.
+
+## Automating the build {#build-automation}
+
+- Decide on the Windows image and tool list.
+- Make setup repeatable rather than configuring it by hand each time.
+
+The pattern: a clean Windows image, then scripts that install and configure everything from a data file, then a snapshot. Rebuilding for a new tool version means editing the data file and rerunning, not remembering clicks.
+
+1. Create the VM from the chosen Windows image. Microsoft's Evaluation Center publishes time-limited Windows Enterprise evaluation images; a licensed image is the alternative.
+2. Copy the scripts into the VM and review `DfirTools.psd1`.
+3. Run with `-WhatIf` to see every change, then for real with `-Verbose`.
+4. Run `Test-DfirBox.ps1`, then shut down and take the **clean** snapshot.
+
+```powershell
+Set-Location C:\Build
+.\Install-DfirTools.ps1 -WhatIf
+.\Install-DfirTools.ps1 -Verbose
+.\Set-DfirAnalysisSettings.ps1 -UacMode NoPrompt -DefenderExclusionPath C:\Tools -WhatIf
+.\Test-DfirBox.ps1 -CaseRoot E:\Cases | Format-Table
+```
+
+| File | What it does |
+| --- | --- |
+| [DfirTools.psd1](files/scripts/DfirTools.psd1) | The tool manifest: tool folder, winget package IDs and optional pinned versions. **Example entries only.** |
+| [Install-DfirTools.ps1](files/scripts/Install-DfirTools.ps1) | Installs each package with winget, optionally downloads Eric Zimmerman's tools with his `Get-ZimmermanTools.ps1`, and writes `ToolInventory.csv` with installed versions. Supports `-WhatIf`. |
+| [Set-DfirAnalysisSettings.ps1](files/scripts/Set-DfirAnalysisSettings.ps1) | Sets UAC prompt behavior and optional Defender exclusions for this VM. Supports `-WhatIf` and `-Confirm`. |
+| [Test-DfirBox.ps1](files/scripts/Test-DfirBox.ps1) | Checks case storage exists, is writable and is not on the system drive; lists files retained; checks tool folder and free space. Read-only apart from a temporary marker file. |
+
+`-WhatIf` output from `Install-DfirTools.ps1` with the example manifest:
+
+```text
+What if: Performing the operation "Create tool folder" on target "C:\Tools".
+What if: Performing the operation "winget install" on target "7-Zip".
+What if: Performing the operation "winget install" on target "Sysinternals Suite".
+What if: Performing the operation "winget install" on target "PowerShell 7".
+What if: Performing the operation "Download Eric Zimmerman's tools (.NET 9)" on target "C:\Tools\EZTools".
+What if: Performing the operation "Write tool inventory" on target "C:\Tools\ToolInventory.csv".
+```
+
+Pin versions in the manifest (`Version = '26.04'`) once the tool list is settled; an unpinned build installs whatever is current that day. The winget package IDs in the example manifest were confirmed with `winget show --id <id> --exact` on October 16, 2026.
+
+## Configuring Windows for analysis
+
+- Tools that need to run as administrator.
+- UAC: normally I don't disable security features, but this is a disposable VM and reducing friction matters.
+- Other Windows security settings as decisions specific to this machine, not general recommendations.
+
+### UAC
+
+Two registry values under `HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System` control it:
+
+| `-UacMode` | `EnableLUA` | `ConsentPromptBehaviorAdmin` | Effect |
+| --- | ---: | ---: | --- |
+| `NoPrompt` | 1 | 0 | UAC stays on; programs still start with a standard token, and elevation happens without a prompt. |
+| `Disabled` | 0 | 0 | Admin Approval Mode off; administrators run everything elevated. Needs a restart. |
+| `Default` | 1 | 5 | Windows default: prompt for consent for non-Windows binaries. |
+
+`NoPrompt` removes the friction while keeping the elevation boundary visible to tools that check for it. See Microsoft's [User Account Control settings and configuration](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/settings-and-configuration).
+
+```text
+PS> .\Set-DfirAnalysisSettings.ps1 -UacMode NoPrompt -DefenderExclusionPath C:\Tools -WhatIf -Verbose
+VERBOSE: EnableLUA is already 1
+What if: Performing the operation "Set from 2 to 0" on target "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorAdmin".
+What if: Performing the operation "Add Microsoft Defender exclusion" on target "C:\Tools".
+```
+
+### Other settings to decide
+
+| Setting | Consideration |
+| --- | --- |
+| Microsoft Defender | Real-time scanning can quarantine evidence files and slow parsers; turning it off removes a safety net on a machine that opens hostile files. Options include excluding the tool folder only, excluding the case folder, or leaving it on and scanning evidence deliberately. |
+| Network | Analysis rarely needs the internet; installs and tool updates do. Options: networked during build only, host-only network during cases, or a controlled egress path. |
+| Windows Update | Updates during a case change the system mid-analysis; updating the clean image periodically keeps it patched. |
+| SmartScreen and Mark of the Web | Tools downloaded during the build carry Mark of the Web; scripted installs avoid repeated prompts. |
+
+## Tools for analysis
+
+- Select the tools and versions.
+- KAPE modules for processing already-collected artifacts (intended tool name to be confirmed).
+
+The tool list is open. Record the version of every tool used for a case in the case notes; `ToolInventory.csv` from the build is a starting point.
+
+### Processing an existing artifact set with KAPE modules
+
+KAPE has two halves: **targets** collect files from a system, and **modules** run programs against files already collected. For this box only modules apply. Modules are defined in `.mkape` files; the community set is maintained in [KapeFiles](https://github.com/EricZimmerman/KapeFiles), which includes the compound module `!EZParser` (runs Eric Zimmerman's parsers over a collection).
+
+```powershell
+# Module source is a collection that already exists; output goes to case storage.
+.\kape.exe --msource E:\Cases\2026-0142\Collected\C --mdest E:\Cases\2026-0142\Output\EZParser --module !EZParser
+```
+
+Check the switches against `kape.exe --help` and the [KAPE documentation](https://ericzimmerman.github.io/KapeDocs/) for the version you install.
+
+**Licensing.** Kroll's KAPE terms distinguish free use from uses that require an enterprise license, including use on third-party networks or as part of a paid engagement. Confirm which applies to CRT work before selecting it: [KAPE license agreement](https://www.kroll.com/en/kape-license-agreement).
+
+## Using and resetting the box
+
+- Run tools against existing artifacts.
+- Retain the results and relevant logs.
+- Verify the environment and reset it for the next case.
+
+A per-case checklist (proposed):
+
+1. Start from the clean snapshot. Run `Test-DfirBox.ps1 -CaseRoot <case storage>`; every check should pass except "Files retained" on a new case.
+2. Create the case folders (`Collected`, `Output`, `Notes`; see `New-CaseFolder` on the [PowerShell page](powershell.qmd#shouldprocess)) and copy the evidence in. Hash it on arrival with `Get-FileInventory.ps1`.
+3. Run tools against `Collected`, writing to `Output`. Keep each tool's console log or log file in `Output`.
+4. Before reset: run `Get-FileInventory.ps1 -Path <case>\Output -OutputPath <case>\Notes\OutputInventory.csv` and `Test-DfirBox.ps1` again, and confirm the output is on case storage.
+5. Revert to the clean snapshot. Confirm case storage is still intact from the next session.
+
+## Open decisions {#open-decisions}
+
+| Decision | Options under consideration |
+| --- | --- |
+| Windows version and image | Windows 11 Enterprise or Pro; evaluation versus licensed image |
+| Hypervisor | Hyper-V, VMware Workstation, other |
+| Networking | Build-time only, host-only, controlled egress |
+| UAC | `NoPrompt` or `Disabled` |
+| Defender | On, tool-folder exclusion, case-folder exclusion, off |
+| Reset method | Checkpoint or snapshot, differencing disk, Windows Sandbox |
+| Persistent case storage | Host share, separate persistent virtual disk, storage server |
+| Tool list and versions | Open until selected; confirm KAPE licensing |
+
+These are also tracked in the project [README](https://github.com/dzampino/crt-essentials-2026#remaining-decisions).

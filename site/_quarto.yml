@@ -1,0 +1,48 @@
+project:
+  type: website
+  output-dir: ../docs
+  resources:
+    - files/**
+    - js/**
+
+website:
+  title: "CRT Essentials"
+  description: "Companion field guide for CRT Essentials or The Dave Zampino Power Hour, CRT Annual Training Conference 2026."
+  site-url: https://dzampino.github.io/crt-essentials-2026/
+  repo-url: https://github.com/dzampino/crt-essentials-2026
+  repo-actions: [source, issue]
+  page-navigation: true
+  search: true
+  navbar:
+    background: "#0C2454"
+    left:
+      - href: index.qmd
+        text: Home
+      - href: passwords.qmd
+        text: Passwords
+      - href: pki.qmd
+        text: PKI
+      - href: email.qmd
+        text: Email security
+      - href: powershell.qmd
+        text: PowerShell
+      - href: dfir.qmd
+        text: DFIR box
+      - href: references.qmd
+        text: References
+  page-footer:
+    left: "CRT Annual Training Conference 2026"
+    right: "Wisconsin Cyber Response Team"
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    code-copy: true
+    code-overflow: wrap
+    highlight-style: github
+    anchor-sections: true
+    smooth-scroll: true
+    link-external-newwindow: true
