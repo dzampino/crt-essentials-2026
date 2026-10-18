@@ -118,7 +118,7 @@ Get-ChildItem -Path .\Case -Recurse -File |
 Once you have typed the same pipeline twice, make it a function. `Get-FileInventory` combines the listing and the hashing into one object per file:
 
 ```powershell
-{{< include ../scripts/CrtEssentials/Functions/Get-FileInventory.ps1 >}}
+{{< include ../scripts/Get-FileInventory.ps1 >}}
 ```
 
 ```powershell
@@ -156,7 +156,7 @@ Get-WinEvent -FilterHashtable @{
 `Get-EvtxSummary` turns the first example into a function, with the first and last time each event appears:
 
 ```powershell
-{{< include ../scripts/CrtEssentials/Functions/Get-EvtxSummary.ps1 >}}
+{{< include ../scripts/Get-EvtxSummary.ps1 >}}
 ```
 
 ```powershell
@@ -175,7 +175,7 @@ System.evtx Service Control Manager 7045     4 10/16/2026 9:27:25 PM 10/16/2026 
 Event properties hold the event's data fields. To get named fields, such as `TargetUserName` and `IpAddress` in a 4624, read the event XML. `Get-LogonEvent` does that for successful logons:
 
 ```powershell
-{{< include ../scripts/CrtEssentials/Functions/Get-LogonEvent.ps1 >}}
+{{< include ../scripts/Get-LogonEvent.ps1 >}}
 ```
 
 ```powershell
@@ -213,7 +213,7 @@ param(
 Anything that changes state should support `-WhatIf`. Declare `SupportsShouldProcess` and wrap each change in `$PSCmdlet.ShouldProcess()` ([about_Functions_CmdletBindingAttribute](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute)):
 
 ```powershell
-{{< include ../scripts/CrtEssentials/Functions/New-CaseFolder.ps1 >}}
+{{< include ../scripts/New-CaseFolder.ps1 >}}
 ```
 
 ```powershell
@@ -297,6 +297,8 @@ If you see "running scripts is disabled on this system", Windows PowerShell 5.1 
 
 ### The functions on this site
 
+They are starting points for learning, kept short so they are easy to read. Copy the ones you want into your module and change them to suit your work.
+
 | Function | What it does | Page |
 | --- | --- | --- |
 | `Get-PasswordEntropy` | Bits of entropy from alphabet size and length | [Passwords](passwords.qmd#entropy-in-powershell) |
@@ -308,15 +310,6 @@ If you see "running scripts is disabled on this system", Windows PowerShell 5.1 
 | `Get-EvtxSummary` | Event counts by provider and ID in a saved `.evtx` | [above](#looking-at-collected-windows-event-logs-with-get-winevent) |
 | `Get-LogonEvent` | User, logon type and address from 4624 events | [above](#looking-at-collected-windows-event-logs-with-get-winevent) |
 | `New-CaseFolder` | Create a case's folders, with `-WhatIf` | [above](#shouldprocess) |
-
-All of them are also packaged as the **CrtEssentials** module: [download CrtEssentials.zip](files/CrtEssentials.zip), or browse the source on [GitHub](https://github.com/dzampino/crt-essentials-2026/tree/main/scripts/CrtEssentials). It keeps each function in its own file under `Functions\`, and `CrtEssentials.psm1` loads them all, which is a common layout once a module grows. To install it, unblock the download, then extract the `CrtEssentials` folder into your personal module folder:
-
-```powershell
-Unblock-File -Path .\CrtEssentials.zip
-$Modules = Join-Path -Path ([Environment]::GetFolderPath('MyDocuments')) -ChildPath 'PowerShell\Modules'
-Expand-Archive -Path .\CrtEssentials.zip -DestinationPath $Modules
-Get-Command -Module CrtEssentials
-```
 
 When a module is worth sharing, `New-ModuleManifest` adds a `.psd1` with a version number, author and list of exported functions ([about_Module_Manifests](https://learn.microsoft.com/en-us/powershell/scripting/developer/module/how-to-write-a-powershell-module-manifest)).
 

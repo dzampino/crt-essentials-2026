@@ -5,7 +5,6 @@
 	"use strict";
 
 	const NAVY = "#0C2454";
-	const MAX_BITS = 128;
 	const SECONDS_PER_YEAR = 365.25 * 86400;
 	// NIST SP 811 Appendix B: 1 BTU(IT)/h = 0.2930711 W; 1 ton of refrigeration = 12,000 BTU/h
 	const BTU_PER_HOUR_PER_WATT = 1 / 0.2930711;
@@ -83,14 +82,25 @@
 		return el;
 	}
 
+	// A round tick step giving about five gridlines up to max: 1, 2 or 5 times a power of ten
+	function niceStep(max) {
+		const raw = max / 5;
+		const power = Math.pow(10, Math.floor(Math.log10(raw)));
+		const n = raw / power;
+		return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * power;
+	}
+
 	function drawChart() {
 		const host = $("ent-chart");
 		host.innerHTML = "";
-		const W = 720, H = 320, m = { t: 14, r: 120, b: 38, l: 48 };
+		const W = 720, H = 320, m = { t: 14, r: 120, b: 38, l: 60 };
 		const bpc = bitsPerChar();
-		const xMax = Math.max(4, Math.min(256, Math.ceil(MAX_BITS / bpc)));
+		// x covers the whole length slider; y grows to fit the longest password, so the line is never clipped
+		const xMax = Number($("ent-length").max);
+		const yStep = niceStep(xMax * bpc);
+		const yMax = Math.ceil((xMax * bpc) / yStep) * yStep;
 		const x = (len) => m.l + ((len - 1) / (xMax - 1)) * (W - m.l - m.r);
-		const y = (bits) => H - m.b - (Math.min(bits, MAX_BITS) / MAX_BITS) * (H - m.t - m.b);
+		const y = (bits) => H - m.b - (bits / yMax) * (H - m.t - m.b);
 
 		const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img",
 			"aria-label": "Bits of entropy by password length for an alphabet of " + state.alphabet + " symbols" });
@@ -98,10 +108,10 @@
 		// grid and y axis
 		const grid = svgEl("g", { class: "grid" });
 		const axis = svgEl("g", { class: "axis" });
-		for (let b = 0; b <= MAX_BITS; b += 32) {
+		for (let b = 0; b <= yMax; b += yStep) {
 			grid.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: y(b), y2: y(b) }));
 			const t = svgEl("text", { x: m.l - 8, y: y(b) + 4, "text-anchor": "end" });
-			t.textContent = b;
+			t.textContent = b.toLocaleString();
 			axis.appendChild(t);
 		}
 		const yl = svgEl("text", { x: 12, y: (H - m.b + m.t) / 2, transform: "rotate(-90 12 " + (H - m.b + m.t) / 2 + ")", "text-anchor": "middle" });
@@ -123,9 +133,9 @@
 		svg.appendChild(axis);
 
 		// areas and lines
-		function series(offset) {
+		function series() {
 			const pts = [];
-			for (let len = 1; len <= xMax; len++) pts.push([x(len), y(Math.max(0, len * bpc - offset))]);
+			for (let len = 1; len <= xMax; len++) pts.push([x(len), y(len * bpc)]);
 			return pts;
 		}
 		function area(pts) {
@@ -134,22 +144,20 @@
 		function line(pts) {
 			return "M" + pts.map((p) => p.join(",")).join(" L");
 		}
-		const full = series(0);
+		const full = series();
 		svg.appendChild(svgEl("path", { d: area(full), fill: NAVY, "fill-opacity": 0.14 }));
 		svg.appendChild(svgEl("path", { d: line(full), fill: "none", stroke: NAVY, "stroke-width": 2 }));
 
 		// direct label at the right edge
-		const lastFull = Math.min(xMax * bpc, MAX_BITS);
+		const lastFull = xMax * bpc;
 		const l1 = svgEl("text", { x: W - m.r + 8, y: y(lastFull) + 4, class: "series-label" });
 		l1.textContent = "Bits of entropy";
 		svg.appendChild(l1);
 
 		// current length marker
-		if (state.length <= xMax) {
-			const cx = x(state.length);
-			svg.appendChild(svgEl("line", { x1: cx, x2: cx, y1: m.t, y2: H - m.b, stroke: "#5A6472", "stroke-dasharray": "2 3" }));
-			svg.appendChild(svgEl("circle", { cx: cx, cy: y(state.length * bpc), r: 5, fill: NAVY, stroke: "#FFFFFF", "stroke-width": 2 }));
-		}
+		const cx = x(state.length);
+		svg.appendChild(svgEl("line", { x1: cx, x2: cx, y1: m.t, y2: H - m.b, stroke: "#5A6472", "stroke-dasharray": "2 3" }));
+		svg.appendChild(svgEl("circle", { cx: cx, cy: y(state.length * bpc), r: 5, fill: NAVY, stroke: "#FFFFFF", "stroke-width": 2 }));
 
 		// hover crosshair and tooltip
 		const cross = svgEl("line", { y1: m.t, y2: H - m.b, stroke: "#9AA3AE", visibility: "hidden" });

@@ -385,7 +385,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>The generator is written for Windows 10 and 11. Most of these settings are ordinary setup and registry settings that apply to Windows Server 2025 too, but test the file on Server before relying on it. Generate it again when you change the build, rather than editing the XML by hand.</p>
+<p>The generator is written for Windows 10 and 11, and its files work for Windows Server 2025 once you make two choices by hand:</p>
+<ul>
+<li><strong>Product key.</strong> Choose <em>Enter another product key</em> and enter your own key, or the generic key for the edition from Microsoft’s <a href="https://learn.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys">KMS client product keys</a> (Windows Server 2025 Standard: <code>TVRH6-WHNXV-R9WG3-9XRFY-MY832</code>). The generic key picks the edition; it does not activate Windows.</li>
+<li><strong>Image.</strong> Choose <em>Select image with this name</em> or <em>Select image with this index</em>, and pick a Desktop Experience image. To list the images on the ISO, mount it and run <code>Get-WindowsImage -ImagePath D:\sources\install.wim</code> in an elevated PowerShell (D: being the mounted ISO).</li>
+</ul>
+<p>Generate the file again when you change the build, rather than editing the XML by hand.</p>
 <p>Windows Setup looks for <code>autounattend.xml</code> in the root of removable media. In Workstation, create the VM with <strong>I will install the operating system later</strong> (so VMware’s Easy Install does not supply its own answers), attach the Windows ISO, and attach a second small ISO, or a floppy image, containing <code>autounattend.xml</code>.</p>
 </section>
 </section>
@@ -449,7 +454,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="network-and-updates" class="level3">
 <h3 class="anchored" data-anchor-id="network-and-updates">Network and updates</h3>
-<p>Analysis rarely needs the internet; installs and tool updates do. Connect the VM during the build, then use a host-only network (or none) during cases. Windows Update in the middle of a case changes the system under the analysis; update the clean image on a schedule instead.</p>
+<p>Analysis rarely needs the internet; installs and tool updates do. Connect the VM during the build, then keep it off the internet during cases: a host-only network, or none. Hostile files cannot reach out, and the tools stay at the versions in the image. Windows Update in the middle of a case changes the system under the analysis; update the clean image on a schedule instead.</p>
 </section>
 </section>
 <section id="tools-for-analysis" class="level2">
@@ -462,7 +467,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="chocolatey-and-scoop">Chocolatey and Scoop</h3>
 <p><a href="https://chocolatey.org/install">Chocolatey</a> installs most of the list from one command, which makes the FirstLogon step one line. Its community packages are maintained by volunteers, separately from the tools’ authors: check the package page links to the real project before adding it. <a href="https://scoop.sh/">Scoop</a> is an alternative that installs per user without administrator rights; it has fewer DFIR tools.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>choco install <span class="op">-</span>y 7zip sysinternals pwsh ericzimmermantools volatility3 autopsy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Record what is installed for the case notes, and pin versions (<code>--version</code>) once the list settles so every rebuild is the same:</p>
+<p>There is no need to pin versions. The non-persistent disk keeps every tool at the version in the image until you deliberately update it, and Scoop keeps earlier versions side by side when it updates an app (<code>scoop cleanup</code> removes them). Record what is installed for the case notes:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>choco list <span class="op">|</span> <span class="fu">Out-File</span> <span class="op">-</span>FilePath <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Notes\Tools.txt"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="the-tool-list" class="level3">
@@ -536,7 +541,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Module source is a collection that already exists; output goes to case storage.</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\kape<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>msource <span class="st">"\\vmware-host\Shared Folders\Evidence\2026-0142\C"</span> <span class="op">--</span>mdest <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Output\EZParser"</span> <span class="op">--</span>module <span class="op">!</span>EZParser</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Check the switches against <code>kape.exe --help</code> and the <a href="https://ericzimmerman.github.io/KapeDocs/">KAPE documentation</a> for the version you install.</p>
-<p><strong>Licensing.</strong> Kroll’s KAPE terms distinguish free use from uses that require an enterprise license, including use on third-party networks or as part of a paid engagement. Check which applies to your work: <a href="https://www.kroll.com/en/kape-license-agreement">KAPE license agreement</a>.</p>
+<p><strong>Licensing.</strong> KAPE is free for CRT members. Commercial use, such as paid engagements, requires an enterprise license from Kroll: <a href="https://www.kroll.com/en/kape-license-agreement">KAPE license agreement</a>.</p>
 </section>
 </section>
 <section id="using-and-resetting-the-box" class="level2">
@@ -549,7 +554,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>A per-case checklist:</p>
 <ol type="1">
 <li>Power on from the non-persistent image. Confirm <code>\\vmware-host\Shared Folders\Evidence</code> is read-only and <code>Cases</code> is writable.</li>
-<li>Create the case folders with <code>New-CaseFolder</code> from the <a href="./powershell.html#module">CrtEssentials module</a>, and put the evidence in the host’s <code>Evidence</code> folder. Hash it on arrival with <code>Get-FileInventory</code>.</li>
+<li>Create the case folders with <code>New-CaseFolder</code> from the <a href="./powershell.html#shouldprocess">PowerShell page</a>, and put the evidence in the host’s <code>Evidence</code> folder. Hash it on arrival with <code>Get-FileInventory</code>.</li>
 <li>Run tools against <code>Evidence</code>, writing to <code>Cases\&lt;case&gt;\Output</code>. Keep each tool’s console log or log file in <code>Output</code>.</li>
 <li>Before power-off, confirm the output is on the <code>Cases</code> share: <code>Get-FileInventory -Path &lt;case&gt;\Output | Export-Csv &lt;case&gt;\Notes\OutputInventory.csv -NoTypeInformation</code>.</li>
 <li>Power off. Everything on the system disk is discarded; the next case starts clean.</li>

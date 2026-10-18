@@ -1,6 +1,5 @@
 # CRT Essentials
 
-**Full title:** CRT Essentials or The Dave Zampino Power Hour  
 **Event:** CRT Annual Training Conference 2026
 
 ## Topics
@@ -24,7 +23,7 @@
 | `quarto/slides.qmd` | The full deck, using the WICRT template in `quarto/_extensions/wicrt/` |
 | `site/` | Quarto website source: one page per topic, `js/` for the interactive tools |
 | `docs/` | Rendered site, served by GitHub Pages. Generated; do not edit by hand. |
-| `scripts/` | The `CrtEssentials` PowerShell module: every function shown on the site |
+| `scripts/` | The PowerShell functions shown on the site, one per file |
 | `samples/` | PKI sample files and email exercises |
 | `assets/` | Logo, diagrams and attributed artwork |
 | `references.md` | Primary sources |

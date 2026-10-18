@@ -1,4 +1,4 @@
-# CRT Essentials or The Dave Zampino Power Hour
+# CRT Essentials
 
 ## CRT Annual Training Conference 2026 project master outline
 
@@ -9,7 +9,7 @@
 - A supplementary website with the technical depth, examples, commands, references, and interactive demonstrations that do not fit comfortably into the live presentation.
 - Shared, portable project files that ChatGPT and Claude can both work with.
 
-The final title is **CRT Essentials or The Dave Zampino Power Hour**. In working discussion, use **CRT Essentials** or **the CRT Annual Training Conference 2026 project**. The session is two hours.
+The title is **CRT Essentials**. The deck's subtitle appears only in the deck. In working discussion, use **CRT Essentials** or **the CRT Annual Training Conference 2026 project**. The session is two hours.
 
 The five topics were assigned and are somewhat disparate. Their connection is practical security knowledge CRT responders should understand and be able to explain, including preventative advice that helps organizations avoid the incidents we respond to. There is no need to force everything into one fictional incident or an artificial narrative.
 
@@ -22,11 +22,11 @@ The five topics were assigned and are somewhat disparate. Their connection is pr
 5. **Slides and a field guide.** The SANS-inspired model is a focused live presentation supported by material attendees can use afterward. The website should add value beyond reproducing the slides.
 6. **Technical accuracy.** Correct factual errors and identify uncertainty while preserving David's intended point. Verify standards, changing guidance, commands, and software behavior before publishing them.
 
-## 3. Presentation order and proposed timing
+## 3. Presentation order and timing
 
 The order is **Passwords → PKI → Email Security → PowerShell → DFIR workstation**.
 
-The following is a proposed pacing budget, not a previously settled schedule. Demonstrations are included within each section's allocation.
+Demonstrations are included within each section's allocation.
 
 | Segment | Minutes | Running time |
 | --- | ---: | ---: |
@@ -256,8 +256,8 @@ An opinionated build (David's choices), without build scripts:
 
 1. Windows Server 2025 (Desktop Experience): stable, Defender can be removed as a feature, no TPM requirement.
 2. VMware Workstation Pro: independent non-persistent system disk; Shared Folders, evidence read-only and case output read-write.
-3. Automate the Windows install with an unattend file: https://schneegans.de/windows/unattend-generator/
+3. Automate the Windows install with an unattend file: https://schneegans.de/windows/unattend-generator/ (for Server 2025, add a generic or real product key and select the image by name or index).
 4. Windows settings: UAC disabled, Defender removed, long paths enabled, file extensions and hidden files shown, and similar.
-5. Tools through Chocolatey/Scoop where packaged: Eric Zimmerman's tools, KAPE, FTK Imager (mounting), Volatility, log2timeline/plaso, Office if licensed, Chainsaw, Hayabusa, Autopsy.
+5. Tools through Chocolatey/Scoop where packaged: Eric Zimmerman's tools, KAPE, FTK Imager (mounting), Volatility, log2timeline/plaso, Office if licensed, Chainsaw, Hayabusa, Autopsy. No version pinning: the non-persistent disk fixes the versions, and the VM stays off the internet during cases. KAPE is free for CRT members; commercial use requires a Kroll enterprise license.
 6. A working example of processing an existing artifact set with a KAPE module, without adding an evidence collection workflow.
 7. Reset and retention checks: what is discarded at power-off and what is kept on the shared folders.

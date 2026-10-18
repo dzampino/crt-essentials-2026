@@ -15,20 +15,15 @@ outline.md is the editorial authority; edit there first, then here, then the mat
 The Passwords section supersedes passwords.qmd, which is kept as the earlier single-section draft.
 Speaker notes hold references and talking points only: nothing about how the deck was made.
 Editorial labels go in HTML comments like this one, which do not render:
-  PROPOSED = wording that is not David's; NOTES TO ADD = David's notes still needed.
+  PROPOSED = wording that is not David's.
+Images take their alt text from the image title ("..."); build.ps1 removes the file path Pandoc appends.
 Transcripts use ```smtp (../syntax/smtp.xml): client lines navy, server lines red.
 Render with build.ps1 (or: quarto render slides.qmd --output-dir ../output).
 -->
 
-## Companion site
+## dzampino.github.io/crt-essentials-2026
 
-**dzampino.github.io/crt-essentials-2026**
-
-Calculators, sample files, commands, a PowerShell module and references for everything in this session
-
-![](../assets/site-qr.png)
-
-<!-- PROPOSED: caption wording. -->
+![](../assets/site-qr.png "QR code linking to dzampino.github.io/crt-essentials-2026")
 
 ::: notes
 https://dzampino.github.io/crt-essentials-2026/
@@ -41,8 +36,6 @@ https://dzampino.github.io/crt-essentials-2026/
 3. Email security
 4. PowerShell
 5. Building a Windows DFIR box
-
-<!-- PROPOSED: timing, from outline.md section 3. -->
 
 ::: notes
 Timing: introduction 5 minutes, passwords 20, PKI 25, email security 30, PowerShell 20, DFIR box 15, questions and wrap-up 5.
@@ -58,7 +51,9 @@ Timing: introduction 5 minutes, passwords 20, PKI 25, email security 30, PowerSh
 - Goal in all authentication methods is **good enough** uniqueness
 - We can add behavior to assist in making risk assessments
 
-<!-- NOTES TO ADD -->
+::: notes
+NIST SP 800-63B-4 covers passwords alongside the other authenticator types: https://pages.nist.gov/800-63-4/sp800-63b.html
+:::
 
 ## correct horse battery staple
 
@@ -66,7 +61,7 @@ xkcd 936, "Password Strength"
 
 <https://xkcd.com/936/>
 
-![](../assets/xkcd-936.png)
+![](../assets/xkcd-936.png "xkcd 936 comic: Tr0ub4dor&3 is hard to remember and has about 28 bits of entropy; correct horse battery staple, four random common words, is easy to remember and has about 44 bits")
 
 ::: notes
 xkcd 936, "Password Strength," by Randall Munroe: https://xkcd.com/936/ (CC BY-NC 2.5).
@@ -146,8 +141,6 @@ Microsoft, Passwords technical overview: https://learn.microsoft.com/en-us/windo
 - Do what we can to protect users
 - Attack modeling should be based on online attacks
 - We have duties to protect hashes from getting stolen
-
-<!-- NOTES TO ADD -->
 
 ::: notes
 NIST SP 800-63B-4 section 3.2.2: rate limiting SHALL limit consecutive failed attempts on an account to no more than 100. Section 3.1.1.2: passwords SHALL be salted (at least 32 bits) and hashed with a suitable password hashing scheme; the cost factor SHOULD be as high as practical.
@@ -245,7 +238,7 @@ XCA, a graphical certificate and key manager: https://hohnstaedt.de/xca/
 - Trust anchors and the certificate store
 - A valid signature is not the same as a trusted certificate
 
-![](../assets/diagrams/certificate-chain.png)
+![](../assets/diagrams/certificate-chain.png "Certificate chain: the self-signed root CA signs the intermediate CA, which signs the leaf. The client supplies the trust anchor from its certificate store; the server presents the leaf and intermediates and proves possession of the leaf private key")
 
 ::: notes
 The training sample is a two-level chain: the root signs the leaf directly. Public CAs issue from intermediates.
@@ -356,7 +349,7 @@ These limits apply to publicly trusted TLS certificates. Internal CAs set their 
 - SMTP, submission, relay, delivery, and DNS/MX records
 - Submission is usually authenticated on 587 or 465, but can be unauthenticated on 25
 
-![](../assets/diagrams/email-flow.png)
+![](../assets/diagrams/email-flow.png "Email flow: the author client (MUA) submits to the MSA, which relays to the sending MTA. The sending MTA finds the receiving MTA through DNS MX records and sends by SMTP; the receiving MTA looks up SPF, DKIM and DMARC policy and delivers to the MDA, which the recipient client reads. Each hop adds a Received header")
 
 ::: notes
 RFC 5598, Internet Mail Architecture: https://www.rfc-editor.org/rfc/rfc5598.html
@@ -570,7 +563,11 @@ RFC 6686 (Sender ID and SPF experiment resolution): https://www.rfc-editor.org/r
 - Turning a repetitive task into something repeatable
 - Objects, not text: no parsing columns with regex
 
-<!-- PROPOSED: the third point. NOTES TO ADD -->
+<!-- PROPOSED: the third point. -->
+
+::: notes
+Get-Member shows the properties and methods of whatever a command returns.
+:::
 
 ## Finding commands
 
@@ -700,7 +697,7 @@ Get-Command -Module MyTools
 
 ::: notes
 about_Modules: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules
-Windows PowerShell 5.1 uses Documents\WindowsPowerShell\Modules instead. Every function on the companion site is in its own copyable block, and all of them are packaged as the CrtEssentials module.
+Windows PowerShell 5.1 uses Documents\WindowsPowerShell\Modules instead. Every function on the companion site is in its own copyable block.
 :::
 
 # Questions? {#powershell-questions}
@@ -713,7 +710,9 @@ Windows PowerShell 5.1 uses Documents\WindowsPowerShell\Modules instead. Every f
 - Evidence is already collected
 - Memory acquisition is handled separately (Magnet in our workflow)
 
-<!-- NOTES TO ADD -->
+::: notes
+Evidence arrives through the read-only Evidence shared folder; output goes to Cases. The VM stays off the internet during cases.
+:::
 
 ## Disposable/nonpersistent virtual machine
 
@@ -752,7 +751,7 @@ In the guest, shared folders are at \\vmware-host\Shared Folders\.
 Windows Server hardware requirements list a TPM as required only for certain features: https://learn.microsoft.com/en-us/windows-server/get-started/hardware-requirements
 Defender on Windows Server is the Windows-Defender feature: https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure
 The 180-day evaluation must be activated online within its first 10 days.
-The unattend generator is written for Windows 10 and 11; test its output on Server 2025.
+The unattend generator is written for Windows 10 and 11. For Server 2025, enter the product key (generic or real) and select the image by name or index.
 :::
 
 ## Configuring Windows for analysis
@@ -784,7 +783,7 @@ choco install -y ericzimmermantools volatility3 autopsy
 The full line on the companion site also installs 7-Zip, Sysinternals and PowerShell 7.
 KAPE, FTK Imager, Chainsaw and Hayabusa are direct downloads; Chocolatey's "chainsaw" package is a different program. Plaso runs on Windows through Docker.
 KAPE and the community KapeFiles repository: https://github.com/EricZimmerman/KapeFiles
-Kroll's KAPE terms distinguish free and enterprise use: https://www.kroll.com/en/kape-license-agreement
+KAPE is free for CRT members; commercial use needs a Kroll enterprise license: https://www.kroll.com/en/kape-license-agreement
 :::
 
 ## Using and resetting the box

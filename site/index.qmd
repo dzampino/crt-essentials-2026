@@ -1,6 +1,5 @@
 ---
 title: "CRT Essentials"
-subtitle: "or The Dave Zampino Power Hour"
 toc: false
 ---
 
@@ -47,5 +46,4 @@ Windows Server 2025 · VMware Workstation · unattended install · tool list
 
 - [Slides (PowerPoint)](files/crt-essentials.pptx)
 - [PKI sample files](pki.qmd#sample-files): fictional training certificates and a CSR. No private keys are included. Do not install the training root.
-- [CrtEssentials PowerShell module](powershell.qmd#module): every function on this site
 - Source for everything on this site: [github.com/dzampino/crt-essentials-2026](https://github.com/dzampino/crt-essentials-2026)

@@ -1,6 +1,6 @@
 # CRT Essentials shared instructions
 
-The title is "CRT Essentials or The Dave Zampino Power Hour". Refer to CRT Essentials or the CRT Annual Training Conference 2026 project in working discussion.
+The title is "CRT Essentials". The deck's subtitle appears only in the deck, never on the site, README or elsewhere. Refer to CRT Essentials or the CRT Annual Training Conference 2026 project in working discussion.
 
 - Read README.md and outline.md before editing.
 - Keep the five-topic order and two-hour budget.

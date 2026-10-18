@@ -67,22 +67,28 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 - [x] Render deck and site, commit `docs/`, push to github.com/dzampino/crt-essentials-2026.
   - Rendered, committed and pushed October 18, 2026. Live site checked: pki.html shows `squeakycurds.example`, files/CrtEssentials.zip returns 200, home page has no session plan.
 
+## 9. David's answers to the open decisions (October 18, 2026)
+
+- [x] Speaker notes: none from David; placeholders removed, minor notes added (he walks around and may not see them).
+- [x] Image alt text: descriptions as image titles in `quarto/slides.qmd`; `build.ps1` strips the file path Pandoc appends.
+- [x] Timing confirmed: "proposed" removed from outline section 3 and the deck.
+- [x] KAPE: free for CRT members; commercial use needs a Kroll enterprise license.
+- [x] Unattend: works for Server 2025 with a generic or real product key and the image selected by name or index.
+- [x] No version pinning: non-persistent disk fixes versions; VM stays off the internet during cases. (Only the Scoop side-by-side claim is stated; Chocolatey keeping old versions was not confirmed.)
+- [x] Certificate-chain diagram updated to `squeakycurds.example`.
+
+## 10. Second request list (October 18, 2026)
+
+- [x] Entropy chart: y-axis resizes with the alphabet; the line must stay straight (it bent at length 27 to 28 because bits were clamped at 128).
+  - x covers the whole length slider (1 to 64); y rounds up to a 1/2/5 step. Checked straight for alphabets 2 to 1,000,000.
+- [x] No downloadable CrtEssentials module: learners may build their own; the material is a starting point for learning.
+  - Zip and `.psm1` removed; the function files moved to `scripts/*.ps1`, still included by the site pages. "Your own module" section kept, with the functions described as starting points.
+- [x] Deck: drop the companion site description.
+  - Slide 2 is now the URL as the title plus the QR code (the URL wrapped in the narrow text column).
+- [x] The deck subtitle appears only in the deck; drop it everywhere else.
+  - Removed from the site home, README, outline and AGENTS.md (which now states the rule without naming it). `quarto/passwords.qmd` and `quarto/template.qmd` are decks, so they keep it.
+
 ## Open decisions
 
-Carried over from README.md, which no longer holds working notes.
-
-Presentation:
-
-- [ ] David's notes still needed where `quarto/slides.qmd` has `<!-- NOTES TO ADD -->`, and review of `<!-- PROPOSED -->` wording.
-- [ ] Image alt text in the .pptx is the file path (Pandoc limitation); set real alt text in PowerPoint before sharing.
-- [ ] Confirm the proposed timing in outline section 3.
-
-Site:
-
-- [ ] Cracking explorer defaults ($/kWh, $/GPU-hour, tier GPU counts and prices) are placeholders; replace with figures David wants to stand behind.
-
-Windows DFIR box:
-
-- [ ] Confirm which KAPE license applies to CRT work.
-- [ ] Test an unattend file from the generator on Windows Server 2025 (the generator targets Windows 10/11).
-- [ ] Decide on pinned Chocolatey versions for the DFIR box once the tool list settles.
+- [ ] Review the `<!-- PROPOSED -->` wording in `quarto/slides.qmd` (wording that is not David's).
+- [ ] Chocolatey and old versions: David said Chocolatey and Scoop keep old versions by default; only Scoop's behavior is confirmed and stated on the site.

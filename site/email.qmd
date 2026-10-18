@@ -122,7 +122,7 @@ Forwarding and mailing lists break SPF (a new IP) and often DKIM (a modified sub
 Header lines are folded: a line beginning with a space or tab continues the previous header. Unfold first, then parse:
 
 ```powershell
-{{< include ../scripts/CrtEssentials/Functions/Get-MailHeader.ps1 >}}
+{{< include ../scripts/Get-MailHeader.ps1 >}}
 ```
 
 ```powershell

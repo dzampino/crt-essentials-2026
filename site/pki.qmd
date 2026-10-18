@@ -144,7 +144,7 @@ certutil shows validity in local time (here US Central, UTC−5): `9/30/2026 7:0
 .NET reads certificate files directly. This function returns the fields you usually want, including the names in the SAN:
 
 ```powershell
-{{< include ../scripts/CrtEssentials/Functions/Get-CertificateInfo.ps1 >}}
+{{< include ../scripts/Get-CertificateInfo.ps1 >}}
 ```
 
 ```powershell

@@ -3,8 +3,8 @@
 	Renders the slide deck and the companion site.
 
 .DESCRIPTION
-	1. Renders quarto/slides.qmd to output/slides.pptx.
-	2. Copies the deck, samples, scripts and images into site/files (not tracked in Git).
+	1. Renders quarto/slides.qmd to output/slides.pptx and cleans up the image alt text.
+	2. Copies the deck, samples and images into site/files (not tracked in Git).
 	3. Renders the site into docs/, which GitHub Pages serves from the main branch.
 
 	Requires Quarto 1.4 or later. Looks for quarto on PATH, then in the default install folder.
@@ -51,6 +51,32 @@ if (-not $SiteOnly) {
 		finally {
 			Pop-Location
 		}
+
+		# Pandoc appends the image's file path to its alt text; keep only the description (the image title in slides.qmd)
+		Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+		$Deck = [System.IO.Compression.ZipFile]::Open((Join-Path -Path $Root -ChildPath 'output\slides.pptx'), 'Update')
+		try {
+			$Deck.Entries | Where-Object FullName -match '^ppt/slides/slide\d+\.xml$' | ForEach-Object {
+				$Reader = [System.IO.StreamReader]::new($_.Open())
+				$Xml = $Reader.ReadToEnd()
+				$Reader.Close()
+				$Fixed = $Xml -replace 'descr="([^"]*?)\n\n[^"\n]*"', 'descr="$1"'
+				if ($Fixed -match 'descr="[^"]*\.(png|jpg|svg)"') {
+					Write-Warning "$($_.FullName): an image has no alt text; give it a title in slides.qmd"
+				}
+				if ($Fixed -ne $Xml) {
+					$Stream = $_.Open()
+					$Stream.SetLength(0)
+					$Writer = [System.IO.StreamWriter]::new($Stream, [System.Text.UTF8Encoding]::new($false))
+					$Writer.Write($Fixed)
+					$Writer.Close()
+					Write-Verbose "Set alt text in $($_.FullName)"
+				}
+			}
+		}
+		finally {
+			$Deck.Dispose()
+		}
 	}
 }
 
@@ -76,10 +102,6 @@ if (-not $SlidesOnly) {
 			Copy-Item -Path (Join-Path -Path $Root -ChildPath $_.From) -Destination $Destination
 			Write-Verbose "Copied $($_.From) to files\$($_.To)"
 		}
-		# The PowerShell module, zipped so it extracts straight into a Modules folder
-		$Zip = Join-Path -Path $Files -ChildPath 'CrtEssentials.zip'
-		Compress-Archive -Path (Join-Path -Path $Root -ChildPath 'scripts\CrtEssentials') -DestinationPath $Zip
-		Write-Verbose "Created files\CrtEssentials.zip"
 	}
 
 	$Docs = Join-Path -Path $Root -ChildPath 'docs'

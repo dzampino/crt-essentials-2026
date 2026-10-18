@@ -72,7 +72,12 @@ An unattend file (`autounattend.xml`) answers every question Windows Setup asks 
 | Remove bloatware | Fewer distractions and background updates |
 | FirstLogon scripts | Install Chocolatey and the tools ([below](#tools-for-analysis)) |
 
-The generator is written for Windows 10 and 11. Most of these settings are ordinary setup and registry settings that apply to Windows Server 2025 too, but test the file on Server before relying on it. Generate it again when you change the build, rather than editing the XML by hand.
+The generator is written for Windows 10 and 11, and its files work for Windows Server 2025 once you make two choices by hand:
+
+- **Product key.** Choose *Enter another product key* and enter your own key, or the generic key for the edition from Microsoft's [KMS client product keys](https://learn.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys) (Windows Server 2025 Standard: `TVRH6-WHNXV-R9WG3-9XRFY-MY832`). The generic key picks the edition; it does not activate Windows.
+- **Image.** Choose *Select image with this name* or *Select image with this index*, and pick a Desktop Experience image. To list the images on the ISO, mount it and run `Get-WindowsImage -ImagePath D:\sources\install.wim` in an elevated PowerShell (D: being the mounted ISO).
+
+Generate the file again when you change the build, rather than editing the XML by hand.
 
 Windows Setup looks for `autounattend.xml` in the root of removable media. In Workstation, create the VM with **I will install the operating system later** (so VMware's Easy Install does not supply its own answers), attach the Windows ISO, and attach a second small ISO, or a floppy image, containing `autounattend.xml`.
 
@@ -101,7 +106,7 @@ With `EnableLUA` = 0, Admin Approval Mode is off and administrators run everythi
 
 ### Network and updates
 
-Analysis rarely needs the internet; installs and tool updates do. Connect the VM during the build, then use a host-only network (or none) during cases. Windows Update in the middle of a case changes the system under the analysis; update the clean image on a schedule instead.
+Analysis rarely needs the internet; installs and tool updates do. Connect the VM during the build, then keep it off the internet during cases: a host-only network, or none. Hostile files cannot reach out, and the tools stay at the versions in the image. Windows Update in the middle of a case changes the system under the analysis; update the clean image on a schedule instead.
 
 ## Tools for analysis
 
@@ -116,7 +121,7 @@ Analysis rarely needs the internet; installs and tool updates do. Connect the VM
 choco install -y 7zip sysinternals pwsh ericzimmermantools volatility3 autopsy
 ```
 
-Record what is installed for the case notes, and pin versions (`--version`) once the list settles so every rebuild is the same:
+There is no need to pin versions. The non-persistent disk keeps every tool at the version in the image until you deliberately update it, and Scoop keeps earlier versions side by side when it updates an app (`scoop cleanup` removes them). Record what is installed for the case notes:
 
 ```powershell
 choco list | Out-File -FilePath "\\vmware-host\Shared Folders\Cases\2026-0142\Notes\Tools.txt"
@@ -150,7 +155,7 @@ KAPE has two halves: **targets** collect files from a system, and **modules** ru
 
 Check the switches against `kape.exe --help` and the [KAPE documentation](https://ericzimmerman.github.io/KapeDocs/) for the version you install.
 
-**Licensing.** Kroll's KAPE terms distinguish free use from uses that require an enterprise license, including use on third-party networks or as part of a paid engagement. Check which applies to your work: [KAPE license agreement](https://www.kroll.com/en/kape-license-agreement).
+**Licensing.** KAPE is free for CRT members. Commercial use, such as paid engagements, requires an enterprise license from Kroll: [KAPE license agreement](https://www.kroll.com/en/kape-license-agreement).
 
 ## Using and resetting the box
 
@@ -161,7 +166,7 @@ Check the switches against `kape.exe --help` and the [KAPE documentation](https:
 A per-case checklist:
 
 1. Power on from the non-persistent image. Confirm `\\vmware-host\Shared Folders\Evidence` is read-only and `Cases` is writable.
-2. Create the case folders with `New-CaseFolder` from the [CrtEssentials module](powershell.qmd#module), and put the evidence in the host's `Evidence` folder. Hash it on arrival with `Get-FileInventory`.
+2. Create the case folders with `New-CaseFolder` from the [PowerShell page](powershell.qmd#shouldprocess), and put the evidence in the host's `Evidence` folder. Hash it on arrival with `Get-FileInventory`.
 3. Run tools against `Evidence`, writing to `Cases\<case>\Output`. Keep each tool's console log or log file in `Output`.
 4. Before power-off, confirm the output is on the `Cases` share: `Get-FileInventory -Path <case>\Output | Export-Csv <case>\Notes\OutputInventory.csv -NoTypeInformation`.
 5. Power off. Everything on the system disk is discarded; the next case starts clean.
