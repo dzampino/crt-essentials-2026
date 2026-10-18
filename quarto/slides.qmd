@@ -405,8 +405,12 @@ Message Header Analyzer: paste headers at https://mha.azurewebsites.net/pages/mh
 ## SPF
 
 - What SPF checks: is this IP allowed to send for the envelope domain?
+  - The IP: the server connecting to the receiver, not anything in the message
+  - The domain: `MAIL FROM`, or the `HELO`/`EHLO` name when `MAIL FROM` is empty
 - DNS records, sending IPs, and envelope domains
 - SPF pass does not necessarily mean DMARC pass
+
+<!-- PROPOSED: the two sub-points. -->
 
 ```text
 red.secondary.com.  TXT  "v=spf1 ip4:182.107.92.190 -all"
@@ -414,6 +418,7 @@ red.secondary.com.  TXT  "v=spf1 ip4:182.107.92.190 -all"
 
 ::: notes
 RFC 7208: SPF checks the MAIL FROM domain (or the HELO domain when MAIL FROM is empty), not the From header. https://www.rfc-editor.org/rfc/rfc7208.html
+Section 4.1: the IP is "the IP address of the SMTP client that is emitting the mail". Section 2.3 also recommends checking the HELO identity on its own; section 2.4 covers the empty MAIL FROM of bounces, where the check uses postmaster@ the HELO name.
 
 Record from learndmarc.com example 1.
 :::
