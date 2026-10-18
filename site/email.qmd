@@ -5,7 +5,13 @@ subtitle: "Understand how email moves, which identities are being authenticated,
 
 ## How email works
 
+::: {.light-content}
 ![Each hop adds a Received header. One server can perform several roles.](files/images/email-flow.png){fig-alt="Mail flow: author's MUA submits to an MSA, which relays to a sending MTA, which uses SMTP to the receiving MX, which delivers through an MDA to the recipient's MUA. DNS supplies MX and policy records."}
+:::
+
+::: {.dark-content}
+![Each hop adds a Received header. One server can perform several roles.](files/images/email-flow-dark.png){fig-alt="Mail flow: author's MUA submits to an MSA, which relays to a sending MTA, which uses SMTP to the receiving MX, which delivers through an MDA to the recipient's MUA. DNS supplies MX and policy records."}
+:::
 
 The roles come from [RFC 5598](https://www.rfc-editor.org/rfc/rfc5598.html), Internet Mail Architecture:
 

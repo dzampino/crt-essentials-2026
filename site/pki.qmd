@@ -24,7 +24,13 @@ Training certificate and CSR samples. **Do not install the training root.** No p
 
 The chain is two levels: the root signs the leaf directly. Public CAs issue from an intermediate, as in the diagram below.
 
+::: {.light-content}
 ![Root CA signs an intermediate, which signs the leaf. The client supplies the trust anchor; the server presents the leaf and intermediates.](files/images/certificate-chain.png){fig-alt="Certificate chain diagram: root CA, intermediate CA, leaf certificate."}
+:::
+
+::: {.dark-content}
+![Root CA signs an intermediate, which signs the leaf. The client supplies the trust anchor; the server presents the leaf and intermediates.](files/images/certificate-chain-dark.png){fig-alt="Certificate chain diagram: root CA, intermediate CA, leaf certificate."}
+:::
 
 ## What's in a certificate?
 

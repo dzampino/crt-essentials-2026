@@ -146,6 +146,7 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 - [x] Deck Verb-Noun slide: wildcard example `Get-Command Get-*Event` (returns Get-Event and Get-WinEvent in 7.6.7 and 5.1).
 - [x] PowerShell verbosity, tab completion, Ctrl+Space after `-`, aliases: deck slide "Long names, little typing" (PROPOSED) and site section of the same name under Finding commands. Bindings and aliases checked in 7.6.7 and 5.1 (PSReadLine 2.4.5).
 - [x] Site dark mode: follows the reader's system setting (respect-user-color-scheme), navbar toggle remembers the choice. Dark theme is Cosmo plus site/dark.scss so fonts match; site colors are CSS variables switched under body.quarto-dark (chart, panels, SMTP transcripts, checker); code uses github-dark. Checked by screenshot with Edge forced to dark and light.
+- [x] Diagrams readable in dark mode: assets/diagrams/make_dark.py writes NAME-dark.svg from each diagram (colors matched to the dark theme); PNGs rendered with headless Edge. Pages show light or dark with Quarto's .light-content/.dark-content, so the toggle switches them. The deck keeps the light versions; the xkcd comic is unchanged.
 
 ## Open decisions
 
