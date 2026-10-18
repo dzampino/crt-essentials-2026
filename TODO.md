@@ -64,8 +64,8 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 
 ## 8. Publish
 
-- [x] Render deck and site, commit `docs/`, push to github.com/dzampino/crt-essentials-2026.
-  - Pushed October 18, 2026. Pages serves `docs/` from `main`.
+- [~] Render deck and site, commit `docs/`, push to github.com/dzampino/crt-essentials-2026.
+  - Rendered and committed October 18, 2026. Push pending: `git push origin main` waited on a GitHub sign-in and never completed from the agent session. Once pushed, check https://dzampino.github.io/crt-essentials-2026/pki.html shows `squeakycurds.example`, then mark this `[x]`.
 
 ## Open decisions
 
