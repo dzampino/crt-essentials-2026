@@ -52,25 +52,44 @@ if (-not $SiteOnly) {
 			Pop-Location
 		}
 
-		# Pandoc appends the image's file path to its alt text; keep only the description (the image title in slides.qmd)
+		# Two fixes Pandoc needs, made inside the .pptx (a zip):
+		# 1. Pandoc appends the image's file path to its alt text; keep only the description (the image title in slides.qmd).
+		# 2. Pandoc copies the template's footer, including its GitHub link, but not the link's target; add the target to each slide.
 		Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+		$FooterLink = '<Relationship Id="rIdGitHubFooter" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://github.com/dzampino/crt-essentials-2026" TargetMode="External"/>'
 		$Deck = [System.IO.Compression.ZipFile]::Open((Join-Path -Path $Root -ChildPath 'output\slides.pptx'), 'Update')
 		try {
-			$Deck.Entries | Where-Object FullName -match '^ppt/slides/slide\d+\.xml$' | ForEach-Object {
-				$Reader = [System.IO.StreamReader]::new($_.Open())
-				$Xml = $Reader.ReadToEnd()
+			$ReadEntry = {
+				param($Entry)
+				$Reader = [System.IO.StreamReader]::new($Entry.Open())
+				$Reader.ReadToEnd()
 				$Reader.Close()
+			}
+			$WriteEntry = {
+				param($Entry, $Text)
+				$Stream = $Entry.Open()
+				$Stream.SetLength(0)
+				$Writer = [System.IO.StreamWriter]::new($Stream, [System.Text.UTF8Encoding]::new($false))
+				$Writer.Write($Text)
+				$Writer.Close()
+			}
+			@($Deck.Entries) | Where-Object FullName -match '^ppt/slides/slide\d+\.xml$' | ForEach-Object {
+				$Xml = & $ReadEntry $_
 				$Fixed = $Xml -replace 'descr="([^"]*?)\n\n[^"\n]*"', 'descr="$1"'
 				if ($Fixed -match 'descr="[^"]*\.(png|jpg|svg)"') {
 					Write-Warning "$($_.FullName): an image has no alt text; give it a title in slides.qmd"
 				}
 				if ($Fixed -ne $Xml) {
-					$Stream = $_.Open()
-					$Stream.SetLength(0)
-					$Writer = [System.IO.StreamWriter]::new($Stream, [System.Text.UTF8Encoding]::new($false))
-					$Writer.Write($Fixed)
-					$Writer.Close()
+					& $WriteEntry $_ $Fixed
 					Write-Verbose "Set alt text in $($_.FullName)"
+				}
+				if ($Fixed -match 'r:id="rIdGitHubFooter"') {
+					$Rels = $Deck.GetEntry(($_.FullName -replace '^ppt/slides/', 'ppt/slides/_rels/') + '.rels')
+					$RelsXml = & $ReadEntry $Rels
+					if ($RelsXml -notmatch 'Id="rIdGitHubFooter"') {
+						& $WriteEntry $Rels ($RelsXml -replace '</Relationships>', "$FooterLink</Relationships>")
+						Write-Verbose "Linked the footer in $($_.FullName)"
+					}
 				}
 			}
 		}

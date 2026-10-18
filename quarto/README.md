@@ -48,10 +48,12 @@ Speaker notes go in a `::: notes` div.
 
 ## Changing the footer
 
-The footer reads "CRT Annual Training Conference 2026" and is fixed in the template. The original TLP:CLEAR marking was removed.
+The footer reads "CRT Annual Training Conference 2026 · github.com/dzampino/crt-essentials-2026" and is fixed in the template. The original TLP:CLEAR marking was removed.
+
+The GitHub address is a link. `add_footer_link.py` added it to the master and every layout (`python add_footer_link.py original.pptx wicrt-template.pptx`); it takes the footer's text color through an Office 2019+ extension, so it stays readable on the navy slides. Pandoc copies the footer onto each slide but not the link's target, so `build.ps1` adds the target (`rIdGitHubFooter`) to every rendered slide.
 
 - **One deck:** after rendering, open the .pptx and use Insert → Header & Footer → Apply to All.
-- **Every deck:** edit the footer text in `wicrt-template.pptx` (View → Slide Master, on the master and each layout), or edit `FOOTER_TEXT` in `build_template.py` (in the separate source zip) and rebuild (below). If you rebuild from that source, also remove its TLP marking (`TLP_LABEL`) and set `FOOTER_TEXT` again, or the old footer and marking come back.
+- **Every deck:** edit the footer text in `wicrt-template.pptx` (View → Slide Master, on the master and each layout), or edit `FOOTER_TEXT` in `build_template.py` (in the separate source zip) and rebuild (below). If you rebuild from that source, also remove its TLP marking (`TLP_LABEL`) and set `FOOTER_TEXT` again, or the old footer and marking come back; then run `add_footer_link.py` on the result.
 
 ## Fonts
 

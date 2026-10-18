@@ -21,14 +21,6 @@ Transcripts use ```smtp (../syntax/smtp.xml): client lines navy, server lines re
 Render with build.ps1 (or: quarto render slides.qmd --output-dir ../output).
 -->
 
-## dzampino.github.io/crt-essentials-2026
-
-![](../assets/site-qr.png "QR code linking to dzampino.github.io/crt-essentials-2026")
-
-::: notes
-https://dzampino.github.io/crt-essentials-2026/
-:::
-
 ## Agenda
 
 1. Passwords
@@ -39,6 +31,14 @@ https://dzampino.github.io/crt-essentials-2026/
 
 ::: notes
 Timing: introduction 5 minutes, passwords 20, PKI 25, email security 30, PowerShell 20, DFIR box 15, questions and wrap-up 5.
+:::
+
+## dzampino.github.io/crt-essentials-2026
+
+![](../assets/site-qr.png "QR code linking to dzampino.github.io/crt-essentials-2026")
+
+::: notes
+https://dzampino.github.io/crt-essentials-2026/
 :::
 
 # Passwords

@@ -137,6 +137,12 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 - [x] Deck: PowerShell default security settings (what Open does with a .ps1, execution policy).
   - From about_Scripts and about_Execution_Policies; PowerShell 7's RemoteSigned checked in $PSHOME\powershell.config.json on this PC (PROPOSED slide).
 
+## 15. Seventh request list (October 18, 2026)
+
+- [x] Deck: agenda before the companion site slide.
+- [x] Deck footer: link to the GitHub repository.
+  - Template footer now "CRT Annual Training Conference 2026 · github.com/dzampino/crt-essentials-2026", the address linked and in the footer's text color (quarto/add_footer_link.py). build.ps1 adds the link target Pandoc leaves out; all 65 footer links resolve and PowerPoint opens the deck cleanly.
+
 ## Open decisions
 
 - [ ] Review the `<!-- PROPOSED -->` wording in `quarto/slides.qmd` (wording that is not David's).
