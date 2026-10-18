@@ -36,13 +36,19 @@ website:
 
 format:
   html:
-    theme: cosmo
+    # Light and dark themes add a toggle to the navbar; the default follows the reader's system setting
+    theme:
+      light: cosmo
+      dark: [cosmo, dark.scss]
+    respect-user-color-scheme: true
     css: styles.css
     toc: true
     toc-depth: 3
     code-copy: true
     code-overflow: wrap
-    highlight-style: github
+    highlight-style:
+      light: github
+      dark: github-dark
     syntax-definitions:
       - ../syntax/smtp.xml
     anchor-sections: true

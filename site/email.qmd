@@ -249,7 +249,7 @@ Pick a worked example, or enter the identities from your own message. Work out t
 <button type="button" id="dm-reveal" class="reveal-button">Show answer</button>
 <div id="dm-answer" hidden>
 <div id="dm-verdict" class="verdict"></div>
-<ul id="dm-reasons" class="tool-note" style="font-size:0.92rem;color:#1A1D23"></ul>
+<ul id="dm-reasons" class="tool-note" style="font-size:0.92rem;color:var(--crt-ink)"></ul>
 </div>
 </div>
 ```

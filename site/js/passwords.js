@@ -4,7 +4,8 @@
 (function () {
 	"use strict";
 
-	const NAVY = "#0C2454";
+	// Colors come from styles.css variables, so the chart follows the light or dark theme
+	const LINE = "var(--crt-chart)";
 	const SECONDS_PER_YEAR = 365.25 * 86400;
 	// NIST SP 811 Appendix B: 1 BTU(IT)/h = 0.2930711 W; 1 ton of refrigeration = 12,000 BTU/h
 	const BTU_PER_HOUR_PER_WATT = 1 / 0.2930711;
@@ -147,8 +148,8 @@
 			return "M" + pts.map((p) => p.join(",")).join(" L");
 		}
 		const full = series();
-		svg.appendChild(svgEl("path", { d: area(full), fill: NAVY, "fill-opacity": 0.14 }));
-		svg.appendChild(svgEl("path", { d: line(full), fill: "none", stroke: NAVY, "stroke-width": 2 }));
+		svg.appendChild(svgEl("path", { d: area(full), style: "fill: " + LINE + "; fill-opacity: 0.14" }));
+		svg.appendChild(svgEl("path", { d: line(full), fill: "none", style: "stroke: " + LINE, "stroke-width": 2 }));
 
 		// direct label at the right edge
 		const lastFull = xMax * bpc;
@@ -158,11 +159,11 @@
 
 		// current length marker
 		const cx = x(state.length);
-		svg.appendChild(svgEl("line", { x1: cx, x2: cx, y1: m.t, y2: H - m.b, stroke: "#5A6472", "stroke-dasharray": "2 3" }));
-		svg.appendChild(svgEl("circle", { cx: cx, cy: y(state.length * bpc), r: 5, fill: NAVY, stroke: "#FFFFFF", "stroke-width": 2 }));
+		svg.appendChild(svgEl("line", { x1: cx, x2: cx, y1: m.t, y2: H - m.b, style: "stroke: var(--crt-muted)", "stroke-dasharray": "2 3" }));
+		svg.appendChild(svgEl("circle", { cx: cx, cy: y(state.length * bpc), r: 5, style: "fill: " + LINE + "; stroke: var(--crt-surface)", "stroke-width": 2 }));
 
 		// hover crosshair and tooltip
-		const cross = svgEl("line", { y1: m.t, y2: H - m.b, stroke: "#9AA3AE", visibility: "hidden" });
+		const cross = svgEl("line", { y1: m.t, y2: H - m.b, style: "stroke: var(--crt-muted)", visibility: "hidden" });
 		svg.appendChild(cross);
 		const hit = svgEl("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: "transparent" });
 		svg.appendChild(hit);
@@ -181,7 +182,7 @@
 			const bits = len * bpc;
 			const fullLog10 = bits * Math.log10(2) - Math.log10(state.rate);
 			tip.innerHTML = "<strong>Length " + len + "</strong><br>" +
-				'<span class="swatch" style="background:' + NAVY + '"></span>' + bits.toFixed(1) + " bits<br>" +
+				'<span class="swatch" style="background:' + LINE + '"></span>' + bits.toFixed(1) + " bits<br>" +
 				"Search all of it: " + formatDuration(fullLog10);
 			tip.style.display = "block";
 			const px = (x(len) / W) * r.width;
