@@ -28,6 +28,34 @@ Get-Command Get-FileHash -Syntax                 # parameter sets at a glance
 
 Local help is minimal until you run `Update-Help` (from an elevated prompt in Windows PowerShell 5.1). `Get-Help <command> -Online` opens the current Microsoft Learn page instead.
 
+### Long names, little typing
+
+PowerShell is verbose on purpose: `Get-ChildItem -Path C:\Windows -Filter *.log -Recurse` reads like a sentence, and so does a script written that way six months later. You rarely type the whole thing.
+
+| Key | What it does |
+| --- | --- |
+| Tab | Completes the command, parameter, parameter value or path under the cursor; press again for the next match |
+| Shift+Tab | Goes back to the previous match |
+| Ctrl+Space | Shows every match as a menu to pick from with the arrow keys |
+
+Ctrl+Space is most useful after a `-`: type `Get-ChildItem -` and press Ctrl+Space to see every parameter the command takes. Tab also completes values, such as the event log names after `Get-WinEvent -LogName ` and the property names after `Select-Object `. These keys come from the PSReadLine module, with the same bindings in Windows PowerShell 5.1 and PowerShell 7 ([about_PSReadLine_Functions](https://learn.microsoft.com/en-us/powershell/module/psreadline/about/about_psreadline_functions)).
+
+**Aliases** are short names for commands. They save typing at the prompt:
+
+| Alias | Command |
+| --- | --- |
+| `ls`, `dir`, `gci` | `Get-ChildItem` |
+| `?` | `Where-Object` |
+| `%` | `ForEach-Object` |
+| `select`, `sort`, `gm`, `ft` | `Select-Object`, `Sort-Object`, `Get-Member`, `Format-Table` |
+
+```powershell
+Get-Alias ls                           # what an alias runs
+Get-Alias -Definition Get-ChildItem    # every alias for a command: dir, gci, ls
+```
+
+Use aliases at the prompt, and full names in scripts and anything you share: the next reader may not know `%`, and aliases differ between versions. In Windows PowerShell 5.1, `curl` and `wget` run `Invoke-WebRequest`; PowerShell 7 dropped those aliases, so `curl` runs `curl.exe`. On Linux and macOS, `ls` runs the system's `ls`. PSScriptAnalyzer flags aliases in scripts ([AvoidUsingCmdletAliases](https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/rules/avoidusingcmdletaliases)); see also [about_Aliases](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_aliases).
+
 ### Figure out what a command returns
 
 Pipe it to `Get-Member`. The first line is the type; the list is what you can select, filter and sort on.
@@ -336,6 +364,7 @@ For scripts shared between both, specify `-Encoding UTF8` (or `utf8NoBOM` in 7 o
 | | |
 | --- | --- |
 | [about_Pipelines](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines) | Microsoft Learn |
+| [about_PSReadLine_Functions](https://learn.microsoft.com/en-us/powershell/module/psreadline/about/about_psreadline_functions) and [about_Aliases](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_aliases) | Microsoft Learn |
 | [about_Modules](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules) | Microsoft Learn |
 | [How to write a module manifest](https://learn.microsoft.com/en-us/powershell/scripting/developer/module/how-to-write-a-powershell-module-manifest) | Microsoft Learn |
 | [about_Functions_CmdletBindingAttribute](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute) | Microsoft Learn |

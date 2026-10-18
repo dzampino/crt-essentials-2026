@@ -192,6 +192,7 @@ NOTE: swap to site for entropy calculation
   - Administration, automation, and analysis
   - Turning a repetitive task into something repeatable
   - Then, for people new to it: Verb-Noun command names; objects (properties and methods) for an audience that may not know object-oriented programming; Windows PowerShell 5.1 and PowerShell 7
+  - Verbosity: long names on purpose; Tab and Shift+Tab, Ctrl+Space after `-`, aliases at the prompt and full names in scripts (deck and site)
 2. Finding commands
   - `Get-Command`, `Get-Help`
   - Find the parameters and figure out what a command returns
