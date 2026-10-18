@@ -1,20 +1,22 @@
 # To do
 
-Working tracker for agents. Items are in the order they are being worked, grouped so each file is edited as few times as possible. Mark an item `[x]` when it is committed, and note the commit or any follow-up under it. Anything that needs David's decision goes under **Open decisions** at the end.
+Working tracker for agents. Items are in the order they are being worked, grouped so each file is edited as few times as possible. Mark an item `[x]` when it is committed (`[~]` = partly done), and note the commit or any follow-up under it. Anything that needs David's decision goes under **Open decisions** at the end.
 
 The original request list (October 18, 2026) is preserved, reworded only to group it.
 
 ## 0. Setup
 
-- [ ] Tracker (this file). Quarto available for rendering (portable copy in `.tools/`, ignored by Git).
+- [x] Tracker (this file). Quarto available for rendering (portable copy in `.tools/`, ignored by Git).
 
 ## 1. No instructions or context in published output
 
-- [ ] Site, PowerPoint and GitHub README never show instructions or context (for example "a two-hour session" in the site description; editorial notes in speaker notes).
-- [ ] Site home: drop or rewrite the intro (everything before Topics).
-- [ ] Site home: drop the session plan.
-- [ ] Site home: drop "How to read this site".
-- [ ] Drop "Tested in PowerShell..." lines.
+- [~] Site, PowerPoint and GitHub README never show instructions or context (for example "a two-hour session" in the site description; editorial notes in speaker notes).
+  - Done: site description, home page, README (working notes moved here), references subtitle, PKI and email wording. AGENTS.md now points to TODO.md. Remaining: speaker notes in `quarto/slides.qmd` (done in the section 7 slide pass) and the DFIR page (section 6).
+- [x] Site home: drop or rewrite the intro (everything before Topics).
+- [x] Site home: drop the session plan.
+- [x] Site home: drop "How to read this site".
+- [~] Drop "Tested in PowerShell..." lines.
+  - Done on PowerShell and PKI pages; the Passwords one goes with section 2.
 
 ## 2. Passwords
 

@@ -279,7 +279,7 @@ certreq -submit -config "CA01\Contoso Issuing CA" request.csr server.cer
 certreq -accept server.cer                  # install, pairing with the pending private key
 ```
 
-`CA01\Contoso Issuing CA` is a placeholder for your `CAHost\CA name`. The `CertificateTemplate` line needs a domain-joined machine that can see the template; without one, `certreq -new` reports "Template not found." This INF was tested on PowerShell 7.6 / Windows 11 with `MachineKeySet = FALSE` and the template line removed, and produced a valid PKCS #10 request with the SAN.
+Replace `CA01\Contoso Issuing CA` with your `CAHost\CA name`. The `CertificateTemplate` line needs a domain-joined machine that can see the template; without one, `certreq -new` reports "Template not found." To make a request without AD CS, remove that line and set `MachineKeySet = FALSE`.
 
 Template settings that let the requester supply the subject name, combined with a client authentication EKU and broad enrollment rights, are a well-known AD CS privilege escalation path ("ESC1" in SpecterOps' [Certified Pre-Owned](https://specterops.io/wp-content/uploads/sites/3/2022/06/Certified_Pre-Owned.pdf)). Review who can enroll in such templates.
 

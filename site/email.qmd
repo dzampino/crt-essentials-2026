@@ -369,7 +369,7 @@ SPF policy red.primary.com: "v=spf1 ip4:156.157.23.197 -all"
 *Notes:* the sending IP **is** listed in `red.primary.com`'s SPF record, which is a trap: SPF is evaluated for the `MAIL FROM` domain, not the `From` domain. And under relaxed alignment, the DKIM signature from `blue.primary.com` would have aligned with `red.primary.com`.
 </details>
 
-The answers above are learndmarc's explanations; the notes are additions for this guide.
+The answers above are learndmarc's explanations; the notes are additions.
 
 ## DNS records: lookups and troubleshooting
 

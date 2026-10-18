@@ -30,9 +30,13 @@ $Root = $PSScriptRoot
 
 $Quarto = (Get-Command quarto -ErrorAction SilentlyContinue).Source
 if (-not $Quarto) {
-	$Quarto = Join-Path -Path $env:ProgramFiles -ChildPath 'Quarto\bin\quarto.exe'
+	# A portable copy unzipped into .tools\quarto (ignored by Git), then the default install folder
+	$Quarto = @(
+		Join-Path -Path $Root -ChildPath '.tools\quarto\bin\quarto.exe'
+		Join-Path -Path $env:ProgramFiles -ChildPath 'Quarto\bin\quarto.exe'
+	) | Where-Object { Test-Path -Path $_ } | Select-Object -First 1
 }
-if (-not (Test-Path -Path $Quarto)) {
+if (-not $Quarto -or -not (Test-Path -Path $Quarto)) {
 	throw 'Quarto was not found. Install it from https://quarto.org/docs/get-started/.'
 }
 Write-Verbose "Using $Quarto"

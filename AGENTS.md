@@ -10,5 +10,5 @@ The title is "CRT Essentials or The Dave Zampino Power Hour". Refer to CRT Essen
 - Keep slides concise and move deeper detail to the companion material.
 - For PowerShell, use PascalCase, tabs, lowercase keywords, pipelines rather than +=, and CIM rather than WMI. Use WhatIf/ShouldProcess and Verbose for changes.
 - Keep dependencies small. Do not add a framework or deployment without a concrete need.
-- Record remaining decisions in README.md. Validate actual behavior and rendered output.
+- Track work and remaining decisions in TODO.md. README.md, the site and the deck must not show instructions or working context. Validate actual behavior and rendered output.
 - Make use of Git for changes. Site will need to be published on Github Pages. Sync with github.com/dzampino/crt-essentials-2026

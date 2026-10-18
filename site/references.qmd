@@ -1,6 +1,6 @@
 ---
 title: "References"
-subtitle: "Primary sources, reviewed October 16, 2026. These are links, not copied standards text."
+subtitle: "Primary sources for each section."
 ---
 
 ## Passwords

@@ -4,14 +4,6 @@ subtitle: "or The Dave Zampino Power Hour"
 toc: false
 ---
 
-::: {.lead-in}
-Companion field guide for a two-hour session at the CRT Annual Training Conference 2026, for Wisconsin Cyber Response Team volunteers and fellow SLTT IT professionals.
-:::
-
-The live session is a focused presentation. This site holds what does not fit in two hours: calculators, sample files, commands you can copy, scripts, longer explanations and the primary sources behind each claim.
-
-The five topics were assigned and are somewhat disparate. Their connection is practical security knowledge CRT responders should understand and be able to explain, including preventative advice that helps organizations avoid the incidents we respond to.
-
 ## Topics
 
 ::: {.topic-grid}
@@ -19,14 +11,14 @@ The five topics were assigned and are somewhat disparate. Their connection is pr
 ### [1. Passwords](passwords.qmd)
 How passwords get guessed, what an entropy model can tell us, and what infrastructure should do to protect users.
 
-Entropy calculator · cracking time and cost explorer · NIST SP 800-63B-4
+Entropy calculator · cracking time, cost and cooling · NIST SP 800-63B-4
 :::
 
 ::: {.topic-card}
 ### [2. PKI](pki.qmd)
 Inspect a certificate, explain issuance, and name the validation check that fails.
 
-Sample certificates · field reference · OpenSSL and certutil · AD CS and ACME
+Sample certificates · field reference · OpenSSL, certutil and XCA · AD CS and ACME
 :::
 
 ::: {.topic-card}
@@ -40,38 +32,20 @@ Header walkthroughs · alignment checker · SPF, DKIM, DMARC, MTA-STS records
 ### [4. PowerShell](powershell.qmd)
 Make administrative and incident-response tasks easier to repeat and automate.
 
-Copyable examples · file inventory and EVTX scripts · 5.1 versus 7
+Your own module · copyable functions · 5.1 versus 7
 :::
 
 ::: {.topic-card}
 ### [5. Windows DFIR box](dfir.qmd)
 Build a repeatable Windows workstation for analyzing evidence that has already been collected.
 
-Build scripts · reset and retention checks · open decisions
+Windows Server 2025 · VMware Workstation · unattended install · tool list
 :::
 :::
-
-## Session plan
-
-| Segment | Minutes | Running time |
-| --- | ---: | ---: |
-| Introduction and purpose | 5 | 0–5 |
-| Passwords | 20 | 5–25 |
-| PKI | 25 | 25–50 |
-| Email security | 30 | 50–80 |
-| PowerShell | 20 | 80–100 |
-| Building a Windows DFIR box | 15 | 100–115 |
-| Questions and wrap-up | 5 | 115–120 |
 
 ## Downloads
 
 - [Slides (PowerPoint)](files/crt-essentials.pptx)
 - [PKI sample files](pki.qmd#sample-files): fictional training certificates and a CSR. No private keys are included. Do not install the training root.
-- [PowerShell scripts](powershell.qmd#scripts) and [DFIR box scripts](dfir.qmd#build-automation)
+- [CrtEssentials PowerShell module](powershell.qmd#module): every function on this site
 - Source for everything on this site: [github.com/dzampino/crt-essentials-2026](https://github.com/dzampino/crt-essentials-2026)
-
-## How to read this site
-
-- Commands and scripts were run against the sample files before publishing; outputs shown are real, sometimes trimmed. Versions are noted where behavior varies.
-- Each section cites its primary sources inline. The [references](references.qmd) page collects them.
-- Where something is a proposal, an assumption or an open decision rather than settled guidance, it is labeled that way.

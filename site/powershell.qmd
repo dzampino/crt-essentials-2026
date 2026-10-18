@@ -10,7 +10,7 @@ subtitle: "Show how PowerShell can make administrative and incident-response tas
 
 PowerShell commands return **objects**, not text. A file has a `Length` and a `LastWriteTimeUtc`; an event has an `Id` and a `TimeCreated`. You filter and sort on those properties directly instead of cutting columns out of text, and the result is the same whether the output is 10 lines or 10 million.
 
-Everything on this page runs in Windows PowerShell 5.1 and PowerShell 7 unless noted. Examples were tested in PowerShell 7.6.7 and Windows PowerShell 5.1.26100 on Windows 11.
+Everything on this page runs in Windows PowerShell 5.1 and PowerShell 7 unless noted.
 
 ## Finding commands
 

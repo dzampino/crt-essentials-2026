@@ -7,7 +7,7 @@ project:
 
 website:
   title: "CRT Essentials"
-  description: "Companion field guide for CRT Essentials or The Dave Zampino Power Hour, CRT Annual Training Conference 2026."
+  description: "Passwords, PKI, email security, PowerShell and a Windows DFIR box: calculators, sample files, commands and references."
   site-url: https://dzampino.github.io/crt-essentials-2026/
   repo-url: https://github.com/dzampino/crt-essentials-2026
   repo-actions: [source, issue]
