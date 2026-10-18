@@ -208,7 +208,10 @@ NOTE: swap to site for entropy calculation
   - Parameters instead of hard-coded values
   - Functions, `-Verbose`, `-WhatIf` where applicable
   - An example of automating part of the DFIR box build
-7. Questions?
+7. Your own module
+  - A .psm1 in your Modules folder; PowerShell loads it for you
+  - Collect the functions from this session in it
+8. Questions?
 
 #### 4.2 PowerShell Supplementary Material
 
@@ -216,6 +219,7 @@ NOTE: swap to site for entropy calculation
 2. Example scripts for a file inventory and querying an existing EVTX file; analysis rather than evidence acquisition.
 3. Reference material on pipelines, functions, parameters, error handling, and `ShouldProcess`.
 4. Notes on differences between Windows PowerShell 5.1 and PowerShell 7 where relevant.
+5. Creating your own module. Every example on the site is a reusable function, shown in its own code block (separate from usage examples) so it can be copied into the learner's module. Keep functions simple and commented for people new to PowerShell.
 
 
 ### 5. Building a Windows DFIR box

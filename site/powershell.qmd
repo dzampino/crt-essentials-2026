@@ -115,7 +115,22 @@ Get-ChildItem -Path .\Case -Recurse -File |
 	Sort-Object LastWriteTimeUtc
 ```
 
-The [`Get-FileInventory.ps1`](#scripts) script combines these into one inventory.
+Once you have typed the same pipeline twice, make it a function. `Get-FileInventory` combines the listing and the hashing into one object per file:
+
+```powershell
+{{< include ../scripts/CrtEssentials/Functions/Get-FileInventory.ps1 >}}
+```
+
+```powershell
+Get-FileInventory -Path D:\Case\Collected |
+	Sort-Object Length -Descending |
+	Select-Object -First 10
+
+Get-FileInventory -Path D:\Case\Collected |
+	Export-Csv D:\Case\Output\Inventory.csv -NoTypeInformation
+```
+
+The function returns objects and leaves the CSV to `Export-Csv`. That keeps it small, and the same output can go to the screen, a CSV or the next command.
 
 ### Looking at collected Windows event logs with `Get-WinEvent`
 
@@ -138,29 +153,42 @@ Get-WinEvent -FilterHashtable @{
 	Select-Object Count, Name
 ```
 
-Event properties hold the event's data fields. To get named fields (for example `TargetUserName` and `IpAddress` in a 4624), read the event XML:
+`Get-EvtxSummary` turns the first example into a function, with the first and last time each event appears:
 
 ```powershell
-Get-WinEvent -FilterHashtable @{ Path = '.\Case\Logs\Security.evtx'; Id = 4624 } -MaxEvents 100 |
-	ForEach-Object {
-		$Data = @{}
-		([xml]$_.ToXml()).Event.EventData.Data | ForEach-Object { $Data[$_.Name] = $_.'#text' }
-		[pscustomobject]@{
-			TimeCreated = $_.TimeCreated
-			User = '{0}\{1}' -f $Data.TargetDomainName, $Data.TargetUserName
-			LogonType = $Data.LogonType
-			IpAddress = $Data.IpAddress
-		}
-	}
+{{< include ../scripts/CrtEssentials/Functions/Get-EvtxSummary.ps1 >}}
 ```
 
-`Get-WinEvent` throws "No events were found that match the specified selection criteria" when a filter matches nothing; scripts should treat that as an empty result, as [`Get-EvtxSummary.ps1`](#scripts) does.
+```powershell
+Get-EvtxSummary -Path D:\Case\Collected\Logs\System.evtx | Format-Table
+
+# Service installs (7045) in every log under the case
+Get-ChildItem D:\Case\Collected -Filter *.evtx -Recurse | Get-EvtxSummary -Id 7045
+```
+
+```text
+File        ProviderName              Id Count First                 Last
+----        ------------              -- ----- -----                 ----
+System.evtx Service Control Manager 7045     4 10/16/2026 9:27:25 PM 10/16/2026 11:09:27 PM
+```
+
+Event properties hold the event's data fields. To get named fields, such as `TargetUserName` and `IpAddress` in a 4624, read the event XML. `Get-LogonEvent` does that for successful logons:
+
+```powershell
+{{< include ../scripts/CrtEssentials/Functions/Get-LogonEvent.ps1 >}}
+```
+
+```powershell
+Get-LogonEvent -Path D:\Case\Collected\Logs\Security.evtx |
+	Group-Object LogonType |
+	Select-Object Count, Name
+```
 
 ## Making a script reusable
 
 - Parameters instead of hard-coded values.
 - Functions, `-Verbose`, `-WhatIf` where applicable.
-- An example of automating part of the DFIR box build: see the [DFIR box build scripts](dfir.qmd#build-automation).
+- An example of automating part of the DFIR box build: `New-CaseFolder`, below, creates the folders for each case.
 
 ### Parameters
 
@@ -178,34 +206,17 @@ param(
 )
 ```
 
-`[CmdletBinding()]` makes a script or function an **advanced function**: it gets `-Verbose`, `-Debug`, `-ErrorAction` and the other common parameters for free. Validation attributes reject bad input before your code runs.
+`[CmdletBinding()]` makes a script or function an **advanced function**: it gets `-Verbose`, `-Debug`, `-ErrorAction` and the other common parameters for free. Validation attributes reject bad input before your code runs. A comment on the line above a parameter becomes its help text in `Get-Help`.
 
 ### `-WhatIf`, `-Confirm` and `ShouldProcess` {#shouldprocess}
 
 Anything that changes state should support `-WhatIf`. Declare `SupportsShouldProcess` and wrap each change in `$PSCmdlet.ShouldProcess()` ([about_Functions_CmdletBindingAttribute](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute)):
 
 ```powershell
-function New-CaseFolder {
-	[CmdletBinding(SupportsShouldProcess)]
-	param(
-		[Parameter(Mandatory)]
-		[string]$CaseRoot,
+{{< include ../scripts/CrtEssentials/Functions/New-CaseFolder.ps1 >}}
+```
 
-		[Parameter(Mandatory)]
-		[string]$CaseNumber
-	)
-	$CasePath = Join-Path -Path $CaseRoot -ChildPath $CaseNumber
-	'Collected', 'Output', 'Notes' |
-		ForEach-Object { Join-Path -Path $CasePath -ChildPath $_ } |
-		Where-Object { -not (Test-Path -Path $_) } |
-		ForEach-Object {
-			if ($PSCmdlet.ShouldProcess($_, 'Create folder')) {
-				New-Item -Path $_ -ItemType Directory | Out-Null
-				Write-Verbose "Created $_"
-			}
-		}
-}
-
+```powershell
 New-CaseFolder -CaseRoot E:\Cases -CaseNumber 2026-0142 -WhatIf
 ```
 
@@ -235,47 +246,79 @@ catch {
 }
 ```
 
-To collect non-terminating errors without stopping, use `-ErrorAction SilentlyContinue -ErrorVariable Problems` and report `$Problems` afterward, as `Get-FileInventory.ps1` does for files it cannot read.
+`Get-WinEvent` reports "No events were found that match the specified selection criteria" as an error. `Get-EvtxSummary` uses `-ErrorAction SilentlyContinue` instead, which is simpler but also hides other problems, such as a damaged file. To collect non-terminating errors without stopping, add `-ErrorVariable Problems` and look at `$Problems` afterward.
 
 ### Building collections
 
 Let the pipeline build arrays. `$Results = foreach (...) { [pscustomobject]@{...} }` and `$Results = ... | ForEach-Object { ... }` collect output efficiently; appending with `$Results += $Item` copies the whole array on every addition and gets slow with large data. When you do need to add items one by one, use `[System.Collections.Generic.List[object]]::new()` and `.Add()`.
 
-## Scripts {#scripts}
+## Your own module {#module}
 
-Analysis of existing files and logs, not evidence acquisition. Download, read, then run. Source is also on [GitHub](https://github.com/dzampino/crt-essentials-2026/tree/main/scripts).
+A function you paste into a window is gone when the window closes. A **module** keeps your functions in one file that PowerShell loads for you: type the function name in any new window and it works.
 
-| Script | What it does |
+A script module is a `.psm1` file inside a folder with the same name, in one of the folders listed in `$env:PSModulePath` ([about_Modules](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules)). Your personal folder is under Documents:
+
+| | Personal module folder |
 | --- | --- |
-| [Get-FileInventory.ps1](files/scripts/Get-FileInventory.ps1) | Relative path, extension, size, UTC timestamps and hash for every file under a folder; optional CSV with `-WhatIf` support |
-| [Get-EvtxSummary.ps1](files/scripts/Get-EvtxSummary.ps1) | Counts by provider and event ID, with first and last time, for collected `.evtx` files; `-Detail` returns the events |
+| PowerShell 7 | `Documents\PowerShell\Modules` |
+| Windows PowerShell 5.1 | `Documents\WindowsPowerShell\Modules` |
+
+### 1. Create the module
 
 ```powershell
-.\Get-FileInventory.ps1 -Path D:\Case\Collected |
-	Sort-Object Length -Descending |
-	Select-Object -First 10
+# Your Documents folder (it may have been moved to OneDrive)
+$Documents = [Environment]::GetFolderPath('MyDocuments')
 
-.\Get-FileInventory.ps1 -Path D:\Case\Collected -OutputPath D:\Case\Output\Inventory.csv -Verbose
+# For Windows PowerShell 5.1, use 'WindowsPowerShell\Modules\MyTools' instead
+$ModuleFolder = Join-Path -Path $Documents -ChildPath 'PowerShell\Modules\MyTools'
+New-Item -Path $ModuleFolder -ItemType Directory -Force
 
-.\Get-EvtxSummary.ps1 -Path D:\Case\Collected\Logs | Format-Table
-
-.\Get-EvtxSummary.ps1 -Path D:\Case\Collected\Logs\Security.evtx -Id 4624, 4625 -Detail |
-	Export-Csv D:\Case\Output\Logons.csv -NoTypeInformation
-
-Get-ChildItem D:\Case\Collected -Filter *.evtx -Recurse | .\Get-EvtxSummary.ps1 -Id 7045
+# The .psm1 file must have the same name as its folder
+$ModuleFile = Join-Path -Path $ModuleFolder -ChildPath 'MyTools.psm1'
+New-Item -Path $ModuleFile -ItemType File
+notepad $ModuleFile
 ```
 
-Sample output of `Get-EvtxSummary.ps1` against a week of an exported System log:
+### 2. Add functions
 
-```text
-File        ProviderName                            Id Count First               Last
-----        ------------                            -- ----- -----               ----
-System.evtx Microsoft-Windows-WindowsUpdateClient   44  1148 2026-10-09 15:51:20 2026-10-16 06:43:23
-System.evtx Microsoft-Windows-Kernel-General        16    98 2026-10-09 15:53:25 2026-10-16 14:32:46
-System.evtx Service Control Manager               7040    75 2026-10-09 15:54:14 2026-10-16 15:21:15
+Every function on this site is in a code block of its own, separate from the examples that use it. Use the copy button at the top right of the block, paste it into `MyTools.psm1`, and save. Add as many as you like, one after another.
+
+### 3. Use it
+
+```powershell
+Import-Module MyTools -Force       # load it now; run again after each edit
+Get-Command -Module MyTools        # what it contains
+Get-Help Get-PasswordEntropy       # the help block at the top of each function
 ```
 
-Downloaded scripts carry a mark of the web. If the execution policy blocks them, read them first, then `Unblock-File .\Get-FileInventory.ps1`.
+In a new window you do not need `Import-Module`: PowerShell loads the module the first time you use one of its functions.
+
+If you see "running scripts is disabled on this system", Windows PowerShell 5.1 is using the default `Restricted` execution policy. `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` allows your own files to run, and still blocks unsigned scripts downloaded from the internet.
+
+### The functions on this site
+
+| Function | What it does | Page |
+| --- | --- | --- |
+| `Get-PasswordEntropy` | Bits of entropy from alphabet size and length | [Passwords](passwords.qmd#entropy-in-powershell) |
+| `Get-PasswordLength` | Length needed to reach a number of bits | [Passwords](passwords.qmd#entropy-in-powershell) |
+| `Test-PwnedPassword` | Check a password against Pwned Passwords without sending it | [Passwords](passwords.qmd#check-a-password-against-pwned-passwords) |
+| `Get-CertificateInfo` | Main fields and SAN names of a certificate file | [PKI](pki.qmd#powershell-and-.net) |
+| `Get-MailHeader` | One object per header of a saved message | [Email security](email.qmd#pulling-headers-apart-in-powershell) |
+| `Get-FileInventory` | Size, timestamps and hash of every file under a folder | [above](#working-with-an-existing-collection-of-files) |
+| `Get-EvtxSummary` | Event counts by provider and ID in a saved `.evtx` | [above](#looking-at-collected-windows-event-logs-with-get-winevent) |
+| `Get-LogonEvent` | User, logon type and address from 4624 events | [above](#looking-at-collected-windows-event-logs-with-get-winevent) |
+| `New-CaseFolder` | Create a case's folders, with `-WhatIf` | [above](#shouldprocess) |
+
+All of them are also packaged as the **CrtEssentials** module: [download CrtEssentials.zip](files/CrtEssentials.zip), or browse the source on [GitHub](https://github.com/dzampino/crt-essentials-2026/tree/main/scripts/CrtEssentials). It keeps each function in its own file under `Functions\`, and `CrtEssentials.psm1` loads them all, which is a common layout once a module grows. To install it, unblock the download, then extract the `CrtEssentials` folder into your personal module folder:
+
+```powershell
+Unblock-File -Path .\CrtEssentials.zip
+$Modules = Join-Path -Path ([Environment]::GetFolderPath('MyDocuments')) -ChildPath 'PowerShell\Modules'
+Expand-Archive -Path .\CrtEssentials.zip -DestinationPath $Modules
+Get-Command -Module CrtEssentials
+```
+
+When a module is worth sharing, `New-ModuleManifest` adds a `.psd1` with a version number, author and list of exported functions ([about_Module_Manifests](https://learn.microsoft.com/en-us/powershell/scripting/developer/module/how-to-write-a-powershell-module-manifest)).
 
 ## Windows PowerShell 5.1 and PowerShell 7
 
@@ -300,6 +343,8 @@ For scripts shared between both, specify `-Encoding UTF8` (or `utf8NoBOM` in 7 o
 | | |
 | --- | --- |
 | [about_Pipelines](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines) | Microsoft Learn |
+| [about_Modules](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules) | Microsoft Learn |
+| [How to write a module manifest](https://learn.microsoft.com/en-us/powershell/scripting/developer/module/how-to-write-a-powershell-module-manifest) | Microsoft Learn |
 | [about_Functions_CmdletBindingAttribute](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute) | Microsoft Learn |
 | [Get-WinEvent](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent) | Microsoft Learn |
 | [Export-Csv](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/export-csv) | Microsoft Learn |

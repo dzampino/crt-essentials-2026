@@ -62,7 +62,6 @@ if (-not $SlidesOnly) {
 		@{ From = 'samples\pki\*.der'; To = 'samples\pki' }
 		@{ From = 'samples\pki\*.csr'; To = 'samples\pki' }
 		@{ From = 'samples\email\*.eml'; To = 'samples\email' }
-		@{ From = 'scripts\*'; To = 'scripts' }
 		@{ From = 'assets\xkcd-936.png'; To = 'images' }
 		@{ From = 'assets\diagrams\*.png'; To = 'images' }
 	)
@@ -77,6 +76,10 @@ if (-not $SlidesOnly) {
 			Copy-Item -Path (Join-Path -Path $Root -ChildPath $_.From) -Destination $Destination
 			Write-Verbose "Copied $($_.From) to files\$($_.To)"
 		}
+		# The PowerShell module, zipped so it extracts straight into a Modules folder
+		$Zip = Join-Path -Path $Files -ChildPath 'CrtEssentials.zip'
+		Compress-Archive -Path (Join-Path -Path $Root -ChildPath 'scripts\CrtEssentials') -DestinationPath $Zip
+		Write-Verbose "Created files\CrtEssentials.zip"
 	}
 
 	$Docs = Join-Path -Path $Root -ChildPath 'docs'

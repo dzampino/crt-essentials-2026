@@ -122,23 +122,10 @@ Forwarding and mailing lists break SPF (a new IP) and often DKIM (a modified sub
 Header lines are folded: a line beginning with a space or tab continues the previous header. Unfold first, then parse:
 
 ```powershell
-function Get-MailHeader {
-	[CmdletBinding()]
-	param(
-		[Parameter(Mandatory)]
-		[string]$Path
-	)
-	$Raw = Get-Content -LiteralPath $Path -Raw
-	$HeaderBlock = ($Raw -split "\r?\n\r?\n", 2)[0]
-	$Unfolded = $HeaderBlock -replace '\r?\n[ \t]+', ' '
-	$Order = 0
-	$Unfolded -split '\r?\n' |
-		ForEach-Object {
-			$Name, $Value = $_ -split ':\s*', 2
-			[pscustomobject]@{ Order = $Order++; Name = $Name; Value = $Value }
-		}
-}
+{{< include ../scripts/CrtEssentials/Functions/Get-MailHeader.ps1 >}}
+```
 
+```powershell
 # Path, oldest hop first
 Get-MailHeader -Path .\constructed-headers.eml |
 	Where-Object Name -eq 'Received' |

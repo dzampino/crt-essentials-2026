@@ -45,9 +45,10 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 
 ## 5. PowerShell
 
-- [ ] Introduce creating your own PowerShell module (site and slides); turn site examples into reusable functions for that module.
-- [ ] Separate functions from usage examples so the copy button copies just the function.
-- [ ] Keep scripts simple for PowerShell beginners; comment where needed.
+- [~] Introduce creating your own PowerShell module (site and slides); turn site examples into reusable functions for that module.
+  - Site done: "Your own module" section on powershell.qmd; nine functions in `scripts/CrtEssentials/Functions/`, packaged by build.ps1 as `files/CrtEssentials.zip`. Old `Get-FileInventory.ps1` / `Get-EvtxSummary.ps1` scripts replaced by functions. Tested in PowerShell 7.6 and 5.1. Slide in the section 7 pass.
+- [x] Separate functions from usage examples so the copy button copies just the function.
+- [x] Keep scripts simple for PowerShell beginners; comment where needed.
 
 ## 6. Windows DFIR box
 
