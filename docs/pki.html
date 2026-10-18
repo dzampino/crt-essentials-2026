@@ -449,21 +449,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <p>The chain is two levels: the root signs the leaf directly. Public CAs issue from an intermediate, as in the diagram below.</p>
-<div class="light-content">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="files/images/certificate-chain.png" class="img-fluid figure-img" alt="Certificate chain diagram: root CA, intermediate CA, leaf certificate."></p>
 <figcaption>Root CA signs an intermediate, which signs the leaf. The client supplies the trust anchor; the server presents the leaf and intermediates.</figcaption>
 </figure>
-</div>
-</div>
-<div class="dark-content">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="files/images/certificate-chain-dark.png" class="img-fluid figure-img" alt="Certificate chain diagram: root CA, intermediate CA, leaf certificate."></p>
-<figcaption>Root CA signs an intermediate, which signs the leaf. The client supplies the trust anchor; the server presents the leaf and intermediates.</figcaption>
-</figure>
-</div>
 </div>
 </section>
 <section id="whats-in-a-certificate" class="level2">

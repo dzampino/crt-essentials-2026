@@ -410,21 +410,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="how-email-works" class="level2">
 <h2 class="anchored" data-anchor-id="how-email-works">How email works</h2>
-<div class="light-content">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="files/images/email-flow.png" class="img-fluid figure-img" alt="Mail flow: author's MUA submits to an MSA, which relays to a sending MTA, which uses SMTP to the receiving MX, which delivers through an MDA to the recipient's MUA. DNS supplies MX and policy records."></p>
 <figcaption>Each hop adds a Received header. One server can perform several roles.</figcaption>
 </figure>
-</div>
-</div>
-<div class="dark-content">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="files/images/email-flow-dark.png" class="img-fluid figure-img" alt="Mail flow: author's MUA submits to an MSA, which relays to a sending MTA, which uses SMTP to the receiving MX, which delivers through an MDA to the recipient's MUA. DNS supplies MX and policy records."></p>
-<figcaption>Each hop adds a Received header. One server can perform several roles.</figcaption>
-</figure>
-</div>
 </div>
 <p>The roles come from <a href="https://www.rfc-editor.org/rfc/rfc5598.html">RFC 5598</a>, Internet Mail Architecture:</p>
 <table class="caption-top table">
