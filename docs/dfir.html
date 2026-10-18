@@ -195,6 +195,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#chocolatey-and-scoop" id="toc-chocolatey-and-scoop" class="nav-link" data-scroll-target="#chocolatey-and-scoop">Chocolatey and Scoop</a></li>
   <li><a href="#the-tool-list" id="toc-the-tool-list" class="nav-link" data-scroll-target="#the-tool-list">The tool list</a></li>
+  <li><a href="#wsl" id="toc-wsl" class="nav-link" data-scroll-target="#wsl">WSL</a></li>
   <li><a href="#processing-an-existing-artifact-set-with-kape-modules" id="toc-processing-an-existing-artifact-set-with-kape-modules" class="nav-link" data-scroll-target="#processing-an-existing-artifact-set-with-kape-modules">Processing an existing artifact set with KAPE modules</a></li>
   </ul></li>
   <li><a href="#using-and-resetting-the-box" id="toc-using-and-resetting-the-box" class="nav-link" data-scroll-target="#using-and-resetting-the-box">Using and resetting the box</a></li>
@@ -269,7 +270,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="odd">
 <td>Tools</td>
-<td>Chocolatey, plus a few direct downloads</td>
+<td>Chocolatey, plus a few direct downloads; WSL 1 for Linux tools</td>
 <td>One command line installs most of the list, and records versions</td>
 </tr>
 </tbody>
@@ -532,12 +533,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="chocolatey-and-scoop" class="level3">
 <h3 class="anchored" data-anchor-id="chocolatey-and-scoop">Chocolatey and Scoop</h3>
 <p><a href="https://chocolatey.org/install">Chocolatey</a> installs most of the list from one command, which makes the FirstLogon step one line. Its community packages are maintained by volunteers, separately from the tools’ authors: check the package page links to the real project before adding it. <a href="https://scoop.sh/">Scoop</a> is an alternative that installs per user without administrator rights; it has fewer DFIR tools.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>choco install <span class="op">-</span>y 7zip sysinternals pwsh ericzimmermantools volatility3 autopsy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>choco install <span class="op">-</span>y 7zip sysinternals pwsh vscode git python wireshark cyberchef exiftool arsenalimagemounter ericzimmermantools volatility3 autopsy</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Python tools, in a new window so python and pip are on the PATH</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>pip install <span class="op">-</span>U oletools<span class="op">[</span>full<span class="op">]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>There is no need to pin versions. The non-persistent disk keeps every tool at the version in the image until you deliberately update it, and Scoop keeps earlier versions side by side when it updates an app (<code>scoop cleanup</code> removes them). Record what is installed for the case notes:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>choco list <span class="op">|</span> <span class="fu">Out-File</span> <span class="op">-</span>FilePath <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Notes\Tools.txt"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="the-tool-list" class="level3">
 <h3 class="anchored" data-anchor-id="the-tool-list">The tool list</h3>
+<p>The common Windows tools from DFIR distributions such as <a href="https://github.com/mandiant/flare-vm">FLARE-VM</a> and the <a href="https://www.sans.org/tools/sift-workstation/">SIFT Workstation</a>, grouped by job.</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -548,29 +553,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
+<td><strong>Parsing and timelines</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
 <td><a href="https://ericzimmerman.github.io/">Eric Zimmerman’s tools</a></td>
 <td>Registry, event logs, MFT, LNK, jump lists; Timeline Explorer for the CSVs</td>
 <td><code>choco install ericzimmermantools</code>, or his <code>Get-ZimmermanTools.ps1</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="https://www.kroll.com/kape">KAPE</a></td>
 <td>Running modules over a collection</td>
 <td>Download from Kroll after registering; see licensing below</td>
-</tr>
-<tr class="odd">
-<td><a href="https://www.exterro.com/digital-forensics-software/ftk-imager">FTK Imager</a></td>
-<td>Mounting and browsing disk images</td>
-<td>Download from Exterro</td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/volatilityfoundation/volatility3">Volatility 3</a></td>
-<td>Memory images</td>
-<td><code>choco install volatility3</code></td>
-</tr>
-<tr class="odd">
-<td><a href="https://plaso.readthedocs.io/">log2timeline / plaso</a></td>
-<td>Super timelines</td>
-<td>Docker on Windows (<a href="https://plaso.readthedocs.io/en/latest/sources/user/Users-Guide.html">plaso documentation</a>); inside this VM that needs nested virtualization, so a separate Linux VM is often simpler</td>
 </tr>
 <tr class="even">
 <td><a href="https://github.com/WithSecureLabs/chainsaw">Chainsaw</a></td>
@@ -583,29 +578,110 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Release zip from GitHub</td>
 </tr>
 <tr class="even">
+<td><a href="https://plaso.readthedocs.io/">log2timeline / plaso</a></td>
+<td>Super timelines</td>
+<td>In <a href="#wsl">WSL</a>, from the GIFT PPA as the <a href="https://plaso.readthedocs.io/en/latest/sources/user/Ubuntu-Packaged-Release.html">plaso documentation</a> describes: <code>sudo add-apt-repository ppa:gift/stable</code>, then <code>sudo apt install plaso-tools</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Disk images and memory</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><a href="https://www.exterro.com/digital-forensics-software/ftk-imager">FTK Imager</a></td>
+<td>Mounting and browsing disk images, hashing</td>
+<td>Download from Exterro</td>
+</tr>
+<tr class="odd">
+<td><a href="https://arsenalrecon.com/products/arsenal-image-mounter">Arsenal Image Mounter</a></td>
+<td>Mounting images as complete disks, so any Windows tool can read them; Free Mode includes temporary write support kept in separate differencing files</td>
+<td><code>choco install arsenalimagemounter</code></td>
+</tr>
+<tr class="even">
 <td><a href="https://www.sleuthkit.org/autopsy/">Autopsy</a></td>
 <td>Disk image analysis</td>
 <td><code>choco install autopsy</code></td>
+</tr>
+<tr class="odd">
+<td><a href="https://github.com/volatilityfoundation/volatility3">Volatility 3</a></td>
+<td>Memory images</td>
+<td><code>choco install volatility3</code></td>
+</tr>
+<tr class="even">
+<td><strong>Files, documents and network</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><a href="https://gchq.github.io/CyberChef/">CyberChef</a></td>
+<td>Decoding, decompressing and converting data; a local copy that works offline</td>
+<td><code>choco install cyberchef</code></td>
+</tr>
+<tr class="even">
+<td><a href="https://exiftool.org/">ExifTool</a></td>
+<td>File metadata</td>
+<td><code>choco install exiftool</code></td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.winitor.com/">pestudio</a></td>
+<td>First look at a Windows executable</td>
+<td>Download from Winitor (Chocolatey flags its package as possibly broken)</td>
+</tr>
+<tr class="even">
+<td><a href="https://github.com/decalage2/oletools">oletools</a></td>
+<td>Macros and objects in Office documents</td>
+<td><code>pip install -U oletools[full]</code></td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.wireshark.org/">Wireshark</a></td>
+<td>Packet captures</td>
+<td><code>choco install wireshark</code></td>
+</tr>
+<tr class="even">
+<td><strong>Basics</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>7-Zip, <a href="https://learn.microsoft.com/en-us/sysinternals/">Sysinternals</a>, PowerShell 7, Git, Python</td>
+<td>Archives, process and file utilities, scripting</td>
+<td>In the <code>choco</code> line above</td>
+</tr>
+<tr class="even">
+<td><a href="https://code.visualstudio.com/">VS Code</a></td>
+<td>Reading scripts, logs, JSON and CSV; editing notes</td>
+<td><code>choco install vscode</code></td>
 </tr>
 <tr class="odd">
 <td>Microsoft Office</td>
 <td>Documents, and Excel for the CSVs</td>
 <td>If your license covers it</td>
 </tr>
-<tr class="even">
-<td>7-Zip, Sysinternals, PowerShell 7</td>
-<td>The basics</td>
-<td>In the <code>choco</code> line above</td>
-</tr>
 </tbody>
 </table>
+<p>Also common in those distributions, if your work calls for them: <a href="https://notepad-plus-plus.org/">Notepad++</a> (<code>notepadplusplus</code>), <a href="https://mh-nexus.de/en/hxd/">HxD</a> (<code>hxd</code>), <a href="https://sqlitebrowser.org/">DB Browser for SQLite</a> (<code>sqlitebrowser</code>) and <a href="https://virustotal.github.io/yara/">YARA</a> (<code>yara</code>) from Chocolatey; <a href="https://github.com/keydet89/RegRipper3.0">RegRipper</a>, <a href="https://github.com/mandiant/capa">capa</a> and <a href="https://github.com/mandiant/flare-floss">FLOSS</a> from their GitHub releases (their Chocolatey packages are years behind).</p>
 <p>Record the version of every tool used for a case in the case notes.</p>
+</section>
+<section id="wsl" class="level3">
+<h3 class="anchored" data-anchor-id="wsl">WSL</h3>
+<p>The Windows Subsystem for Linux runs Linux command-line tools, such as plaso, next to the Windows tools, on the same files. Windows Server 2025 installs it with <code>wsl.exe --install</code> (<a href="https://learn.microsoft.com/en-us/windows/wsl/install-on-server">Microsoft Learn</a>).</p>
+<p><strong>Inside VMware Workstation, use WSL 1.</strong> WSL 2 runs Linux in a lightweight virtual machine, so inside this VM it needs nested virtualization: <strong>VM Settings → Processors → Virtualize Intel VT-x/EPT or AMD-V/RVI</strong>. Workstation cannot provide that while the host itself runs Hyper-V or virtualization-based security, which Memory Integrity, Credential Guard, WSL 2 and Docker Desktop on the host all turn on (<a href="https://knowledge.broadcom.com/external/article/389469/virtualized-intel-vtxept-is-not-supporte.html">Broadcom KB 389469</a>). On a Windows 11 host with virtualization-based security running, Workstation 25.0.1 refused to power on a VM with that option set: “Virtualized Intel VT-x/EPT is not supported on this platform.” WSL 1 does not use virtualization, so it works whatever the host runs.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># WSL with the WSL 1 component, and no distribution yet; restart afterwards</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>wsl<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>install <span class="op">--</span>enable-wsl1 <span class="op">--</span>no-distribution</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># After the restart: new distributions use WSL 1, then install Ubuntu</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>wsl<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>set-default-version <span class="dv">1</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="dt">wsl</span><span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>install <span class="op">--</span>distribution Ubuntu</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># The VERSION column should show 1</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>wsl<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>list <span class="op">--</span>verbose</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Install the distribution and its tools during the build, like everything else on the system disk. Windows drives appear in Linux under <code>/mnt/c</code> and so on (<a href="https://learn.microsoft.com/en-us/windows/wsl/basic-commands">WSL commands</a>).</p>
 </section>
 <section id="processing-an-existing-artifact-set-with-kape-modules" class="level3">
 <h3 class="anchored" data-anchor-id="processing-an-existing-artifact-set-with-kape-modules">Processing an existing artifact set with KAPE modules</h3>
 <p>KAPE has two halves: <strong>targets</strong> collect files from a system, and <strong>modules</strong> run programs against files already collected. For this box only modules apply. Modules are defined in <code>.mkape</code> files; the community set is maintained in <a href="https://github.com/EricZimmerman/KapeFiles">KapeFiles</a>, which includes the compound module <code>!EZParser</code> (runs Eric Zimmerman’s parsers over a collection).</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Module source is a collection that already exists; output goes to case storage.</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\kape<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>msource <span class="st">"\\vmware-host\Shared Folders\Evidence\2026-0142\C"</span> <span class="op">--</span>mdest <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Output\EZParser"</span> <span class="op">--</span>module <span class="op">!</span>EZParser</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Module source is a collection that already exists; output goes to case storage.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\kape<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>msource <span class="st">"\\vmware-host\Shared Folders\Evidence\2026-0142\C"</span> <span class="op">--</span>mdest <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Output\EZParser"</span> <span class="op">--</span>module <span class="op">!</span>EZParser</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Check the switches against <code>kape.exe --help</code> and the <a href="https://ericzimmerman.github.io/KapeDocs/">KAPE documentation</a> for the version you install.</p>
 <p><strong>Licensing.</strong> KAPE is free for CRT members. Commercial use, such as paid engagements, requires an enterprise license from Kroll: <a href="https://www.kroll.com/en/kape-license-agreement">KAPE license agreement</a>.</p>
 </section>
@@ -681,6 +757,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td><a href="https://www.kroll.com/en/kape-license-agreement">KAPE license agreement</a></td>
 <td>Kroll</td>
+</tr>
+<tr class="even">
+<td><a href="https://learn.microsoft.com/en-us/windows/wsl/install-on-server">Install WSL on Windows Server</a> and <a href="https://learn.microsoft.com/en-us/windows/wsl/basic-commands">WSL commands</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="odd">
+<td><a href="https://knowledge.broadcom.com/external/article/389469/virtualized-intel-vtxept-is-not-supporte.html">Virtualized Intel VT-x/EPT is not supported on this platform</a></td>
+<td>Broadcom KB 389469</td>
 </tr>
 </tbody>
 </table>

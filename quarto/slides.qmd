@@ -785,9 +785,24 @@ choco install -y ericzimmermantools volatility3 autopsy
 
 ::: notes
 The full line on the companion site also installs 7-Zip, Sysinternals and PowerShell 7.
-KAPE, FTK Imager, Chainsaw and Hayabusa are direct downloads; Chocolatey's "chainsaw" package is a different program. Plaso runs on Windows through Docker.
+KAPE, FTK Imager, Chainsaw and Hayabusa are direct downloads; Chocolatey's "chainsaw" package is a different program. Plaso runs in WSL (Ubuntu, GIFT PPA).
 KAPE and the community KapeFiles repository: https://github.com/EricZimmerman/KapeFiles
 KAPE is free for CRT members; commercial use needs a Kroll enterprise license: https://www.kroll.com/en/kape-license-agreement
+:::
+
+## Suggested tool list
+
+- Parsing and timelines: Eric Zimmerman's tools, KAPE, Chainsaw, Hayabusa, plaso
+- Disk images and memory: FTK Imager, Arsenal Image Mounter, Autopsy, Volatility 3
+- Files, documents and network: CyberChef, ExifTool, pestudio, oletools, Wireshark
+- Basics: 7-Zip, Sysinternals, VS Code, PowerShell 7, Office if licensed
+- Linux tools: WSL 1
+
+<!-- PROPOSED: slide added for David's tool list; grouping and wording. -->
+
+::: notes
+The common Windows tools from DFIR distributions such as FLARE-VM and the SIFT Workstation. Install commands are on the companion site.
+WSL 2 needs nested virtualization, which VMware Workstation cannot provide while the host runs Hyper-V or virtualization-based security (Broadcom KB 389469). WSL 1 does not use virtualization: wsl.exe --install --enable-wsl1 --no-distribution, then wsl.exe --set-default-version 1.
 :::
 
 ## Using and resetting the box

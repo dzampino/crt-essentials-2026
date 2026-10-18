@@ -97,8 +97,16 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 - [x] DFIR: David's suggestion of a second clock set to UTC, or UTC as the system time zone.
   - Clock section on the site (generator setting, Set-TimeZone -Id 'UTC', Control Panel Additional Clocks); slide bullet marked PROPOSED.
 
+## 12. Fourth request list (October 18, 2026)
+
+- [x] DFIR: mention WSL for the VM, after confirming it works inside VMware Workstation.
+  - Tested on this PC (Workstation 25.0.1, Windows 11 host with VBS running): a VM with nested VT-x enabled logged `Monitor Mode: ULM` and refused: "Virtualized Intel VT-x/EPT is not supported on this platform." So WSL 2 cannot run in the VM on such a host; the site recommends WSL 1 (no virtualization). WSL 1 itself not yet run inside a Server 2025 VM.
+- [x] DFIR: suggested software list covering the common tools in DFIR distributions, including 7-Zip, FTK Imager, VS Code, Arsenal Image Mounter, Sysinternals, Wireshark, CyberChef, ExifTool, pestudio, log2timeline/plaso, Volatility 3, oletools.
+  - Tool table grouped by job, with Chocolatey packages checked (`choco info`: package and project site). pestudio from Winitor (package flagged possibly broken); RegRipper, capa and FLOSS from GitHub (packages years behind); oletools via pip; plaso in WSL from the GIFT PPA. New deck slide "Suggested tool list" (PROPOSED).
+
 ## Open decisions
 
 - [ ] Review the `<!-- PROPOSED -->` wording in `quarto/slides.qmd` (wording that is not David's).
 - [ ] Chocolatey and old versions: David said Chocolatey and Scoop keep old versions by default; only Scoop's behavior is confirmed and stated on the site.
 - [ ] Run the ISO rebuild on the DFIR page end to end with the ADK and a Server 2025 ISO.
+- [ ] In a Server 2025 VM: run the WSL 1 install commands and plaso from the GIFT PPA under WSL 1. (The plaso docs page says "Ubuntu 26.04 LTS (noble)"; noble is 24.04, so the site names no version.)

@@ -18,7 +18,7 @@ This is an opinionated build. Each choice below has alternatives; these are the 
 | Hypervisor | VMware Workstation Pro | Independent non-persistent disks reset on power-off; Shared Folders, one of them read-only, keep case data outside the VM |
 | Install | An unattend file | The same Windows build every time, with the settings below already applied |
 | Settings | UAC off, Defender removed, long paths on, extensions and hidden files shown | Analysis tools run without friction on a machine that is thrown away |
-| Tools | Chocolatey, plus a few direct downloads | One command line installs most of the list, and records versions |
+| Tools | Chocolatey, plus a few direct downloads; WSL 1 for Linux tools | One command line installs most of the list, and records versions |
 
 ## Disposable/nonpersistent virtual machine
 
@@ -186,7 +186,10 @@ Analysis rarely needs the internet; installs and tool updates do. Connect the VM
 [Chocolatey](https://chocolatey.org/install) installs most of the list from one command, which makes the FirstLogon step one line. Its community packages are maintained by volunteers, separately from the tools' authors: check the package page links to the real project before adding it. [Scoop](https://scoop.sh/) is an alternative that installs per user without administrator rights; it has fewer DFIR tools.
 
 ```powershell
-choco install -y 7zip sysinternals pwsh ericzimmermantools volatility3 autopsy
+choco install -y 7zip sysinternals pwsh vscode git python wireshark cyberchef exiftool arsenalimagemounter ericzimmermantools volatility3 autopsy
+
+# Python tools, in a new window so python and pip are on the PATH
+pip install -U oletools[full]
 ```
 
 There is no need to pin versions. The non-persistent disk keeps every tool at the version in the image until you deliberately update it, and Scoop keeps earlier versions side by side when it updates an app (`scoop cleanup` removes them). Record what is installed for the case notes:
@@ -197,20 +200,55 @@ choco list | Out-File -FilePath "\\vmware-host\Shared Folders\Cases\2026-0142\No
 
 ### The tool list
 
+The common Windows tools from DFIR distributions such as [FLARE-VM](https://github.com/mandiant/flare-vm) and the [SIFT Workstation](https://www.sans.org/tools/sift-workstation/), grouped by job.
+
 | Tool | For | Install |
 | --- | --- | --- |
+| **Parsing and timelines** | | |
 | [Eric Zimmerman's tools](https://ericzimmerman.github.io/) | Registry, event logs, MFT, LNK, jump lists; Timeline Explorer for the CSVs | `choco install ericzimmermantools`, or his `Get-ZimmermanTools.ps1` |
 | [KAPE](https://www.kroll.com/kape) | Running modules over a collection | Download from Kroll after registering; see licensing below |
-| [FTK Imager](https://www.exterro.com/digital-forensics-software/ftk-imager) | Mounting and browsing disk images | Download from Exterro |
-| [Volatility 3](https://github.com/volatilityfoundation/volatility3) | Memory images | `choco install volatility3` |
-| [log2timeline / plaso](https://plaso.readthedocs.io/) | Super timelines | Docker on Windows ([plaso documentation](https://plaso.readthedocs.io/en/latest/sources/user/Users-Guide.html)); inside this VM that needs nested virtualization, so a separate Linux VM is often simpler |
 | [Chainsaw](https://github.com/WithSecureLabs/chainsaw) | Hunting through event logs with Sigma rules | Release zip from GitHub (Chocolatey's `chainsaw` is a different program) |
 | [Hayabusa](https://github.com/Yamato-Security/hayabusa) | Event log timelines and Sigma detections | Release zip from GitHub |
+| [log2timeline / plaso](https://plaso.readthedocs.io/) | Super timelines | In [WSL](#wsl), from the GIFT PPA as the [plaso documentation](https://plaso.readthedocs.io/en/latest/sources/user/Ubuntu-Packaged-Release.html) describes: `sudo add-apt-repository ppa:gift/stable`, then `sudo apt install plaso-tools` |
+| **Disk images and memory** | | |
+| [FTK Imager](https://www.exterro.com/digital-forensics-software/ftk-imager) | Mounting and browsing disk images, hashing | Download from Exterro |
+| [Arsenal Image Mounter](https://arsenalrecon.com/products/arsenal-image-mounter) | Mounting images as complete disks, so any Windows tool can read them; Free Mode includes temporary write support kept in separate differencing files | `choco install arsenalimagemounter` |
 | [Autopsy](https://www.sleuthkit.org/autopsy/) | Disk image analysis | `choco install autopsy` |
+| [Volatility 3](https://github.com/volatilityfoundation/volatility3) | Memory images | `choco install volatility3` |
+| **Files, documents and network** | | |
+| [CyberChef](https://gchq.github.io/CyberChef/) | Decoding, decompressing and converting data; a local copy that works offline | `choco install cyberchef` |
+| [ExifTool](https://exiftool.org/) | File metadata | `choco install exiftool` |
+| [pestudio](https://www.winitor.com/) | First look at a Windows executable | Download from Winitor (Chocolatey flags its package as possibly broken) |
+| [oletools](https://github.com/decalage2/oletools) | Macros and objects in Office documents | `pip install -U oletools[full]` |
+| [Wireshark](https://www.wireshark.org/) | Packet captures | `choco install wireshark` |
+| **Basics** | | |
+| 7-Zip, [Sysinternals](https://learn.microsoft.com/en-us/sysinternals/), PowerShell 7, Git, Python | Archives, process and file utilities, scripting | In the `choco` line above |
+| [VS Code](https://code.visualstudio.com/) | Reading scripts, logs, JSON and CSV; editing notes | `choco install vscode` |
 | Microsoft Office | Documents, and Excel for the CSVs | If your license covers it |
-| 7-Zip, Sysinternals, PowerShell 7 | The basics | In the `choco` line above |
+
+Also common in those distributions, if your work calls for them: [Notepad++](https://notepad-plus-plus.org/) (`notepadplusplus`), [HxD](https://mh-nexus.de/en/hxd/) (`hxd`), [DB Browser for SQLite](https://sqlitebrowser.org/) (`sqlitebrowser`) and [YARA](https://virustotal.github.io/yara/) (`yara`) from Chocolatey; [RegRipper](https://github.com/keydet89/RegRipper3.0), [capa](https://github.com/mandiant/capa) and [FLOSS](https://github.com/mandiant/flare-floss) from their GitHub releases (their Chocolatey packages are years behind).
 
 Record the version of every tool used for a case in the case notes.
+
+### WSL {#wsl}
+
+The Windows Subsystem for Linux runs Linux command-line tools, such as plaso, next to the Windows tools, on the same files. Windows Server 2025 installs it with `wsl.exe --install` ([Microsoft Learn](https://learn.microsoft.com/en-us/windows/wsl/install-on-server)).
+
+**Inside VMware Workstation, use WSL 1.** WSL 2 runs Linux in a lightweight virtual machine, so inside this VM it needs nested virtualization: **VM Settings → Processors → Virtualize Intel VT-x/EPT or AMD-V/RVI**. Workstation cannot provide that while the host itself runs Hyper-V or virtualization-based security, which Memory Integrity, Credential Guard, WSL 2 and Docker Desktop on the host all turn on ([Broadcom KB 389469](https://knowledge.broadcom.com/external/article/389469/virtualized-intel-vtxept-is-not-supporte.html)). On a Windows 11 host with virtualization-based security running, Workstation 25.0.1 refused to power on a VM with that option set: "Virtualized Intel VT-x/EPT is not supported on this platform." WSL 1 does not use virtualization, so it works whatever the host runs.
+
+```powershell
+# WSL with the WSL 1 component, and no distribution yet; restart afterwards
+wsl.exe --install --enable-wsl1 --no-distribution
+
+# After the restart: new distributions use WSL 1, then install Ubuntu
+wsl.exe --set-default-version 1
+wsl.exe --install --distribution Ubuntu
+
+# The VERSION column should show 1
+wsl.exe --list --verbose
+```
+
+Install the distribution and its tools during the build, like everything else on the system disk. Windows drives appear in Linux under `/mnt/c` and so on ([WSL commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands)).
 
 ### Processing an existing artifact set with KAPE modules
 
@@ -256,3 +294,5 @@ A per-case checklist:
 | [Chocolatey](https://chocolatey.org/install) | Installation |
 | [KAPE documentation](https://ericzimmerman.github.io/KapeDocs/) and [KapeFiles](https://github.com/EricZimmerman/KapeFiles) | Eric Zimmerman |
 | [KAPE license agreement](https://www.kroll.com/en/kape-license-agreement) | Kroll |
+| [Install WSL on Windows Server](https://learn.microsoft.com/en-us/windows/wsl/install-on-server) and [WSL commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands) | Microsoft Learn |
+| [Virtualized Intel VT-x/EPT is not supported on this platform](https://knowledge.broadcom.com/external/article/389469/virtualized-intel-vtxept-is-not-supporte.html) | Broadcom KB 389469 |
