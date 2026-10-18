@@ -176,19 +176,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#what-were-building" id="toc-what-were-building" class="nav-link active" data-scroll-target="#what-were-building">What we’re building</a></li>
-  <li><a href="#disposablenonpersistent-virtual-machine" id="toc-disposablenonpersistent-virtual-machine" class="nav-link" data-scroll-target="#disposablenonpersistent-virtual-machine">Disposable/nonpersistent virtual machine</a></li>
-  <li><a href="#build-automation" id="toc-build-automation" class="nav-link" data-scroll-target="#build-automation">Automating the build</a></li>
+  <li><a href="#disposablenonpersistent-virtual-machine" id="toc-disposablenonpersistent-virtual-machine" class="nav-link" data-scroll-target="#disposablenonpersistent-virtual-machine">Disposable/nonpersistent virtual machine</a>
+  <ul class="collapse">
+  <li><a href="#vmware-workstation-pro" id="toc-vmware-workstation-pro" class="nav-link" data-scroll-target="#vmware-workstation-pro">VMware Workstation Pro</a></li>
+  </ul></li>
+  <li><a href="#automating-the-build" id="toc-automating-the-build" class="nav-link" data-scroll-target="#automating-the-build">Automating the build</a>
+  <ul class="collapse">
+  <li><a href="#windows-server-2025" id="toc-windows-server-2025" class="nav-link" data-scroll-target="#windows-server-2025">Windows Server 2025</a></li>
+  <li><a href="#unattended-install" id="toc-unattended-install" class="nav-link" data-scroll-target="#unattended-install">Unattended install</a></li>
+  </ul></li>
   <li><a href="#configuring-windows-for-analysis" id="toc-configuring-windows-for-analysis" class="nav-link" data-scroll-target="#configuring-windows-for-analysis">Configuring Windows for analysis</a>
   <ul class="collapse">
   <li><a href="#uac" id="toc-uac" class="nav-link" data-scroll-target="#uac">UAC</a></li>
-  <li><a href="#other-settings-to-decide" id="toc-other-settings-to-decide" class="nav-link" data-scroll-target="#other-settings-to-decide">Other settings to decide</a></li>
+  <li><a href="#network-and-updates" id="toc-network-and-updates" class="nav-link" data-scroll-target="#network-and-updates">Network and updates</a></li>
   </ul></li>
   <li><a href="#tools-for-analysis" id="toc-tools-for-analysis" class="nav-link" data-scroll-target="#tools-for-analysis">Tools for analysis</a>
   <ul class="collapse">
+  <li><a href="#chocolatey-and-scoop" id="toc-chocolatey-and-scoop" class="nav-link" data-scroll-target="#chocolatey-and-scoop">Chocolatey and Scoop</a></li>
+  <li><a href="#the-tool-list" id="toc-the-tool-list" class="nav-link" data-scroll-target="#the-tool-list">The tool list</a></li>
   <li><a href="#processing-an-existing-artifact-set-with-kape-modules" id="toc-processing-an-existing-artifact-set-with-kape-modules" class="nav-link" data-scroll-target="#processing-an-existing-artifact-set-with-kape-modules">Processing an existing artifact set with KAPE modules</a></li>
   </ul></li>
   <li><a href="#using-and-resetting-the-box" id="toc-using-and-resetting-the-box" class="nav-link" data-scroll-target="#using-and-resetting-the-box">Using and resetting the box</a></li>
-  <li><a href="#open-decisions" id="toc-open-decisions" class="nav-link" data-scroll-target="#open-decisions">Open decisions</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/dzampino/crt-essentials-2026/blob/main/dfir.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/dzampino/crt-essentials-2026/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -215,26 +224,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Status
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Several implementation choices are still open: Windows version, hypervisor, networking, UAC and Defender configuration, reset method, persistent case storage, and the tool list. They are listed at the <a href="#open-decisions">end of this page</a>. Where this page shows a specific tool or setting, it is an example of the approach, not a selection.</p>
-</div>
-</div>
 <section id="what-were-building" class="level2">
 <h2 class="anchored" data-anchor-id="what-were-building">What we’re building</h2>
 <ul>
 <li>A Windows analysis machine, not an evidence acquisition machine.</li>
 <li>Evidence is already collected; memory acquisition is handled separately (Magnet in our workflow).</li>
 </ul>
-<p>The box takes collected artifacts (triage collections, event logs, registry hives, disk images) and produces analysis output: parsed CSVs, timelines, notes. It never touches the client’s systems.</p>
+<p>The box takes collected artifacts (triage collections, event logs, registry hives, disk images, memory images) and produces analysis output: parsed CSVs, timelines, notes. It never touches the client’s systems.</p>
+<p>This is an opinionated build. Each choice below has alternatives; these are the ones that have worked.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Choice</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Windows</td>
+<td>Windows Server 2025, Desktop Experience</td>
+<td>Stable Long-Term Servicing Channel release; Microsoft Defender Antivirus is a feature you can remove; no TPM requirement</td>
+</tr>
+<tr class="even">
+<td>Hypervisor</td>
+<td>VMware Workstation Pro</td>
+<td>Independent non-persistent disks reset on power-off; Shared Folders, one of them read-only, keep case data outside the VM</td>
+</tr>
+<tr class="odd">
+<td>Install</td>
+<td>An unattend file</td>
+<td>The same Windows build every time, with the settings below already applied</td>
+</tr>
+<tr class="even">
+<td>Settings</td>
+<td>UAC off, Defender removed, long paths on, extensions and hidden files shown</td>
+<td>Analysis tools run without friction on a machine that is thrown away</td>
+</tr>
+<tr class="odd">
+<td>Tools</td>
+<td>Chocolatey, plus a few direct downloads</td>
+<td>One command line installs most of the list, and records versions</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="disposablenonpersistent-virtual-machine" class="level2">
 <h2 class="anchored" data-anchor-id="disposablenonpersistent-virtual-machine">Disposable/nonpersistent virtual machine</h2>
@@ -242,6 +280,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Return the machine to a known state.</li>
 <li>Keep case data and analysis output separate from what gets reset.</li>
 </ul>
+<p><strong>Why disposable.</strong> Analysis tools open hostile files. Each case starts from the same known-good image, nothing carries over from the previous client, and “what version of the tool did we use” has one answer.</p>
+<section id="vmware-workstation-pro" class="level3">
+<h3 class="anchored" data-anchor-id="vmware-workstation-pro">VMware Workstation Pro</h3>
+<p>Workstation Pro has been free for commercial, educational and personal use since November 2024 (<a href="https://knowledge.broadcom.com/external/article/368667/download-and-license-vmware-desktop-hypervisor.html">Broadcom</a>); download it from the Broadcom support portal.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -258,118 +300,94 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>Windows, settings, installed tools</td>
-<td>The VM’s system disk</td>
-<td>Returned to the clean snapshot</td>
+<td>System disk, <strong>independent non-persistent</strong></td>
+<td>Discarded at power-off</td>
 </tr>
 <tr class="even">
 <td>Temporary files, caches, tool state</td>
-<td>The VM’s system disk</td>
-<td>Discarded</td>
+<td>System disk</td>
+<td>Discarded at power-off</td>
 </tr>
 <tr class="odd">
-<td>Evidence (read-only working copy)</td>
-<td>Persistent case storage</td>
-<td>Kept</td>
+<td>Evidence</td>
+<td>Host folder, shared <strong>read-only</strong></td>
+<td>Kept; the VM cannot change it</td>
 </tr>
 <tr class="even">
 <td>Analysis output, tool logs, notes</td>
-<td>Persistent case storage</td>
+<td>Host folder, shared read-write</td>
 <td>Kept</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Why disposable.</strong> Analysis tools open hostile files. Each case starts from the same known-good image, nothing carries over from the previous client, and “what version of the tool did we use” has one answer.</p>
-<p><strong>How the reset can work</strong> (the method is an open decision):</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Option</th>
-<th>How it resets</th>
-<th>Keeping case data out of the reset</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Hyper-V checkpoint</td>
-<td>Apply the clean checkpoint</td>
-<td>Checkpoints cover the VM’s virtual disks, so keep case data on a share or storage outside the VM</td>
-</tr>
-<tr class="even">
-<td>VMware Workstation snapshot</td>
-<td>Revert to snapshot</td>
-<td>A disk in <strong>independent-persistent</strong> mode is not included in snapshots</td>
-</tr>
-<tr class="odd">
-<td>Differencing disk over a clean parent</td>
-<td>Delete and recreate the child disk</td>
-<td>Case data on a separate disk or share</td>
-</tr>
-<tr class="even">
-<td>Windows Sandbox</td>
-<td>Every session starts clean</td>
-<td>Map a host folder in the <code>.wsb</code> configuration; tools must be installed each session</td>
-</tr>
-</tbody>
-</table>
-<p>Whatever the method, verify it: write a test file to the case storage, reset, and confirm the file is still there and the system disk change is gone. <code>Test-DfirBox.ps1</code> (below) does the first half.</p>
+<p><strong>Non-persistent system disk.</strong> Build the VM with a normal disk, install and configure everything, shut it down, then in <strong>VM Settings → Hard Disk → Advanced</strong> set the disk to <em>Independent</em> and <em>Nonpersistent</em>. From then on, changes are discarded when you power off the VM or restore a snapshot, and the disk is in the same state every time it starts (<a href="https://docs.vmware.com/en/VMware-Workstation-Pro/17/com.vmware.ws.using.doc/GUID-A6792F54-2734-4AF4-9473-C8B9AD8321AF.html">VMware Workstation Pro documentation</a>). A restart inside Windows is not a power-off; shut down, and power the VM off. To update the image, switch the disk back to persistent, update, and switch it back.</p>
+<p><strong>Shared Folders.</strong> In <strong>VM Settings → Options → Shared Folders</strong>, add two host folders: <code>Evidence</code> with the <strong>Read-only</strong> attribute, so the VM can view and copy files but cannot add, change or remove them, and <code>Cases</code> read-write for output. With VMware Tools installed, they appear in Windows at <code>\\vmware-host\Shared Folders\</code>. Host file permissions still apply.</p>
+<p><strong>Verify it.</strong> Write a test file to <code>Cases</code>, try (and fail) to write one to <code>Evidence</code>, power off, power on, and confirm the <code>Cases</code> file is still there and a file you left on the desktop is gone.</p>
 </section>
-<section id="build-automation" class="level2">
-<h2 class="anchored" data-anchor-id="build-automation">Automating the build</h2>
+</section>
+<section id="automating-the-build" class="level2">
+<h2 class="anchored" data-anchor-id="automating-the-build">Automating the build</h2>
 <ul>
 <li>Decide on the Windows image and tool list.</li>
 <li>Make setup repeatable rather than configuring it by hand each time.</li>
 </ul>
-<p>The pattern: a clean Windows image, then scripts that install and configure everything from a data file, then a snapshot. Rebuilding for a new tool version means editing the data file and rerunning, not remembering clicks.</p>
-<ol type="1">
-<li>Create the VM from the chosen Windows image. Microsoft’s Evaluation Center publishes time-limited Windows Enterprise evaluation images; a licensed image is the alternative.</li>
-<li>Copy the scripts into the VM and review <code>DfirTools.psd1</code>.</li>
-<li>Run with <code>-WhatIf</code> to see every change, then for real with <code>-Verbose</code>.</li>
-<li>Run <code>Test-DfirBox.ps1</code>, then shut down and take the <strong>clean</strong> snapshot.</li>
-</ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Set-Location</span> C<span class="op">:</span>\Build</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Install-DfirTools<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>WhatIf</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Install-DfirTools<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Verbose</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Set-DfirAnalysisSettings<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>UacMode NoPrompt <span class="op">-</span>DefenderExclusionPath C<span class="op">:</span>\Tools <span class="op">-</span>WhatIf</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Test-DfirBox<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>CaseRoot E<span class="op">:</span>\Cases <span class="op">|</span> <span class="fu">Format-Table</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="windows-server-2025" class="level3">
+<h3 class="anchored" data-anchor-id="windows-server-2025">Windows Server 2025</h3>
+<p>Use the Desktop Experience installation option; the analysis tools need a desktop. Microsoft’s <a href="https://www.microsoft.com/en-us/evalcenter/download-windows-server-2025">Evaluation Center</a> has a 180-day evaluation, which must be activated online within its first 10 days or it shuts down; activate it during the build, while the VM has a network. A licensed image is the alternative. Why Server rather than Windows 11:</p>
+<ul>
+<li><strong>Stable.</strong> Long-Term Servicing Channel: no feature updates rearranging the system between cases.</li>
+<li><strong>Defender is a feature.</strong> On Windows Server, Microsoft Defender Antivirus is installed as a Windows feature, <code>Windows-Defender</code>, so it can be removed cleanly instead of fought with (<a href="https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure">Microsoft Learn</a>).</li>
+<li><strong>No TPM requirement.</strong> Microsoft lists a TPM as “required only for certain features,” such as BitLocker (<a href="https://learn.microsoft.com/en-us/windows-server/get-started/hardware-requirements">hardware requirements</a>), so the VM needs no virtual TPM, and no encryption of the VM that a virtual TPM brings with it in Workstation.</li>
+</ul>
+</section>
+<section id="unattended-install" class="level3">
+<h3 class="anchored" data-anchor-id="unattended-install">Unattended install</h3>
+<p>An unattend file (<code>autounattend.xml</code>) answers every question Windows Setup asks and can apply settings and run scripts. Build one with <a href="https://schneegans.de/windows/unattend-generator/">Christoph Schneegans’ unattend generator</a>. Settings to choose for this box:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
-<th>File</th>
-<th>What it does</th>
+<th>Generator setting</th>
+<th>Why</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="files/scripts/DfirTools.psd1">DfirTools.psd1</a></td>
-<td>The tool manifest: tool folder, winget package IDs and optional pinned versions. <strong>Example entries only.</strong></td>
+<td>A local administrator account</td>
+<td>No Microsoft account; one known login</td>
 </tr>
 <tr class="even">
-<td><a href="files/scripts/Install-DfirTools.ps1">Install-DfirTools.ps1</a></td>
-<td>Installs each package with winget, optionally downloads Eric Zimmerman’s tools with his <code>Get-ZimmermanTools.ps1</code>, and writes <code>ToolInventory.csv</code> with installed versions. Supports <code>-WhatIf</code>.</td>
+<td>Disable User Account Control (UAC)</td>
+<td>See <a href="#uac">UAC</a> below</td>
 </tr>
 <tr class="odd">
-<td><a href="files/scripts/Set-DfirAnalysisSettings.ps1">Set-DfirAnalysisSettings.ps1</a></td>
-<td>Sets UAC prompt behavior and optional Defender exclusions for this VM. Supports <code>-WhatIf</code> and <code>-Confirm</code>.</td>
+<td>Enable long paths</td>
+<td>Deep paths inside collections otherwise fail</td>
 </tr>
 <tr class="even">
-<td><a href="files/scripts/Test-DfirBox.ps1">Test-DfirBox.ps1</a></td>
-<td>Checks case storage exists, is writable and is not on the system drive; lists files retained; checks tool folder and free space. Read-only apart from a temporary marker file.</td>
+<td>Always show file extensions; show all files</td>
+<td><code>invoice.pdf.exe</code> and hidden files are visible</td>
+</tr>
+<tr class="odd">
+<td>Do not update Last Access Time stamp</td>
+<td>Reading a file on the box does not change its last access time</td>
+</tr>
+<tr class="even">
+<td>Disable SmartScreen</td>
+<td>Tools downloaded during the build are not blocked</td>
+</tr>
+<tr class="odd">
+<td>Remove bloatware</td>
+<td>Fewer distractions and background updates</td>
+</tr>
+<tr class="even">
+<td>FirstLogon scripts</td>
+<td>Install Chocolatey and the tools (<a href="#tools-for-analysis">below</a>)</td>
 </tr>
 </tbody>
 </table>
-<p><code>-WhatIf</code> output from <code>Install-DfirTools.ps1</code> with the example manifest:</p>
-<pre class="text"><code>What if: Performing the operation "Create tool folder" on target "C:\Tools".
-What if: Performing the operation "winget install" on target "7-Zip".
-What if: Performing the operation "winget install" on target "Sysinternals Suite".
-What if: Performing the operation "winget install" on target "PowerShell 7".
-What if: Performing the operation "Download Eric Zimmerman's tools (.NET 9)" on target "C:\Tools\EZTools".
-What if: Performing the operation "Write tool inventory" on target "C:\Tools\ToolInventory.csv".</code></pre>
-<p>Pin versions in the manifest (<code>Version = '26.04'</code>) once the tool list is settled; an unpinned build installs whatever is current that day. The winget package IDs in the example manifest were confirmed with <code>winget show --id &lt;id&gt; --exact</code> on October 16, 2026.</p>
+<p>The generator is written for Windows 10 and 11. Most of these settings are ordinary setup and registry settings that apply to Windows Server 2025 too, but test the file on Server before relying on it. Generate it again when you change the build, rather than editing the XML by hand.</p>
+<p>Windows Setup looks for <code>autounattend.xml</code> in the root of removable media. In Workstation, create the VM with <strong>I will install the operating system later</strong> (so VMware’s Easy Install does not supply its own answers), attach the Windows ISO, and attach a second small ISO, or a floppy image, containing <code>autounattend.xml</code>.</p>
+</section>
 </section>
 <section id="configuring-windows-for-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="configuring-windows-for-analysis">Configuring Windows for analysis</h2>
@@ -378,53 +396,7 @@ What if: Performing the operation "Write tool inventory" on target "C:\Tools\Too
 <li>UAC: normally I don’t disable security features, but this is a disposable VM and reducing friction matters.</li>
 <li>Other Windows security settings as decisions specific to this machine, not general recommendations.</li>
 </ul>
-<section id="uac" class="level3">
-<h3 class="anchored" data-anchor-id="uac">UAC</h3>
-<p>Two registry values under <code>HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</code> control it:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 21%">
-<col style="width: 28%">
-<col style="width: 28%">
-<col style="width: 21%">
-</colgroup>
-<thead>
-<tr class="header">
-<th><code>-UacMode</code></th>
-<th style="text-align: right;"><code>EnableLUA</code></th>
-<th style="text-align: right;"><code>ConsentPromptBehaviorAdmin</code></th>
-<th>Effect</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>NoPrompt</code></td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td>UAC stays on; programs still start with a standard token, and elevation happens without a prompt.</td>
-</tr>
-<tr class="even">
-<td><code>Disabled</code></td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-<td>Admin Approval Mode off; administrators run everything elevated. Needs a restart.</td>
-</tr>
-<tr class="odd">
-<td><code>Default</code></td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">5</td>
-<td>Windows default: prompt for consent for non-Windows binaries.</td>
-</tr>
-</tbody>
-</table>
-<p><code>NoPrompt</code> removes the friction while keeping the elevation boundary visible to tools that check for it. See Microsoft’s <a href="https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/settings-and-configuration">User Account Control settings and configuration</a>.</p>
-<pre class="text"><code>PS&gt; .\Set-DfirAnalysisSettings.ps1 -UacMode NoPrompt -DefenderExclusionPath C:\Tools -WhatIf -Verbose
-VERBOSE: EnableLUA is already 1
-What if: Performing the operation "Set from 2 to 0" on target "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorAdmin".
-What if: Performing the operation "Add Microsoft Defender exclusion" on target "C:\Tools".</code></pre>
-</section>
-<section id="other-settings-to-decide" class="level3">
-<h3 class="anchored" data-anchor-id="other-settings-to-decide">Other settings to decide</h3>
+<p>These are the settings, and the command for each if you apply it after setup instead of in the unattend file. Run them in an elevated PowerShell.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -433,44 +405,138 @@ What if: Performing the operation "Add Microsoft Defender exclusion" on target "
 <thead>
 <tr class="header">
 <th>Setting</th>
-<th>Consideration</th>
+<th>Command</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Microsoft Defender</td>
-<td>Real-time scanning can quarantine evidence files and slow parsers; turning it off removes a safety net on a machine that opens hostile files. Options include excluding the tool folder only, excluding the case folder, or leaving it on and scanning evidence deliberately.</td>
+<td>UAC off</td>
+<td><code>Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name EnableLUA -Value 0</code>, then restart</td>
 </tr>
 <tr class="even">
-<td>Network</td>
-<td>Analysis rarely needs the internet; installs and tool updates do. Options: networked during build only, host-only network during cases, or a controlled egress path.</td>
+<td>Remove Microsoft Defender Antivirus</td>
+<td><code>Uninstall-WindowsFeature -Name Windows-Defender</code>, then restart (check the name with <code>Get-WindowsFeature *defender*</code>)</td>
 </tr>
 <tr class="odd">
-<td>Windows Update</td>
-<td>Updates during a case change the system mid-analysis; updating the clean image periodically keeps it patched.</td>
+<td>Long paths</td>
+<td><code>Set-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem -Name LongPathsEnabled -Value 1</code></td>
 </tr>
 <tr class="even">
-<td>SmartScreen and Mark of the Web</td>
-<td>Tools downloaded during the build carry Mark of the Web; scripted installs avoid repeated prompts.</td>
+<td>Show file extensions</td>
+<td><code>Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name HideFileExt -Value 0</code></td>
+</tr>
+<tr class="odd">
+<td>Show hidden files</td>
+<td>Same key: <code>Hidden</code> = 1</td>
+</tr>
+<tr class="even">
+<td>Show protected system files</td>
+<td>Same key: <code>ShowSuperHidden</code> = 1</td>
+</tr>
+<tr class="odd">
+<td>No last-access updates</td>
+<td><code>fsutil behavior set disablelastaccess 1</code></td>
+</tr>
+<tr class="even">
+<td>Server Manager not at every logon</td>
+<td><code>Get-ScheduledTask -TaskName ServerManager \| Disable-ScheduledTask</code></td>
 </tr>
 </tbody>
 </table>
+<section id="uac" class="level3">
+<h3 class="anchored" data-anchor-id="uac">UAC</h3>
+<p>With <code>EnableLUA</code> = 0, Admin Approval Mode is off and administrators run everything elevated, so tools that need administrator rights simply work. The middle ground is <code>ConsentPromptBehaviorAdmin</code> = 0: UAC stays on and elevates without prompting, but programs still start unelevated unless asked. See Microsoft’s <a href="https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/settings-and-configuration">User Account Control settings and configuration</a>.</p>
+</section>
+<section id="network-and-updates" class="level3">
+<h3 class="anchored" data-anchor-id="network-and-updates">Network and updates</h3>
+<p>Analysis rarely needs the internet; installs and tool updates do. Connect the VM during the build, then use a host-only network (or none) during cases. Windows Update in the middle of a case changes the system under the analysis; update the clean image on a schedule instead.</p>
 </section>
 </section>
 <section id="tools-for-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="tools-for-analysis">Tools for analysis</h2>
 <ul>
 <li>Select the tools and versions.</li>
-<li>KAPE modules for processing already-collected artifacts (intended tool name to be confirmed).</li>
+<li>KAPE modules for processing already-collected artifacts.</li>
 </ul>
-<p>The tool list is open. Record the version of every tool used for a case in the case notes; <code>ToolInventory.csv</code> from the build is a starting point.</p>
+<section id="chocolatey-and-scoop" class="level3">
+<h3 class="anchored" data-anchor-id="chocolatey-and-scoop">Chocolatey and Scoop</h3>
+<p><a href="https://chocolatey.org/install">Chocolatey</a> installs most of the list from one command, which makes the FirstLogon step one line. Its community packages are maintained by volunteers, separately from the tools’ authors: check the package page links to the real project before adding it. <a href="https://scoop.sh/">Scoop</a> is an alternative that installs per user without administrator rights; it has fewer DFIR tools.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>choco install <span class="op">-</span>y 7zip sysinternals pwsh ericzimmermantools volatility3 autopsy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Record what is installed for the case notes, and pin versions (<code>--version</code>) once the list settles so every rebuild is the same:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>choco list <span class="op">|</span> <span class="fu">Out-File</span> <span class="op">-</span>FilePath <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Notes\Tools.txt"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="the-tool-list" class="level3">
+<h3 class="anchored" data-anchor-id="the-tool-list">The tool list</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Tool</th>
+<th>For</th>
+<th>Install</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://ericzimmerman.github.io/">Eric Zimmerman’s tools</a></td>
+<td>Registry, event logs, MFT, LNK, jump lists; Timeline Explorer for the CSVs</td>
+<td><code>choco install ericzimmermantools</code>, or his <code>Get-ZimmermanTools.ps1</code></td>
+</tr>
+<tr class="even">
+<td><a href="https://www.kroll.com/kape">KAPE</a></td>
+<td>Running modules over a collection</td>
+<td>Download from Kroll after registering; see licensing below</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.exterro.com/digital-forensics-software/ftk-imager">FTK Imager</a></td>
+<td>Mounting and browsing disk images</td>
+<td>Download from Exterro</td>
+</tr>
+<tr class="even">
+<td><a href="https://github.com/volatilityfoundation/volatility3">Volatility 3</a></td>
+<td>Memory images</td>
+<td><code>choco install volatility3</code></td>
+</tr>
+<tr class="odd">
+<td><a href="https://plaso.readthedocs.io/">log2timeline / plaso</a></td>
+<td>Super timelines</td>
+<td>Docker on Windows (<a href="https://plaso.readthedocs.io/en/latest/sources/user/Users-Guide.html">plaso documentation</a>); inside this VM that needs nested virtualization, so a separate Linux VM is often simpler</td>
+</tr>
+<tr class="even">
+<td><a href="https://github.com/WithSecureLabs/chainsaw">Chainsaw</a></td>
+<td>Hunting through event logs with Sigma rules</td>
+<td>Release zip from GitHub (Chocolatey’s <code>chainsaw</code> is a different program)</td>
+</tr>
+<tr class="odd">
+<td><a href="https://github.com/Yamato-Security/hayabusa">Hayabusa</a></td>
+<td>Event log timelines and Sigma detections</td>
+<td>Release zip from GitHub</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.sleuthkit.org/autopsy/">Autopsy</a></td>
+<td>Disk image analysis</td>
+<td><code>choco install autopsy</code></td>
+</tr>
+<tr class="odd">
+<td>Microsoft Office</td>
+<td>Documents, and Excel for the CSVs</td>
+<td>If your license covers it</td>
+</tr>
+<tr class="even">
+<td>7-Zip, Sysinternals, PowerShell 7</td>
+<td>The basics</td>
+<td>In the <code>choco</code> line above</td>
+</tr>
+</tbody>
+</table>
+<p>Record the version of every tool used for a case in the case notes.</p>
+</section>
 <section id="processing-an-existing-artifact-set-with-kape-modules" class="level3">
 <h3 class="anchored" data-anchor-id="processing-an-existing-artifact-set-with-kape-modules">Processing an existing artifact set with KAPE modules</h3>
 <p>KAPE has two halves: <strong>targets</strong> collect files from a system, and <strong>modules</strong> run programs against files already collected. For this box only modules apply. Modules are defined in <code>.mkape</code> files; the community set is maintained in <a href="https://github.com/EricZimmerman/KapeFiles">KapeFiles</a>, which includes the compound module <code>!EZParser</code> (runs Eric Zimmerman’s parsers over a collection).</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Module source is a collection that already exists; output goes to case storage.</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\kape<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>msource E<span class="op">:</span>\Cases\<span class="dv">2026</span><span class="op">-</span><span class="dv">0142</span>\Collected\C <span class="op">--</span>mdest E<span class="op">:</span>\Cases\<span class="dv">2026</span><span class="op">-</span><span class="dv">0142</span>\Output\EZParser <span class="op">--</span>module <span class="op">!</span>EZParser</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Module source is a collection that already exists; output goes to case storage.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\kape<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>msource <span class="st">"\\vmware-host\Shared Folders\Evidence\2026-0142\C"</span> <span class="op">--</span>mdest <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Output\EZParser"</span> <span class="op">--</span>module <span class="op">!</span>EZParser</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Check the switches against <code>kape.exe --help</code> and the <a href="https://ericzimmerman.github.io/KapeDocs/">KAPE documentation</a> for the version you install.</p>
-<p><strong>Licensing.</strong> Kroll’s KAPE terms distinguish free use from uses that require an enterprise license, including use on third-party networks or as part of a paid engagement. Confirm which applies to CRT work before selecting it: <a href="https://www.kroll.com/en/kape-license-agreement">KAPE license agreement</a>.</p>
+<p><strong>Licensing.</strong> Kroll’s KAPE terms distinguish free use from uses that require an enterprise license, including use on third-party networks or as part of a paid engagement. Check which applies to your work: <a href="https://www.kroll.com/en/kape-license-agreement">KAPE license agreement</a>.</p>
 </section>
 </section>
 <section id="using-and-resetting-the-box" class="level2">
@@ -480,64 +546,57 @@ What if: Performing the operation "Add Microsoft Defender exclusion" on target "
 <li>Retain the results and relevant logs.</li>
 <li>Verify the environment and reset it for the next case.</li>
 </ul>
-<p>A per-case checklist (proposed):</p>
+<p>A per-case checklist:</p>
 <ol type="1">
-<li>Start from the clean snapshot. Run <code>Test-DfirBox.ps1 -CaseRoot &lt;case storage&gt;</code>; every check should pass except “Files retained” on a new case.</li>
-<li>Create the case folders (<code>Collected</code>, <code>Output</code>, <code>Notes</code>; see <code>New-CaseFolder</code> on the <a href="./powershell.html#shouldprocess">PowerShell page</a>) and copy the evidence in. Hash it on arrival with <code>Get-FileInventory.ps1</code>.</li>
-<li>Run tools against <code>Collected</code>, writing to <code>Output</code>. Keep each tool’s console log or log file in <code>Output</code>.</li>
-<li>Before reset: run <code>Get-FileInventory.ps1 -Path &lt;case&gt;\Output -OutputPath &lt;case&gt;\Notes\OutputInventory.csv</code> and <code>Test-DfirBox.ps1</code> again, and confirm the output is on case storage.</li>
-<li>Revert to the clean snapshot. Confirm case storage is still intact from the next session.</li>
+<li>Power on from the non-persistent image. Confirm <code>\\vmware-host\Shared Folders\Evidence</code> is read-only and <code>Cases</code> is writable.</li>
+<li>Create the case folders with <code>New-CaseFolder</code> from the <a href="./powershell.html#module">CrtEssentials module</a>, and put the evidence in the host’s <code>Evidence</code> folder. Hash it on arrival with <code>Get-FileInventory</code>.</li>
+<li>Run tools against <code>Evidence</code>, writing to <code>Cases\&lt;case&gt;\Output</code>. Keep each tool’s console log or log file in <code>Output</code>.</li>
+<li>Before power-off, confirm the output is on the <code>Cases</code> share: <code>Get-FileInventory -Path &lt;case&gt;\Output | Export-Csv &lt;case&gt;\Notes\OutputInventory.csv -NoTypeInformation</code>.</li>
+<li>Power off. Everything on the system disk is discarded; the next case starts clean.</li>
 </ol>
 </section>
-<section id="open-decisions" class="level2">
-<h2 class="anchored" data-anchor-id="open-decisions">Open decisions</h2>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Decision</th>
-<th>Options under consideration</th>
-</tr>
-</thead>
 <tbody>
 <tr class="odd">
-<td>Windows version and image</td>
-<td>Windows 11 Enterprise or Pro; evaluation versus licensed image</td>
+<td><a href="https://learn.microsoft.com/en-us/windows-server/get-started/hardware-requirements">Windows Server hardware requirements</a></td>
+<td>Microsoft Learn</td>
 </tr>
 <tr class="even">
-<td>Hypervisor</td>
-<td>Hyper-V, VMware Workstation, other</td>
+<td><a href="https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure">Microsoft Defender Antivirus on Windows Server</a></td>
+<td>Microsoft Learn</td>
 </tr>
 <tr class="odd">
-<td>Networking</td>
-<td>Build-time only, host-only, controlled egress</td>
+<td><a href="https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/settings-and-configuration">User Account Control settings</a></td>
+<td>Microsoft Learn</td>
 </tr>
 <tr class="even">
-<td>UAC</td>
-<td><code>NoPrompt</code> or <code>Disabled</code></td>
+<td><a href="https://docs.vmware.com/en/VMware-Workstation-Pro/17/com.vmware.ws.using.doc/GUID-A6792F54-2734-4AF4-9473-C8B9AD8321AF.html">Independent disks</a></td>
+<td>VMware Workstation Pro documentation</td>
 </tr>
 <tr class="odd">
-<td>Defender</td>
-<td>On, tool-folder exclusion, case-folder exclusion, off</td>
+<td><a href="https://knowledge.broadcom.com/external/article/368667/download-and-license-vmware-desktop-hypervisor.html">Desktop Hypervisor licensing</a></td>
+<td>Broadcom</td>
 </tr>
 <tr class="even">
-<td>Reset method</td>
-<td>Checkpoint or snapshot, differencing disk, Windows Sandbox</td>
+<td><a href="https://schneegans.de/windows/unattend-generator/">Unattend generator</a></td>
+<td>Christoph Schneegans</td>
 </tr>
 <tr class="odd">
-<td>Persistent case storage</td>
-<td>Host share, separate persistent virtual disk, storage server</td>
+<td><a href="https://chocolatey.org/install">Chocolatey</a></td>
+<td>Installation</td>
 </tr>
 <tr class="even">
-<td>Tool list and versions</td>
-<td>Open until selected; confirm KAPE licensing</td>
+<td><a href="https://ericzimmerman.github.io/KapeDocs/">KAPE documentation</a> and <a href="https://github.com/EricZimmerman/KapeFiles">KapeFiles</a></td>
+<td>Eric Zimmerman</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.kroll.com/en/kape-license-agreement">KAPE license agreement</a></td>
+<td>Kroll</td>
 </tr>
 </tbody>
 </table>
-<p>These are also tracked in the project <a href="https://github.com/dzampino/crt-essentials-2026#remaining-decisions">README</a>.</p>
 
 
 </section>

@@ -35,3 +35,14 @@ Reviewed October 16, 2026. These are reference links, not copied standards text.
 | events | [https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent) |
 | kape | [https://www.kroll.com/en/publications/cyber/anti-forensic-tactics/detecting-analyzing-timestomping-with-kape](https://www.kroll.com/en/publications/cyber/anti-forensic-tactics/detecting-analyzing-timestomping-with-kape) |
 | kapefiles | [https://github.com/EricZimmerman/KapeFiles](https://github.com/EricZimmerman/KapeFiles) |
+| btu | [https://www.nist.gov/pml/special-publication-811](https://www.nist.gov/pml/special-publication-811) |
+| submission | [https://www.rfc-editor.org/rfc/rfc6409.html](https://www.rfc-editor.org/rfc/rfc6409.html) |
+| implicit-tls | [https://www.rfc-editor.org/rfc/rfc8314.html](https://www.rfc-editor.org/rfc/rfc8314.html) |
+| mha | [https://github.com/microsoft/MHA](https://github.com/microsoft/MHA) |
+| xca | [https://hohnstaedt.de/xca/](https://hohnstaedt.de/xca/) |
+| openssl-win | [https://github.com/openssl/openssl/wiki/Binaries](https://github.com/openssl/openssl/wiki/Binaries) |
+| modules | [https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules) |
+| server-hw | [https://learn.microsoft.com/en-us/windows-server/get-started/hardware-requirements](https://learn.microsoft.com/en-us/windows-server/get-started/hardware-requirements) |
+| server-defender | [https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure](https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure) |
+| vmware-disks | [https://docs.vmware.com/en/VMware-Workstation-Pro/17/com.vmware.ws.using.doc/GUID-A6792F54-2734-4AF4-9473-C8B9AD8321AF.html](https://docs.vmware.com/en/VMware-Workstation-Pro/17/com.vmware.ws.using.doc/GUID-A6792F54-2734-4AF4-9473-C8B9AD8321AF.html) |
+| unattend | [https://schneegans.de/windows/unattend-generator/](https://schneegans.de/windows/unattend-generator/) |

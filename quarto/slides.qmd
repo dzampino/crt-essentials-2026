@@ -3,47 +3,49 @@ title: "CRT Essentials"
 subtitle: "or The Dave Zampino Power Hour"
 author: "David Zampino"
 date: 2026-10-18
-format: wicrt-pptx
+format:
+  wicrt-pptx:
+    syntax-definitions:
+      - ../syntax/smtp.xml
 ---
 
 <!--
 Full deck, built from outline.md section 4 (Master content outline).
 outline.md is the editorial authority; edit there first, then here, then the matching site/ guide.
 The Passwords section supersedes passwords.qmd, which is kept as the earlier single-section draft.
-Speaker notes hold references, review notes and placeholders, not David's prose.
-"Proposed wording" in a note marks a suggestion that is not David's.
+Speaker notes hold references and talking points only: nothing about how the deck was made.
+Editorial labels go in HTML comments like this one, which do not render:
+  PROPOSED = wording that is not David's; NOTES TO ADD = David's notes still needed.
+Transcripts use ```smtp (../syntax/smtp.xml): client lines navy, server lines red.
 Render with build.ps1 (or: quarto render slides.qmd --output-dir ../output).
 -->
 
-## Agenda
+## Companion site
 
-| Segment | Minutes |
-|---------|--------:|
-| Introduction and purpose | 5 |
-| Passwords | 20 |
-| PKI | 25 |
-| Email security | 30 |
-| PowerShell | 20 |
-| Building a Windows DFIR box | 15 |
-| Questions and wrap-up | 5 |
+**dzampino.github.io/crt-essentials-2026**
+
+Calculators, sample files, commands, a PowerShell module and references for everything in this session
+
+![](../assets/site-qr.png)
+
+<!-- PROPOSED: caption wording. -->
 
 ::: notes
-Timing is the proposed pacing budget from outline.md section 3. Demonstrations are included within each section's allocation.
+https://dzampino.github.io/crt-essentials-2026/
 :::
 
-## Why these five topics
+## Agenda
 
-- Practical security knowledge CRT responders should understand and be able to explain
-- Including the preventative advice that helps organizations avoid the incidents we respond to
-- No single fictional incident; each topic stands on its own
-- Slides for today, a field guide for afterward
+1. Passwords
+2. PKI
+3. Email security
+4. PowerShell
+5. Building a Windows DFIR box
 
-**Companion site:** dzampino.github.io/crt-essentials-2026
+<!-- PROPOSED: timing, from outline.md section 3. -->
 
 ::: notes
-Proposed wording, drawn from outline.md section 1.
-
-The companion site holds the calculators, sample files, commands, scripts and references that do not fit in a two-hour session.
+Timing: introduction 5 minutes, passwords 20, PKI 25, email security 30, PowerShell 20, DFIR box 15, questions and wrap-up 5.
 :::
 
 # Passwords
@@ -56,9 +58,7 @@ The companion site holds the calculators, sample files, commands, scripts and re
 - Goal in all authentication methods is **good enough** uniqueness
 - We can add behavior to assist in making risk assessments
 
-::: notes
-[David's notes to add.]
-:::
+<!-- NOTES TO ADD -->
 
 ## correct horse battery staple
 
@@ -71,7 +71,7 @@ xkcd 936, "Password Strength"
 ::: notes
 xkcd 936, "Password Strength," by Randall Munroe: https://xkcd.com/936/ (CC BY-NC 2.5).
 
-Review note (outline section 5): the explanation holds when the words are randomly selected rather than chosen by a person; the comic's guess rates are historical, not a present-day benchmark.
+The explanation holds when the words are randomly selected rather than chosen by a person. The comic's guess rates are historical, not a present-day benchmark.
 :::
 
 ## Entropy
@@ -87,7 +87,7 @@ Claude Shannon, as recounted in M. Tribus and E. C. McIrvine, "Energy and Inform
 ## Entropy (cont.)
 
 - Bits of entropy (aka shannons) = log~2~(search space)
-- Search space = alphabet ^ length
+- Search space = alphabet^length^
 
 | Secret | Alphabet | Length | Bits |
 |--------|---------:|-------:|-----:|
@@ -99,9 +99,11 @@ Claude Shannon, as recounted in M. Tribus and E. C. McIrvine, "Energy and Inform
 | Lowercase | 26 | 15 | 70.5 |
 
 ::: notes
-Review note (outline section 5): the pool/length formula assumes each character, or word, is chosen uniformly at random from the alphabet. Human-chosen passwords do not meet that assumption.
+The alphabet/length formula assumes each character, or word, is chosen uniformly at random from the alphabet. Human-chosen passwords do not meet that assumption.
 
-Table values computed as log2(alphabet^length). xkcd 936 uses 11 bits per word (2,048 words). The EFF large wordlist has 7,776 words (five dice): https://www.eff.org/dice
+Bits = log~2~(alphabet^length^) = length × log~2~(alphabet). xkcd 936 uses 11 bits per word (2,048 words). The EFF large wordlist has 7,776 words (five dice): https://www.eff.org/dice
+
+Get-PasswordEntropy and Get-PasswordLength on the companion site calculate these.
 :::
 
 ## Entropy calculator
@@ -111,9 +113,9 @@ Table values computed as log2(alphabet^length). xkcd 936 uses 11 bits per word (
 - Average time to crack
 
 ::: notes
-SWAP TO SITE for the entropy calculation: dzampino.github.io/crt-essentials-2026/passwords.html
+Switch to the companion site for the entropy calculation: dzampino.github.io/crt-essentials-2026/passwords.html
 
-Points to show: adding a character multiplies the search space by the alphabet size (adds log2(alphabet) bits); doubling the alphabet adds only one bit per character. On average an attacker finds the secret after searching half the space, which is one bit less.
+Adding a character multiplies the search space by the alphabet size (adds log~2~(alphabet) bits); doubling the alphabet adds only one bit per character. On average an attacker finds the secret after searching half the space, which is one bit less.
 :::
 
 ## Cracking = time x money
@@ -128,12 +130,12 @@ Points to show: adding a character multiplies the search space by the alphabet s
 | bcrypt (32 iterations) | 304.8 k | 345 years |
 
 ::: notes
-Companion site: hashing algorithms, threat levels, time and cost to crack.
-
 Rates: hashcat v6.2.6 benchmark, RTX 5090 Founders Edition, Chick3nman, February 2025: https://gist.github.com/Chick3nman/09bac0775e6393468c2925c1e1363d5c
-Average time = (95^8 / 2) / rate, a full brute force with no wordlist. Real attacks start with wordlists and rules, so human-chosen passwords fall much faster.
+Average time = (95^8^ / 2) / rate, a full brute force with no wordlist. Real attacks start with wordlists and rules, so human-chosen passwords fall much faster.
 
-Review note (outline section 5): a stored Windows NT hash and an NTLM protocol exchange (NetNTLMv2, 16.0 G/s on the same card) are different comparison subjects.
+Each RTX 5090 draws up to 575 W, all of which becomes heat: about 1,960 BTU/h, or 0.16 tons of cooling per card. The companion site works out power and cooling for each threat level.
+
+A stored Windows NT hash and an NTLM protocol exchange (NetNTLMv2, 16.0 G/s on the same card) are different things.
 
 OWASP Password Storage Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
 Microsoft, Passwords technical overview: https://learn.microsoft.com/en-us/windows-server/security/kerberos/passwords-technical-overview
@@ -145,9 +147,9 @@ Microsoft, Passwords technical overview: https://learn.microsoft.com/en-us/windo
 - Attack modeling should be based on online attacks
 - We have duties to protect hashes from getting stolen
 
-::: notes
-[David's notes to add.]
+<!-- NOTES TO ADD -->
 
+::: notes
 NIST SP 800-63B-4 section 3.2.2: rate limiting SHALL limit consecutive failed attempts on an account to no more than 100. Section 3.1.1.2: passwords SHALL be salted (at least 32 bits) and hashed with a suitable password hashing scheme; the cost factor SHOULD be as high as practical.
 https://pages.nist.gov/800-63-4/sp800-63b.html
 :::
@@ -180,9 +182,9 @@ Have I Been Pwned, Pwned Passwords: https://haveibeenpwned.com/Passwords
 - Certificate authorities and trust
   - You trust a CA because your certificate store says so
 
-::: notes
-Proposed wording for the sub-points.
+<!-- PROPOSED: the sub-points. -->
 
+::: notes
 RFC 5280, Internet X.509 PKI Certificate and CRL Profile: https://www.rfc-editor.org/rfc/rfc5280.html
 :::
 
@@ -212,27 +214,29 @@ RFC 5280, Internet X.509 PKI Certificate and CRL Profile: https://www.rfc-editor
 RFC 5280 section 4.1 (fields) and 4.2 (extensions).
 
 RFC 9525 section 2: "The Common Name RDN MUST NOT be used to identify a service." Names are matched against the SAN. https://www.rfc-editor.org/rfc/rfc9525.html
-
-Companion site: field reference with OIDs.
 :::
 
 ## Our training certificate
 
 ```text
-Serial Number: 05:6d:6d:da:99:ef:6a:99:e4:fe:...:0a:94
-Issuer:  CN=CRT Fictional Training Root
+Serial Number: 3e:23:6d:a6:5a:1d:83:f6:...:8e:0c
+Issuer:  O=Fictional Cheese Curd Authority, CN=Squeaky Curd Root CA
 Not Before: Oct  1 00:00:00 2026 GMT
 Not After : Oct  1 00:00:00 2027 GMT
-Subject: CN=training.example
+Subject: L=Curdsville, O=Squeaky Curds Co-op, CN=squeakycurds.example
 Basic Constraints: critical, CA:FALSE
-Subject Alternative Name: DNS:training.example
+Subject Alternative Name: DNS:squeakycurds.example
 Extended Key Usage: TLS Web Server Authentication
 ```
 
 ::: notes
-Output trimmed and condensed from: openssl x509 -in training-leaf.pem -noout -text (OpenSSL 3.5).
+Inspect it with openssl x509, certutil -dump or XCA.
 
-The sample files are fictional training certificates; no private keys are included. Do not install the training root. Download them from the companion site.
+Output trimmed and condensed from: openssl x509 -in training-leaf.pem -noout -text (OpenSSL 3.5). The full subject also has ST=Wisconsin, C=US.
+
+Fictional training certificates for the fictional Squeaky Curds Co-op; .example is reserved (RFC 2606), so the names do not exist. No private keys are included. Do not install the training root.
+
+XCA, a graphical certificate and key manager: https://hohnstaedt.de/xca/
 :::
 
 ## Certificate chains
@@ -266,7 +270,9 @@ RFC 5280 section 6 (certification path validation).
 ::: notes
 RFC 7468 (PEM textual encodings), RFC 7292 (PKCS #12), RFC 5652 (CMS, the basis of .p7b), RFC 2986 (PKCS #10).
 
-training-leaf.pem and training-leaf.der are the same certificate: both have SHA-256 fingerprint 3B:44:01:67:...:17:E2. certutil -dump reads both.
+training-leaf.pem and training-leaf.der are the same certificate: both have SHA-256 fingerprint D1:B7:D4:59:...:C0:E5. certutil -dump reads both.
+
+OpenSSL on Windows: it comes with Git for Windows, or winget install ShiningLight.OpenSSL.Light (other builds: https://github.com/openssl/openssl/wiki/Binaries).
 :::
 
 ## Certificate requests and issuance
@@ -285,8 +291,6 @@ certreq: https://learn.microsoft.com/en-us/windows-server/administration/windows
 RFC 8555 (ACME): https://www.rfc-editor.org/rfc/rfc8555.html
 
 The training CSR's public key matches the training leaf: openssl req -in training-request.csr -noout -verify reports "Certificate request self-signature verify OK".
-
-Companion site: CSR, AD CS and ACME examples.
 :::
 
 ## Putting a certificate to use
@@ -298,9 +302,9 @@ Companion site: CSR, AD CS and ACME examples.
 - The certificate presented by a service versus the trust configured on a client
   - The server sends its chain; the client supplies the root
 
-::: notes
-Proposed wording for the sub-points.
+<!-- PROPOSED: the sub-points. -->
 
+::: notes
 A common incident-response finding: a missing intermediate works in one browser (which cached or fetched it) and fails in another client.
 :::
 
@@ -318,7 +322,7 @@ A common incident-response finding: a missing intermediate works in one browser 
 | Wrong usage | unsuitable certificate purpose |
 
 ::: notes
-Each row was produced against the training files with openssl verify (OpenSSL 3.5.7); commands are on the companion site.
+Each row was produced against the training files with openssl verify (OpenSSL 3.5); the commands are on the companion site.
 
 Revocation: Let's Encrypt ended its OCSP service on August 6, 2025 and publishes revocation through CRLs only: https://letsencrypt.org/2025/08/06/ocsp-service-has-reached-end-of-life
 Chrome uses CRLSets rather than online checks for most certificates: https://www.chromium.org/Home/chromium-security/crlsets/
@@ -350,12 +354,15 @@ These limits apply to publicly trusted TLS certificates. Internal CAs set their 
 
 - MUA, MSA, MTA, MDA
 - SMTP, submission, relay, delivery, and DNS/MX records
+- Submission is usually authenticated on 587 or 465, but can be unauthenticated on 25
 
 ![](../assets/diagrams/email-flow.png)
 
 ::: notes
 RFC 5598, Internet Mail Architecture: https://www.rfc-editor.org/rfc/rfc5598.html
 RFC 5321, SMTP: https://www.rfc-editor.org/rfc/rfc5321.html
+
+RFC 6409 section 4.3: the MSA must reject unauthenticated mail by default "unless it has already independently established authentication or authorization (such as being within a protected subnetwork)". Section 3.1: "A site MAY choose to use port 25 for message submission." Printers, scanners and applications relaying through an IP-restricted connector are the everyday example. https://www.rfc-editor.org/rfc/rfc6409.html
 :::
 
 ## The envelope versus the message
@@ -374,6 +381,7 @@ RFC 5321, SMTP: https://www.rfc-editor.org/rfc/rfc5321.html
 
 - `From`: the author, what the user sees
 - `Sender`: who actually sent it, if different
+  - Outlook: "*Sender* on behalf of *From*"
 - The visible sender and the envelope sender can differ
 :::
 ::::
@@ -391,12 +399,14 @@ RFC 5322 section 3.6.2: From, Sender, Reply-To.
   - Trust the one your own boundary added
 - Which headers can be trusted?
   - Only those added by systems you control; everything below can be forged
+- Microsoft's Message Header Analyzer lays it all out
+
+<!-- PROPOSED: the sub-points. -->
 
 ::: notes
-Proposed wording for the sub-points.
-
 RFC 8601, Authentication-Results: https://datatracker.ietf.org/doc/html/rfc8601
-Companion site: annotated sample headers.
+
+Message Header Analyzer: paste headers at https://mha.azurewebsites.net/pages/mha.html, or install the Outlook add-in. Source: https://github.com/microsoft/MHA
 :::
 
 ## SPF
@@ -450,7 +460,7 @@ Aggregate reports: RFC 9990. Failure reports: RFC 9991.
 
 ## Work through it: example 1
 
-```text
+```smtp
 > HELO red.secondary.com
 . 250 smtp.learndmarc.com Hello red.secondary.com <153.112.107.49>
 > MAIL FROM: <gina@red.secondary.com>
@@ -464,7 +474,7 @@ blue.secondary.com: "v=spf1 ip4:24.121.50.128 ~all"
 ```
 
 ::: notes
-Transcript from learndmarc.com, abridged. Ask: what are the sender identities, what did SPF and DKIM return, and does it pass DMARC?
+Transcript from learndmarc.com, abridged. Lines starting > are the client; lines starting . are the server. Ask: what are the sender identities, what did SPF and DKIM return, and does it pass DMARC?
 :::
 
 ## Example 1: answer
@@ -476,13 +486,9 @@ Transcript from learndmarc.com, abridged. Ask: what are the sender identities, w
 - Relaxed alignment applies (no `adkim`/`aspf`)
 - `t=y` is test mode: receivers are asked not to apply the policy
 
-::: notes
-From samples/email/answers.md (learndmarc-1).
-:::
-
 ## Work through it: example 2
 
-```text
+```smtp
 > HELO red.primary.com
 . 250 smtp.learndmarc.com Hello red.primary.com <97.196.174.88>
 > MAIL FROM: <terry@red.primary.com>
@@ -508,13 +514,9 @@ Transcript from learndmarc.com, abridged.
 - Strict alignment: domains must match exactly
 - Neither SPF nor DKIM passed with alignment; `p=quarantine`
 
-::: notes
-From samples/email/answers.md (learndmarc-2).
-:::
-
 ## Work through it: example 3
 
-```text
+```smtp
 > HELO blue.secondary.com
 . 250 smtp.learndmarc.com Hello blue.secondary.com <156.157.23.197>
 > MAIL FROM: <ray@blue.secondary.com>
@@ -541,7 +543,7 @@ Transcript from learndmarc.com, abridged. Note the trap: the sending IP is liste
 - `p=none`: monitoring only
 
 ::: notes
-From samples/email/answers.md (learndmarc-3). The relaxed-alignment sub-point is an added observation: both domains share the organizational domain primary.com.
+Both domains share the organizational domain primary.com, which is why relaxed alignment would have passed.
 :::
 
 ## Other email security mechanisms
@@ -568,9 +570,7 @@ RFC 6686 (Sender ID and SPF experiment resolution): https://www.rfc-editor.org/r
 - Turning a repetitive task into something repeatable
 - Objects, not text: no parsing columns with regex
 
-::: notes
-[David's notes to add.] The third point is proposed wording.
-:::
+<!-- PROPOSED: the third point. NOTES TO ADD -->
 
 ## Finding commands
 
@@ -637,7 +637,7 @@ Get-ChildItem -Path .\Case -Recurse -File |
 ```
 
 ::: notes
-Working with an existing collection of files. The full Get-FileInventory.ps1 script is on the companion site.
+Working with an existing collection of files. Get-FileInventory, on the companion site, combines these into one function.
 :::
 
 ## Example: collected event logs
@@ -656,7 +656,7 @@ Get-WinEvent -FilterHashtable @{
 
 ::: notes
 Get-WinEvent: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent
-4624 is a successful logon, 4625 a failed logon. The Get-EvtxSummary.ps1 script on the companion site extends this.
+4624 is a successful logon, 4625 a failed logon. Get-EvtxSummary and Get-LogonEvent on the companion site extend this.
 :::
 
 ## Making a script reusable
@@ -666,18 +666,41 @@ Get-WinEvent: https://learn.microsoft.com/en-us/powershell/module/microsoft.powe
 - An example of automating part of the DFIR box build
 
 ```powershell
-[CmdletBinding(SupportsShouldProcess)]
-param(
-	[Parameter(Mandatory)]
-	[string]$Path
-)
-if ($PSCmdlet.ShouldProcess($Path, 'Create case folder')) {
-	New-Item -Path $Path -ItemType Directory | Out-Null
+function New-CaseFolder {
+	[CmdletBinding(SupportsShouldProcess)]
+	param(
+		[Parameter(Mandatory)]
+		[string]$Path
+	)
+	if ($PSCmdlet.ShouldProcess($Path, 'Create case folder')) {
+		New-Item -Path $Path -ItemType Directory | Out-Null
+	}
 }
 ```
 
 ::: notes
 about_Functions_CmdletBindingAttribute and ShouldProcess: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute
+New-CaseFolder -Path E:\Cases\2026-0142 -WhatIf shows what would happen without doing it. The full version on the companion site creates Collected, Output and Notes.
+:::
+
+## Your own module
+
+- A `.psm1` file of functions, in a folder of the same name
+- In your `Documents\PowerShell\Modules` folder, PowerShell loads it for you
+
+```powershell
+$Docs = [Environment]::GetFolderPath('MyDocuments')
+$Folder = "$Docs\PowerShell\Modules\MyTools"
+New-Item -Path $Folder -ItemType Directory -Force
+notepad "$Folder\MyTools.psm1"     # paste functions, save
+Get-Command -Module MyTools
+```
+
+<!-- PROPOSED: slide added for the module item (outline 4.1 item 7). -->
+
+::: notes
+about_Modules: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules
+Windows PowerShell 5.1 uses Documents\WindowsPowerShell\Modules instead. Every function on the companion site is in its own copyable block, and all of them are packaged as the CrtEssentials module.
 :::
 
 # Questions? {#powershell-questions}
@@ -690,9 +713,7 @@ about_Functions_CmdletBindingAttribute and ShouldProcess: https://learn.microsof
 - Evidence is already collected
 - Memory acquisition is handled separately (Magnet in our workflow)
 
-::: notes
-[David's notes to add.]
-:::
+<!-- NOTES TO ADD -->
 
 ## Disposable/nonpersistent virtual machine
 
@@ -700,32 +721,38 @@ about_Functions_CmdletBindingAttribute and ShouldProcess: https://learn.microsof
 ::: column
 **Return the machine to a known state**
 
-- Windows and settings
-- Installed tools
-- Temporary files and caches
+- VMware Workstation Pro
+- System disk: independent, non-persistent
+- Power off, and every change is gone
 :::
 
 ::: column
 **Keep case data and analysis output separate from what gets reset**
 
-- Evidence (read-only)
-- Analysis output
-- Tool logs and notes
+- Shared Folders on the host
+- Evidence: read-only
+- Cases (output, logs, notes): read-write
 :::
 ::::
 
 ::: notes
-Proposed split. The reset method (snapshot, differencing disk or other) is an open implementation decision recorded in README.md.
+Independent non-persistent disks discard changes at power-off: https://docs.vmware.com/en/VMware-Workstation-Pro/17/com.vmware.ws.using.doc/GUID-A6792F54-2734-4AF4-9473-C8B9AD8321AF.html
+Workstation Pro is free for commercial, educational and personal use since November 2024: https://knowledge.broadcom.com/external/article/368667/download-and-license-vmware-desktop-hypervisor.html
+In the guest, shared folders are at \\vmware-host\Shared Folders\.
 :::
 
 ## Automating the build
 
 - Decide on the Windows image and tool list
+  - Windows Server 2025: stable, Defender is a removable feature, no TPM needed
 - Make setup repeatable rather than configuring it by hand each time
-- Script it with `-WhatIf` and `-Verbose`, keep the tool list in a data file
+  - An unattend file: schneegans.de/windows/unattend-generator
 
 ::: notes
-The companion site has an example build script and tool manifest. The manifest entries are placeholders until the tool list is selected.
+Windows Server hardware requirements list a TPM as required only for certain features: https://learn.microsoft.com/en-us/windows-server/get-started/hardware-requirements
+Defender on Windows Server is the Windows-Defender feature: https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure
+The 180-day evaluation must be activated online within its first 10 days.
+The unattend generator is written for Windows 10 and 11; test its output on Server 2025.
 :::
 
 ## Configuring Windows for analysis
@@ -733,24 +760,31 @@ The companion site has an example build script and tool manifest. The manifest e
 - Tools that need to run as administrator
 - UAC: normally I don't disable security features, but this is a disposable VM and reducing friction matters
 - Other Windows security settings as decisions specific to this machine, not general recommendations
-  - Defender scanning evidence and tools
-  - Network access
+  - Defender removed, long paths on
+  - File extensions and hidden files shown
 
 ::: notes
-Defender and networking are listed as open decisions in outline.md section 5.2.
+UAC off: EnableLUA = 0. Defender: Uninstall-WindowsFeature -Name Windows-Defender. Long paths: LongPathsEnabled = 1. All of these are options in the unattend generator. Commands are on the companion site.
 :::
 
 ## Tools for analysis
 
 - Select the tools and versions
+  - Eric Zimmerman's tools, KAPE, FTK Imager, Volatility 3, plaso
+  - Chainsaw, Hayabusa, Autopsy, Office if licensed
+- Chocolatey installs most of them in one line
 - KAPE modules for processing already-collected artifacts
   - Targets collect; modules process what was collected
-- Record the version of every tool used in the case notes
+
+```powershell
+choco install -y ericzimmermantools volatility3 autopsy
+```
 
 ::: notes
-Outline: "confirm intended tool name". KAPE and the community KapeFiles repository: https://github.com/EricZimmerman/KapeFiles
-
-Licensing: Kroll's KAPE terms distinguish free and enterprise use; confirm which applies to CRT engagements before selection: https://www.kroll.com/en/kape-license-agreement
+The full line on the companion site also installs 7-Zip, Sysinternals and PowerShell 7.
+KAPE, FTK Imager, Chainsaw and Hayabusa are direct downloads; Chocolatey's "chainsaw" package is a different program. Plaso runs on Windows through Docker.
+KAPE and the community KapeFiles repository: https://github.com/EricZimmerman/KapeFiles
+Kroll's KAPE terms distinguish free and enterprise use: https://www.kroll.com/en/kape-license-agreement
 :::
 
 ## Using and resetting the box
@@ -760,7 +794,7 @@ Licensing: Kroll's KAPE terms distinguish free and enterprise use; confirm which
 - Verify the environment and reset it for the next case
 
 ::: notes
-Companion site: checks to confirm output is retained before reset.
+Read from the read-only Evidence share, write to Cases. Before power-off, confirm the output is on the Cases share; after power-on, confirm the system disk is clean.
 :::
 
 # Questions? {#dfir-questions}
@@ -775,16 +809,14 @@ Companion site: checks to confirm output is retained before reset.
 - **PowerShell:** objects in a pipeline turn a task into something repeatable
 - **DFIR box:** a disposable analysis VM with case data kept elsewhere
 
-::: notes
-Proposed wording, summarizing each section's takeaways.
-:::
+<!-- PROPOSED: the takeaways. -->
 
 ## References
 
 - NIST SP 800-63B-4: pages.nist.gov/800-63-4/sp800-63b.html
 - RFC 5280, RFC 9525, RFC 2986, RFC 8555 (PKI)
-- RFC 5321, RFC 5322, RFC 7208, RFC 6376, RFC 9989, RFC 9990, RFC 9991 (email)
-- Microsoft Learn: about_Pipelines, Get-WinEvent, Export-Csv
+- RFC 5321, RFC 6409, RFC 5322, RFC 7208, RFC 6376, RFC 9989, RFC 9990, RFC 9991 (email)
+- Microsoft Learn: about_Pipelines, about_Modules, Get-WinEvent, Export-Csv
 - Full list with links on the companion site
 
 **dzampino.github.io/crt-essentials-2026**

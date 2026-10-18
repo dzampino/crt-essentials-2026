@@ -1,12 +1,15 @@
 // Entropy calculator and cracking explorer for passwords.qmd. No dependencies.
 // Large numbers are handled in log space so nothing overflows.
+// Formatted numbers can contain <sup> for exponents, so they are written with innerHTML.
 (function () {
 	"use strict";
 
 	const NAVY = "#0C2454";
-	const RED = "#E03E3B";
 	const MAX_BITS = 128;
 	const SECONDS_PER_YEAR = 365.25 * 86400;
+	// NIST SP 811 Appendix B: 1 BTU(IT)/h = 0.2930711 W; 1 ton of refrigeration = 12,000 BTU/h
+	const BTU_PER_HOUR_PER_WATT = 1 / 0.2930711;
+	const BTU_PER_HOUR_PER_TON = 12000;
 
 	const $ = (id) => document.getElementById(id);
 
@@ -41,7 +44,7 @@
 		}
 		const exp = Math.floor(log10);
 		const mant = Math.pow(10, log10 - exp);
-		return mant.toFixed(2) + " × 10^" + exp;
+		return mant.toFixed(2) + " × 10<sup>" + exp + "</sup>";
 	}
 
 	function formatDuration(log10Seconds) {
@@ -131,20 +134,15 @@
 		function line(pts) {
 			return "M" + pts.map((p) => p.join(",")).join(" L");
 		}
-		const full = series(0), avg = series(1);
+		const full = series(0);
 		svg.appendChild(svgEl("path", { d: area(full), fill: NAVY, "fill-opacity": 0.14 }));
-		svg.appendChild(svgEl("path", { d: area(avg), fill: RED, "fill-opacity": 0.16 }));
 		svg.appendChild(svgEl("path", { d: line(full), fill: "none", stroke: NAVY, "stroke-width": 2 }));
-		svg.appendChild(svgEl("path", { d: line(avg), fill: "none", stroke: RED, "stroke-width": 2, "stroke-dasharray": "5 3" }));
 
-		// direct labels at the right edge
-		const lastFull = Math.min(xMax * bpc, MAX_BITS), lastAvg = Math.min(xMax * bpc - 1, MAX_BITS);
-		const l1 = svgEl("text", { x: W - m.r + 8, y: y(lastFull) - 2, class: "series-label" });
-		l1.textContent = "Entire space";
-		const l2 = svgEl("text", { x: W - m.r + 8, y: y(lastAvg) + 14, class: "series-label" });
-		l2.textContent = "Average case";
+		// direct label at the right edge
+		const lastFull = Math.min(xMax * bpc, MAX_BITS);
+		const l1 = svgEl("text", { x: W - m.r + 8, y: y(lastFull) + 4, class: "series-label" });
+		l1.textContent = "Bits of entropy";
 		svg.appendChild(l1);
-		svg.appendChild(l2);
 
 		// current length marker
 		if (state.length <= xMax) {
@@ -171,11 +169,10 @@
 			cross.setAttribute("x2", x(len));
 			cross.setAttribute("visibility", "visible");
 			const bits = len * bpc;
-			const avgLog10 = (bits - 1) * Math.LOG10E * Math.LN2 - Math.log10(state.rate);
+			const fullLog10 = bits * Math.log10(2) - Math.log10(state.rate);
 			tip.innerHTML = "<strong>Length " + len + "</strong><br>" +
 				'<span class="swatch" style="background:' + NAVY + '"></span>' + bits.toFixed(1) + " bits<br>" +
-				'<span class="swatch" style="background:' + RED + '"></span>' + Math.max(0, bits - 1).toFixed(1) + " bits average<br>" +
-				"Average: " + formatDuration(avgLog10);
+				"Search all of it: " + formatDuration(fullLog10);
 			tip.style.display = "block";
 			const px = (x(len) / W) * r.width;
 			tip.style.left = (px > r.width * 0.6 ? px - tip.offsetWidth - 12 : px + 12) + "px";
@@ -195,9 +192,8 @@
 		$("ent-length-out").textContent = state.length;
 		$("ent-bpc").textContent = bpc.toFixed(2);
 		$("ent-bits").textContent = bits.toFixed(1);
-		$("ent-space").textContent = formatCount(log10Space);
-		$("ent-full").textContent = formatDuration(log10Space - log10Rate);
-		$("ent-avg").textContent = formatDuration(log10Space - Math.log10(2) - log10Rate);
+		$("ent-space").innerHTML = formatCount(log10Space);
+		$("ent-full").innerHTML = formatDuration(log10Space - log10Rate);
 		drawChart();
 		updateCracking();
 	}
@@ -224,7 +220,7 @@
 		if (!$("crk-table")) return;
 		readTiers();
 		const bits = state.length * bitsPerChar();
-		const log10AvgGuesses = (bits - 1) * Math.log10(2);
+		const log10Guesses = bits * Math.log10(2);
 		$("crk-password").textContent = state.length + " chars from " + state.alphabet.toLocaleString() + " (" + bits.toFixed(1) + " bits)";
 		const model = $("crk-model").value;
 		const watts = Number($("crk-watts").value) || 0;
@@ -237,7 +233,7 @@
 			(t.purchase ? " · ~$" + t.purchase.toLocaleString() + " to buy" : " · rented") + "</small></th>").join("") +
 			'<th class="num">Cost (any tier)</th></tr></thead><tbody>';
 		ALGORITHMS.forEach((a) => {
-			const log10GpuSeconds = log10AvgGuesses - Math.log10(a.rate);
+			const log10GpuSeconds = log10Guesses - Math.log10(a.rate);
 			html += "<tr><td>" + a.name + "</td>";
 			TIERS.forEach((t) => {
 				html += '<td class="num">' + formatDuration(log10GpuSeconds - Math.log10(t.gpus)) + "</td>";
@@ -247,6 +243,22 @@
 		});
 		html += "</tbody>";
 		$("crk-table").innerHTML = html;
+		updateCooling(watts);
+	}
+
+	// Every watt a GPU draws ends up as heat the room has to remove.
+	function updateCooling(watts) {
+		const rows = [
+			["GPU power", (t) => (t.gpus * watts / 1000).toLocaleString(undefined, { maximumFractionDigits: 1 }) + " kW"],
+			["Heat to remove", (t) => Math.round(t.gpus * watts * BTU_PER_HOUR_PER_WATT).toLocaleString() + " BTU/h"],
+			["Cooling required", (t) => (t.gpus * watts * BTU_PER_HOUR_PER_WATT / BTU_PER_HOUR_PER_TON).toLocaleString(undefined, { maximumFractionDigits: 1 }) + " tons"]
+		];
+		let html = "<thead><tr><th>Power and cooling (" + watts.toLocaleString() + " W per GPU)</th>" +
+			TIERS.map((t) => '<th class="num">' + t.name + "</th>").join("") + "</tr></thead><tbody>";
+		rows.forEach((r) => {
+			html += "<tr><td>" + r[0] + "</td>" + TIERS.map((t) => '<td class="num">' + r[1](t) + "</td>").join("") + "</tr>";
+		});
+		$("crk-cooling").innerHTML = html + "</tbody>";
 	}
 
 	// ---------- wiring ----------

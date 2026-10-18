@@ -187,6 +187,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#certutil-windows" id="toc-certutil-windows" class="nav-link" data-scroll-target="#certutil-windows">certutil (Windows)</a></li>
   <li><a href="#powershell-and-.net" id="toc-powershell-and-.net" class="nav-link" data-scroll-target="#powershell-and-.net">PowerShell and .NET</a></li>
   <li><a href="#openssl" id="toc-openssl" class="nav-link" data-scroll-target="#openssl">OpenSSL</a></li>
+  <li><a href="#xca" id="toc-xca" class="nav-link" data-scroll-target="#xca">XCA</a></li>
   </ul></li>
   <li><a href="#certificate-formats" id="toc-certificate-formats" class="nav-link" data-scroll-target="#certificate-formats">Certificate formats</a>
   <ul class="collapse">
@@ -254,11 +255,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td><a href="files/samples/pki/training-root.pem">training-root.pem</a></td>
-<td>Self-signed root CA, <code>CN=CRT Fictional Training Root</code>, PEM</td>
+<td>Self-signed root CA, <code>CN=Squeaky Curd Root CA</code>, of the Fictional Cheese Curd Authority, PEM</td>
 </tr>
 <tr class="even">
 <td><a href="files/samples/pki/training-leaf.pem">training-leaf.pem</a></td>
-<td>Server certificate for <code>training.example</code>, issued by the root, PEM</td>
+<td>Server certificate for <code>squeakycurds.example</code>, the Squeaky Curds Co-op of Curdsville, Wisconsin, issued by the root, PEM</td>
 </tr>
 <tr class="odd">
 <td><a href="files/samples/pki/training-leaf.der">training-leaf.der</a></td>
@@ -280,33 +281,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="whats-in-a-certificate" class="level2">
 <h2 class="anchored" data-anchor-id="whats-in-a-certificate">What’s in a certificate?</h2>
-<p>Output of <code>openssl x509 -in training-leaf.pem -noout -text</code> (OpenSSL 3.5.7), modulus and signature trimmed:</p>
+<p>Output of <code>openssl x509 -in training-leaf.pem -noout -text</code>, modulus and signature trimmed:</p>
 <pre class="text"><code>Certificate:
     Data:
         Version: 3 (0x2)
         Serial Number:
-            05:6d:6d:da:99:ef:6a:99:e4:fe:84:15:b9:c1:b4:08:c5:b6:0a:94
+            3e:23:6d:a6:5a:1d:83:f6:90:7d:a6:b9:68:8c:2a:c5:ce:d7:8e:0c
         Signature Algorithm: sha256WithRSAEncryption
-        Issuer: CN=CRT Fictional Training Root
+        Issuer: C=US, ST=Wisconsin, O=Fictional Cheese Curd Authority, CN=Squeaky Curd Root CA
         Validity
             Not Before: Oct  1 00:00:00 2026 GMT
             Not After : Oct  1 00:00:00 2027 GMT
-        Subject: CN=training.example
+        Subject: C=US, ST=Wisconsin, L=Curdsville, O=Squeaky Curds Co-op, CN=squeakycurds.example
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
                 Public-Key: (2048 bit)
-                Modulus: 00:c5:48:e6:ab:b4:b4:3d:34: ...
+                Modulus: 00:c3:1f:e5:27:e9:45:43:e1: ...
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
             X509v3 Basic Constraints: critical
                 CA:FALSE
             X509v3 Subject Alternative Name:
-                DNS:training.example
+                DNS:squeakycurds.example
             X509v3 Extended Key Usage:
                 TLS Web Server Authentication
     Signature Algorithm: sha256WithRSAEncryption
-    Signature Value: 98:6d:3b:4a:11:83:2e:2e: ...</code></pre>
-<p>The root has <code>Basic Constraints: critical, CA:TRUE, pathlen:0</code>: it may sign certificates, but no CA below it may.</p>
+    Signature Value: 87:93:0d:c5:a3:69:27:44: ...</code></pre>
+<p>The root has <code>Basic Constraints: critical, CA:TRUE, pathlen:0</code> and <code>Key Usage: critical, Certificate Sign, CRL Sign</code>: it may sign certificates and CRLs, but no CA below it may.</p>
 <section id="field-reference" class="level3">
 <h3 class="anchored" data-anchor-id="field-reference">Field reference</h3>
 <table class="caption-top table">
@@ -479,54 +480,153 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>certutil <span class="op">-</span>dump training-leaf<span class="op">.</span><span class="fu">der</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <pre class="text"><code>X509 Certificate:
 Version: 3
-Serial Number: 056d6dda99ef6a99e4fe8415b9c1b408c5b60a94
+Serial Number: 3e236da65a1d83f6907da6b9688c2ac5ced78e0c
 Signature Algorithm:
     Algorithm ObjectId: 1.2.840.113549.1.1.11 sha256RSA
 Issuer:
-    CN=CRT Fictional Training Root
+    CN=Squeaky Curd Root CA
+    O=Fictional Cheese Curd Authority
+    S=Wisconsin
+    C=US
 
- NotBefore: 2026-09-30 7:00 PM
- NotAfter: 2027-09-30 7:00 PM
+ NotBefore: 9/30/2026 7:00 PM
+ NotAfter: 9/30/2027 7:00 PM
 
 Subject:
-    CN=training.example
+    CN=squeakycurds.example
+    O=Squeaky Curds Co-op
+    L=Curdsville
+    S=Wisconsin
+    C=US
 ...
-Cert Hash(sha256): 3b44016743845b84ff7681a3637e88400658df7f2080e72c4c44dfbd295417e2</code></pre>
+Cert Hash(sha256): d1b7d4595cd352eb0c67dbdaa54a6f8ff1a7631c9b26495a139317ee97d0c0e5</code></pre>
 <div class="output-note">
-<p>certutil shows validity in local time (here US Central, UTC−5): <code>2026-09-30 7:00 PM</code> is <code>Oct 1 00:00:00 2026 GMT</code>. When you compare timestamps across tools, check the time zone.</p>
+<p>certutil shows validity in local time (here US Central, UTC−5): <code>9/30/2026 7:00 PM</code> is <code>Oct 1 00:00:00 2026 GMT</code>. It also lists distinguished names in the opposite order from OpenSSL, and calls the state <code>S</code> rather than <code>ST</code>. When you compare timestamps across tools, check the time zone.</p>
 </div>
 </section>
 <section id="powershell-and-.net" class="level3">
 <h3 class="anchored" data-anchor-id="powershell-and-.net">PowerShell and .NET</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">$Cert</span> <span class="op">=</span> <span class="op">[</span>System<span class="op">.</span><span class="fu">Security</span><span class="op">.</span><span class="fu">Cryptography</span><span class="op">.</span><span class="fu">X509Certificates</span><span class="op">.</span><span class="fu">X509Certificate2</span><span class="op">]::</span>new<span class="op">((</span><span class="fu">Resolve-Path</span> <span class="op">.</span>\training-leaf<span class="op">.</span><span class="fu">pem</span><span class="op">).</span><span class="fu">Path</span><span class="op">)</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="va">$Cert</span> <span class="op">|</span> <span class="fu">Format-List</span> Subject<span class="op">,</span> Issuer<span class="op">,</span> NotBefore<span class="op">,</span> NotAfter<span class="op">,</span> Thumbprint<span class="op">,</span> SerialNumber</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="va">$Cert</span><span class="op">.</span><span class="fu">Extensions</span> <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="st">'{0} ({1}): {2}'</span> <span class="op">-</span>f <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">FriendlyName</span><span class="op">,</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">Value</span><span class="op">,</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Format</span><span class="op">(</span><span class="va">$false</span><span class="op">)</span> <span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<pre class="text"><code>Subject      : CN=training.example
-Issuer       : CN=CRT Fictional Training Root
-NotBefore    : 2026-09-30 19:00:00
-NotAfter     : 2027-09-30 19:00:00
-Thumbprint   : EE6B4D73DBA5B6B92816C12DEC4B6539ADBC2830
-SerialNumber : 056D6DDA99EF6A99E4FE8415B9C1B408C5B60A94
-
-Basic Constraints (2.5.29.19): Subject Type=End Entity, Path Length Constraint=None
-Subject Alternative Name (2.5.29.17): DNS Name=training.example
+<p>.NET reads certificate files directly. This function returns the fields you usually want, including the names in the SAN:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> Get-CertificateInfo <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&lt;#</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">    .SYNOPSIS</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">        Shows the main fields of a certificate file (PEM or DER), including the DNS names in its SAN.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">    .EXAMPLE</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">        Get-CertificateInfo -Path .\training-leaf.pem</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">    .EXAMPLE</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">        Get-ChildItem *.pem, *.cer | Get-CertificateInfo</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">    #&gt;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>CmdletBinding<span class="op">()]</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span><span class="op">(</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># The certificate file; also accepts files piped from Get-ChildItem</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">,</span> ValueFromPipelineByPropertyName<span class="op">)]</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Alias<span class="op">(</span><span class="st">'FullName'</span><span class="op">)]</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Path</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">process</span> <span class="op">{</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># .NET needs a full path, so resolve relative paths like .\leaf.pem first</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">$FullPath</span> <span class="op">=</span> <span class="op">(</span><span class="fu">Resolve-Path</span> <span class="op">-</span>Path <span class="va">$Path</span><span class="op">).</span><span class="fu">ProviderPath</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">$Cert</span> <span class="op">=</span> <span class="op">[</span>System<span class="op">.</span><span class="fu">Security</span><span class="op">.</span><span class="fu">Cryptography</span><span class="op">.</span><span class="fu">X509Certificates</span><span class="op">.</span><span class="fu">X509Certificate2</span><span class="op">]::</span>new<span class="op">(</span><span class="va">$FullPath</span><span class="op">)</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># The SAN extension (OID 2.5.29.17) formats as "DNS Name=a.example, DNS Name=b.example"</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">$San</span> <span class="op">=</span> <span class="va">$Cert</span><span class="op">.</span><span class="fu">Extensions</span> <span class="op">|</span> <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">Value</span> <span class="op">-eq</span> <span class="st">'2.5.29.17'</span> <span class="op">}</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">$DnsNames</span> <span class="op">=</span> <span class="cf">if</span> <span class="op">(</span><span class="va">$San</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>            <span class="va">$San</span><span class="op">.</span><span class="fu">Format</span><span class="op">(</span><span class="va">$false</span><span class="op">)</span> <span class="op">-split</span> <span class="st">',\s*'</span> <span class="op">|</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>                <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span> <span class="op">-like</span> <span class="st">'DNS Name=*'</span> <span class="op">}</span> <span class="op">|</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="va">$_</span> <span class="op">-replace</span> <span class="st">'^DNS Name='</span><span class="op">,</span> <span class="st">''</span> <span class="op">}</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>pscustomobject<span class="op">]</span>@<span class="op">{</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>            Subject      <span class="op">=</span> <span class="va">$Cert</span><span class="op">.</span><span class="fu">Subject</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>            Issuer       <span class="op">=</span> <span class="va">$Cert</span><span class="op">.</span><span class="fu">Issuer</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>            NotBefore    <span class="op">=</span> <span class="va">$Cert</span><span class="op">.</span><span class="fu">NotBefore</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>            NotAfter     <span class="op">=</span> <span class="va">$Cert</span><span class="op">.</span><span class="fu">NotAfter</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>            DnsNames     <span class="op">=</span> <span class="va">$DnsNames</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>            Thumbprint   <span class="op">=</span> <span class="va">$Cert</span><span class="op">.</span><span class="fu">Thumbprint</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>            SerialNumber <span class="op">=</span> <span class="va">$Cert</span><span class="op">.</span><span class="fu">SerialNumber</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Get-CertificateInfo <span class="op">-</span>Path <span class="op">.</span>\training-leaf<span class="op">.</span><span class="fu">pem</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre class="text"><code>Subject      : CN=squeakycurds.example, O=Squeaky Curds Co-op, L=Curdsville, S=Wisconsin, C=US
+Issuer       : CN=Squeaky Curd Root CA, O=Fictional Cheese Curd Authority, S=Wisconsin, C=US
+NotBefore    : 9/30/2026 7:00:00 PM
+NotAfter     : 9/30/2027 7:00:00 PM
+DnsNames     : squeakycurds.example
+Thumbprint   : AE2C904DF148CD5A8135E8D95014C8935ADEE1F6
+SerialNumber : 3E236DA65A1D83F6907DA6B9688C2AC5CED78E0C</code></pre>
+<p>To see every extension with its OID:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="va">$Cert</span> <span class="op">=</span> <span class="op">[</span>System<span class="op">.</span><span class="fu">Security</span><span class="op">.</span><span class="fu">Cryptography</span><span class="op">.</span><span class="fu">X509Certificates</span><span class="op">.</span><span class="fu">X509Certificate2</span><span class="op">]::</span>new<span class="op">((</span><span class="fu">Resolve-Path</span> <span class="op">.</span>\training-leaf<span class="op">.</span><span class="fu">pem</span><span class="op">).</span><span class="fu">Path</span><span class="op">)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="va">$Cert</span><span class="op">.</span><span class="fu">Extensions</span> <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="st">'{0} ({1}): {2}'</span> <span class="op">-</span>f <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">FriendlyName</span><span class="op">,</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">Value</span><span class="op">,</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Format</span><span class="op">(</span><span class="va">$false</span><span class="op">)</span> <span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre class="text"><code>Basic Constraints (2.5.29.19): Subject Type=End Entity, Path Length Constraint=None
+Subject Alternative Name (2.5.29.17): DNS Name=squeakycurds.example
 Enhanced Key Usage (2.5.29.37): Server Authentication (1.3.6.1.5.5.7.3.1)</code></pre>
 <p>The Windows <strong>thumbprint</strong> is the SHA-1 hash of the DER certificate. It identifies a certificate in a store; it is not a security property.</p>
 <p>Certificates already installed on a machine are in the <code>Cert:</code> drive:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> Cert<span class="op">:</span>\LocalMachine\My <span class="op">|</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> Subject<span class="op">,</span> NotAfter<span class="op">,</span> Thumbprint<span class="op">,</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        @<span class="op">{</span> n <span class="op">=</span> <span class="st">'San'</span><span class="op">;</span> e <span class="op">=</span> <span class="op">{</span> <span class="op">(</span><span class="va">$_</span><span class="op">.</span><span class="fu">Extensions</span> <span class="op">|</span> <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">Value</span> <span class="op">-eq</span> <span class="st">'2.5.29.17'</span> <span class="op">}).</span><span class="fu">Format</span><span class="op">(</span><span class="va">$false</span><span class="op">)</span> <span class="op">}</span> <span class="op">}</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> Cert<span class="op">:</span>\LocalMachine\My <span class="op">-</span>ExpiringInDays <span class="dv">30</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> Cert<span class="op">:</span>\LocalMachine\My <span class="op">|</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> Subject<span class="op">,</span> NotAfter<span class="op">,</span> Thumbprint<span class="op">,</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        @<span class="op">{</span> n <span class="op">=</span> <span class="st">'San'</span><span class="op">;</span> e <span class="op">=</span> <span class="op">{</span> <span class="op">(</span><span class="va">$_</span><span class="op">.</span><span class="fu">Extensions</span> <span class="op">|</span> <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">Value</span> <span class="op">-eq</span> <span class="st">'2.5.29.17'</span> <span class="op">}).</span><span class="fu">Format</span><span class="op">(</span><span class="va">$false</span><span class="op">)</span> <span class="op">}</span> <span class="op">}</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> Cert<span class="op">:</span>\LocalMachine\My <span class="op">-</span>ExpiringInDays <span class="dv">30</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="openssl" class="level3">
 <h3 class="anchored" data-anchor-id="openssl">OpenSSL</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem <span class="at">-noout</span> <span class="at">-subject</span> <span class="at">-issuer</span> <span class="at">-dates</span> <span class="at">-ext</span> subjectAltName</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem <span class="at">-noout</span> <span class="at">-fingerprint</span> <span class="at">-sha256</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.der <span class="at">-inform</span> der <span class="at">-noout</span> <span class="at">-fingerprint</span> <span class="at">-sha256</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> asn1parse <span class="at">-in</span> training-leaf.pem        <span class="co"># the raw ASN.1 structure</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> s_client <span class="at">-connect</span> example.com:443 <span class="at">-servername</span> example.com <span class="at">-showcerts</span> <span class="op">&lt;</span>/dev/null   <span class="co"># what a live server presents</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>OpenSSL is included with Git for Windows (<code>C:\Program Files\Git\mingw64\bin\openssl.exe</code>).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem <span class="at">-noout</span> <span class="at">-subject</span> <span class="at">-issuer</span> <span class="at">-dates</span> <span class="at">-ext</span> subjectAltName</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem <span class="at">-noout</span> <span class="at">-fingerprint</span> <span class="at">-sha256</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.der <span class="at">-inform</span> der <span class="at">-noout</span> <span class="at">-fingerprint</span> <span class="at">-sha256</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> asn1parse <span class="at">-in</span> training-leaf.pem        <span class="co"># the raw ASN.1 structure</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> s_client <span class="at">-connect</span> example.com:443 <span class="at">-servername</span> example.com <span class="at">-showcerts</span> <span class="op">&lt;</span>/dev/null   <span class="co"># what a live server presents</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="installing-openssl-on-windows" class="level4">
+<h4 class="anchored" data-anchor-id="installing-openssl-on-windows">Installing OpenSSL on Windows</h4>
+<p>The OpenSSL project publishes source code only; Windows builds come from third parties, listed on the project’s <a href="https://github.com/openssl/openssl/wiki/Binaries">binaries page</a>. Any of these works:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Option</th>
+<th>How</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Git for Windows</td>
+<td>Already installed with Git</td>
+<td><code>C:\Program Files\Git\mingw64\bin\openssl.exe</code>; on the <code>PATH</code> in Git Bash, not in PowerShell</td>
+</tr>
+<tr class="even">
+<td>Shining Light Productions</td>
+<td><code>winget install ShiningLight.OpenSSL.Light</code></td>
+<td>Long-standing Win64 installer; <code>ShiningLight.OpenSSL.LTS.Light</code> tracks the long-term-support 3.5 branch</td>
+</tr>
+<tr class="odd">
+<td>FireDaemon</td>
+<td><code>winget install FireDaemon.OpenSSL</code></td>
+<td>Signed builds, also offered as a zip for portable use</td>
+</tr>
+<tr class="even">
+<td>Chocolatey</td>
+<td><code>choco install openssl</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Scoop</td>
+<td><code>scoop install openssl</code></td>
+<td>Per-user, no administrator rights needed</td>
+</tr>
+</tbody>
+</table>
+<p>After installing, open a new PowerShell window and run <code>openssl version</code>. If an older copy answers instead, <code>Get-Command openssl -All</code> lists every copy on the <code>PATH</code>, in the order they are found.</p>
+</section>
+</section>
+<section id="xca" class="level3">
+<h3 class="anchored" data-anchor-id="xca">XCA</h3>
+<p><a href="https://hohnstaedt.de/xca/">XCA</a> is my preferred graphical tool for certificates. It opens certificates, requests, keys, CRLs and PKCS #12 files, shows every field and extension, and can run a small CA with templates for test work. Keys are stored in an encrypted database. Install it from the <a href="https://hohnstaedt.de/xca/">XCA site</a>, the Microsoft Store, <code>winget install ChristianHohnstadt.xca</code> or <code>choco install xca</code>. Import <code>training-root.pem</code> and <code>training-leaf.pem</code> to see the chain.</p>
 </section>
 </section>
 <section id="certificate-formats" class="level2">
@@ -578,16 +678,16 @@ Enhanced Key Usage (2.5.29.37): Server Authentication (1.3.6.1.5.5.7.3.1)</code>
 </tbody>
 </table>
 <p><strong>Same certificate, two encodings.</strong> <code>training-leaf.pem</code> and <code>training-leaf.der</code> are the same certificate. Their certificate fingerprints match:</p>
-<pre class="text"><code>sha256 Fingerprint=3B:44:01:67:43:84:5B:84:FF:76:81:A3:63:7E:88:40:06:58:DF:7F:20:80:E7:2C:4C:44:DF:BD:29:54:17:E2</code></pre>
+<pre class="text"><code>sha256 Fingerprint=D1:B7:D4:59:5C:D3:52:EB:0C:67:DB:DA:A5:4A:6F:8F:F1:A7:63:1C:9B:26:49:5A:13:93:17:EE:97:D0:C0:E5</code></pre>
 <p>The SHA-256 <strong>file</strong> hash of the DER file is the same value, because a certificate fingerprint is the hash of its DER encoding. The PEM file’s hash differs, because it is text.</p>
 <section id="converting" class="level3">
 <h3 class="anchored" data-anchor-id="converting">Converting</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.der <span class="at">-inform</span> der <span class="at">-out</span> leaf.pem          <span class="co"># DER to PEM</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem <span class="at">-outform</span> der <span class="at">-out</span> leaf.der         <span class="co"># PEM to DER</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> pkcs7 <span class="at">-in</span> bundle.p7b <span class="at">-print_certs</span> <span class="at">-out</span> bundle.pem             <span class="co"># PKCS #7 to PEM certificates</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> pkcs12 <span class="at">-in</span> server.pfx <span class="at">-nokeys</span> <span class="at">-out</span> server-certs.pem           <span class="co"># certificates out of a PFX</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>certutil <span class="op">-</span>encode training-leaf<span class="op">.</span><span class="fu">der</span> leaf<span class="op">.</span><span class="fu">pem</span>     <span class="co"># DER to PEM (Base64)</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>certutil <span class="op">-</span>decode training-leaf<span class="op">.</span><span class="fu">pem</span> leaf<span class="op">.</span><span class="fu">der</span>     <span class="co"># PEM to DER</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.der <span class="at">-inform</span> der <span class="at">-out</span> leaf.pem          <span class="co"># DER to PEM</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem <span class="at">-outform</span> der <span class="at">-out</span> leaf.der         <span class="co"># PEM to DER</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> pkcs7 <span class="at">-in</span> bundle.p7b <span class="at">-print_certs</span> <span class="at">-out</span> bundle.pem             <span class="co"># PKCS #7 to PEM certificates</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> pkcs12 <span class="at">-in</span> server.pfx <span class="at">-nokeys</span> <span class="at">-out</span> server-certs.pem           <span class="co"># certificates out of a PFX</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>certutil <span class="op">-</span>encode training-leaf<span class="op">.</span><span class="fu">der</span> leaf<span class="op">.</span><span class="fu">pem</span>     <span class="co"># DER to PEM (Base64)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>certutil <span class="op">-</span>decode training-leaf<span class="op">.</span><span class="fu">pem</span> leaf<span class="op">.</span><span class="fu">der</span>     <span class="co"># PEM to DER</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="certificate-requests-and-issuance" class="level2">
@@ -595,46 +695,46 @@ Enhanced Key Usage (2.5.29.37): Server Authentication (1.3.6.1.5.5.7.3.1)</code>
 <section id="certificate-signing-requests-pkcs-10" class="level3">
 <h3 class="anchored" data-anchor-id="certificate-signing-requests-pkcs-10">Certificate signing requests (PKCS #10)</h3>
 <p>A CSR (<a href="https://www.rfc-editor.org/rfc/rfc2986.html">RFC 2986</a>) carries the public key, the requested subject and requested extensions, signed with the matching private key. The signature proves the requester holds the private key; it proves nothing about whether they should get the name. That is the CA’s job.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req <span class="at">-in</span> training-request.csr <span class="at">-noout</span> <span class="at">-text</span> <span class="at">-verify</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req <span class="at">-in</span> training-request.csr <span class="at">-noout</span> <span class="at">-text</span> <span class="at">-verify</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <pre class="text"><code>Certificate request self-signature verify OK
 Certificate Request:
     Data:
         Version: 1 (0x0)
-        Subject: CN=training.example
+        Subject: C=US, ST=Wisconsin, L=Curdsville, O=Squeaky Curds Co-op, CN=squeakycurds.example
         ...
         Attributes:
             Requested Extensions:
                 X509v3 Subject Alternative Name:
-                    DNS:training.example</code></pre>
+                    DNS:squeakycurds.example</code></pre>
 <p>The CSR and the issued certificate carry the same public key:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req  <span class="at">-in</span> training-request.csr <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem    <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># both: 134be2713def98d2edbb81406cfa5b70c49a0468d22d1ffc4514d4cb1ff32798</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req  <span class="at">-in</span> training-request.csr <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem    <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># both: 6f1329425fd7b20283a0be2f1bd09e207c6d002acc258130f68e54979952284a</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Creating a key pair and request with OpenSSL (the key stays with you):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req <span class="at">-new</span> <span class="at">-newkey</span> rsa:2048 <span class="at">-nodes</span> <span class="at">-keyout</span> server.key <span class="at">-out</span> server.csr <span class="dt">\</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">-subj</span> <span class="st">"/CN=training.example"</span> <span class="at">-addext</span> <span class="st">"subjectAltName=DNS:training.example"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req <span class="at">-new</span> <span class="at">-newkey</span> rsa:2048 <span class="at">-nodes</span> <span class="at">-keyout</span> server.key <span class="at">-out</span> server.csr <span class="dt">\</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">-subj</span> <span class="st">"/CN=squeakycurds.example"</span> <span class="at">-addext</span> <span class="st">"subjectAltName=DNS:squeakycurds.example"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="internal-cas-ad-cs-and-certificate-templates" class="level3">
 <h3 class="anchored" data-anchor-id="internal-cas-ad-cs-and-certificate-templates">Internal CAs: AD CS and certificate templates</h3>
 <p>Active Directory Certificate Services issues against <strong>certificate templates</strong>, which set key usage, EKU, validity, who may enroll and whether the subject comes from the request or from AD. Request with <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certreq_1"><code>certreq</code></a> and an INF file:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[NewRequest]</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Subject </span><span class="ot">=</span><span class="st"> "CN=training.example"</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="dt">KeyAlgorithm </span><span class="ot">=</span><span class="st"> RSA</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="dt">KeyLength </span><span class="ot">=</span><span class="st"> </span><span class="dv">2048</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Exportable </span><span class="ot">=</span><span class="st"> </span><span class="kw">FALSE</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="dt">MachineKeySet </span><span class="ot">=</span><span class="st"> </span><span class="kw">TRUE</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="dt">RequestType </span><span class="ot">=</span><span class="st"> PKCS10</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="kw">[Extensions]</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="dt">2.5.29.17 </span><span class="ot">=</span><span class="st"> "{text}"</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="dt">_continue_ </span><span class="ot">=</span><span class="st"> "dns=training.example&amp;"</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="kw">[RequestAttributes]</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="dt">CertificateTemplate </span><span class="ot">=</span><span class="st"> WebServer</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>certreq <span class="op">-</span>new request<span class="op">.</span><span class="fu">inf</span> request<span class="op">.</span><span class="fu">csr</span>        <span class="co"># create the key pair and request</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>certreq <span class="op">-</span>submit <span class="op">-</span>config <span class="st">"CA01\Contoso Issuing CA"</span> request<span class="op">.</span><span class="fu">csr</span> server<span class="op">.</span><span class="fu">cer</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>certreq <span class="op">-</span>accept server<span class="op">.</span><span class="fu">cer</span>                  <span class="co"># install, pairing with the pending private key</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><code>CA01\Contoso Issuing CA</code> is a placeholder for your <code>CAHost\CA name</code>. The <code>CertificateTemplate</code> line needs a domain-joined machine that can see the template; without one, <code>certreq -new</code> reports “Template not found.” This INF was tested on PowerShell 7.6 / Windows 11 with <code>MachineKeySet = FALSE</code> and the template line removed, and produced a valid PKCS #10 request with the SAN.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[NewRequest]</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Subject </span><span class="ot">=</span><span class="st"> "CN=squeakycurds.example"</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="dt">KeyAlgorithm </span><span class="ot">=</span><span class="st"> RSA</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="dt">KeyLength </span><span class="ot">=</span><span class="st"> </span><span class="dv">2048</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Exportable </span><span class="ot">=</span><span class="st"> </span><span class="kw">FALSE</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="dt">MachineKeySet </span><span class="ot">=</span><span class="st"> </span><span class="kw">TRUE</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="dt">RequestType </span><span class="ot">=</span><span class="st"> PKCS10</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="kw">[Extensions]</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="dt">2.5.29.17 </span><span class="ot">=</span><span class="st"> "{text}"</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="dt">_continue_ </span><span class="ot">=</span><span class="st"> "dns=squeakycurds.example&amp;"</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="kw">[RequestAttributes]</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="dt">CertificateTemplate </span><span class="ot">=</span><span class="st"> WebServer</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>certreq <span class="op">-</span>new request<span class="op">.</span><span class="fu">inf</span> request<span class="op">.</span><span class="fu">csr</span>        <span class="co"># create the key pair and request</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>certreq <span class="op">-</span>submit <span class="op">-</span>config <span class="st">"CA01\Contoso Issuing CA"</span> request<span class="op">.</span><span class="fu">csr</span> server<span class="op">.</span><span class="fu">cer</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>certreq <span class="op">-</span>accept server<span class="op">.</span><span class="fu">cer</span>                  <span class="co"># install, pairing with the pending private key</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Replace <code>CA01\Contoso Issuing CA</code> with your <code>CAHost\CA name</code>. The <code>CertificateTemplate</code> line needs a domain-joined machine that can see the template; without one, <code>certreq -new</code> reports “Template not found.” To make a request without AD CS, remove that line and set <code>MachineKeySet = FALSE</code>.</p>
 <p>Template settings that let the requester supply the subject name, combined with a client authentication EKU and broad enrollment rights, are a well-known AD CS privilege escalation path (“ESC1” in SpecterOps’ <a href="https://specterops.io/wp-content/uploads/sites/3/2022/06/Certified_Pre-Owned.pdf">Certified Pre-Owned</a>). Review who can enroll in such templates.</p>
 </section>
 <section id="acme-and-automated-issuance" class="level3">
@@ -679,8 +779,8 @@ Certificate Request:
 </ol>
 <p>The certificate presented by a service is separate from the trust configured on a client. The server sends its leaf and intermediates; the client supplies the root from its own store. A server that omits its intermediate can work in one browser, which has the intermediate cached or fetches it from the AIA URL, and fail in another client, such as a script, an appliance or a mail server, that does neither.</p>
 <p>On Windows the private key lives with the certificate in the store (or in a <code>.pfx</code>). On Linux it is usually a separate PEM file. Check that a certificate and key match by comparing public keys:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> server.crt <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> pkey <span class="at">-in</span> server.key <span class="at">-pubout</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> server.crt <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> pkey <span class="at">-in</span> server.key <span class="at">-pubout</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="certificate-validation" class="level2">
 <h2 class="anchored" data-anchor-id="certificate-validation">Certificate validation</h2>
@@ -733,28 +833,28 @@ Certificate Request:
 </table>
 <section id="validation-failures-reproduced" class="level3">
 <h3 class="anchored" data-anchor-id="validation-failures-reproduced">Validation failures, reproduced</h3>
-<p>Each of these was run against the sample files with OpenSSL 3.5.7.</p>
+<p>Each of these was run against the sample files with OpenSSL 3.5.</p>
 <p><strong>Untrusted root</strong> (the root is not in any trust store):</p>
 <pre class="text"><code>$ openssl verify training-leaf.pem
-CN=training.example
+C=US, ST=Wisconsin, L=Curdsville, O=Squeaky Curds Co-op, CN=squeakycurds.example
 error 20 at 0 depth lookup: unable to get local issuer certificate
 error training-leaf.pem: verification failed</code></pre>
 <p>Supplying the root as a trust anchor makes it pass: <code>openssl verify -CAfile training-root.pem training-leaf.pem</code> returns <code>training-leaf.pem: OK</code>.</p>
 <p><strong>Incorrect name:</strong></p>
-<pre class="text"><code>$ openssl verify -CAfile training-root.pem -verify_hostname www.training.example training-leaf.pem
-CN=training.example
+<pre class="text"><code>$ openssl verify -CAfile training-root.pem -verify_hostname www.squeakycurds.example training-leaf.pem
+C=US, ST=Wisconsin, L=Curdsville, O=Squeaky Curds Co-op, CN=squeakycurds.example
 error 62 at 0 depth lookup: hostname mismatch
 error training-leaf.pem: verification failed</code></pre>
-<p><code>training.example</code> passes; <code>www.training.example</code> does not, because the SAN lists only <code>training.example</code>. A wildcard <code>*.training.example</code> would match <code>www.training.example</code> but not <code>training.example</code> or <code>a.b.training.example</code> (RFC 9525 §6.3).</p>
+<p><code>squeakycurds.example</code> passes; <code>www.squeakycurds.example</code> does not, because the SAN lists only <code>squeakycurds.example</code>. A wildcard <code>*.squeakycurds.example</code> would match <code>www.squeakycurds.example</code> but not <code>squeakycurds.example</code> or <code>a.b.squeakycurds.example</code> (RFC 9525 §6.3).</p>
 <p><strong>Expired</strong> (checking as of December 1, 2027):</p>
 <pre class="text"><code>$ openssl verify -CAfile training-root.pem -attime 1827619200 training-leaf.pem
-CN=training.example
+C=US, ST=Wisconsin, L=Curdsville, O=Squeaky Curds Co-op, CN=squeakycurds.example
 error 10 at 0 depth lookup: certificate has expired
 error training-leaf.pem: verification failed</code></pre>
 <p>Checking as of September 1, 2026 reports <code>error 9 at 1 depth lookup: certificate is not yet valid</code>: depth 1 is the root, which was not yet valid either.</p>
 <p><strong>Wrong usage</strong> (the leaf’s EKU is server authentication only):</p>
 <pre class="text"><code>$ openssl verify -CAfile training-root.pem -purpose sslclient training-leaf.pem
-CN=training.example
+C=US, ST=Wisconsin, L=Curdsville, O=Squeaky Curds Co-op, CN=squeakycurds.example
 error 26 at 0 depth lookup: unsuitable certificate purpose
 error training-leaf.pem: verification failed</code></pre>
 <p><strong>Windows view of the untrusted root.</strong> <code>certutil -verify training-leaf.pem</code> on a machine without the training root:</p>
@@ -762,10 +862,11 @@ error training-leaf.pem: verification failed</code></pre>
 ------------------------------------
 Incomplete certificate chain
 Cannot find certificate:
-    CN=CRT Fictional Training Root
+    CN=Squeaky Curd Root CA, O=Fictional Cheese Curd Authority, S=Wisconsin, C=US
 Cert is an End Entity certificate
 
 ERROR: Verifying leaf certificate revocation status returned The revocation function was unable to check revocation because the revocation server was offline. 0x80092013 (-2146885613 CRYPT_E_REVOCATION_OFFLINE)
+CertUtil: The revocation function was unable to check revocation because the revocation server was offline.
 
 CertUtil: -verify command completed successfully.</code></pre>
 <p>Note the last line: certutil reports the <em>command</em> completed, not that the certificate is valid. Read the errors above it. <code>certutil -verify -urlfetch</code> also retrieves AIA and CRL URLs and reports each one, which is the quickest way to find a broken CRL distribution point on an internal CA.</p>
@@ -858,6 +959,14 @@ CertUtil: -verify command completed successfully.</code></pre>
 <tr class="odd">
 <td><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certreq_1">certreq</a></td>
 <td>Microsoft Learn</td>
+</tr>
+<tr class="even">
+<td><a href="https://hohnstaedt.de/xca/">XCA</a></td>
+<td>X Certificate and Key management</td>
+</tr>
+<tr class="odd">
+<td><a href="https://github.com/openssl/openssl/wiki/Binaries">OpenSSL binaries</a></td>
+<td>Third-party OpenSSL builds</td>
 </tr>
 <tr class="even">
 <td><a href="https://www.chromium.org/Home/chromium-security/crlsets/">CRLSets</a></td>

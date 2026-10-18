@@ -194,7 +194,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#error-handling" id="toc-error-handling" class="nav-link" data-scroll-target="#error-handling">Error handling</a></li>
   <li><a href="#building-collections" id="toc-building-collections" class="nav-link" data-scroll-target="#building-collections">Building collections</a></li>
   </ul></li>
-  <li><a href="#scripts" id="toc-scripts" class="nav-link" data-scroll-target="#scripts">Scripts</a></li>
+  <li><a href="#module" id="toc-module" class="nav-link" data-scroll-target="#module">Your own module</a>
+  <ul class="collapse">
+  <li><a href="#create-the-module" id="toc-create-the-module" class="nav-link" data-scroll-target="#create-the-module">1. Create the module</a></li>
+  <li><a href="#add-functions" id="toc-add-functions" class="nav-link" data-scroll-target="#add-functions">2. Add functions</a></li>
+  <li><a href="#use-it" id="toc-use-it" class="nav-link" data-scroll-target="#use-it">3. Use it</a></li>
+  <li><a href="#the-functions-on-this-site" id="toc-the-functions-on-this-site" class="nav-link" data-scroll-target="#the-functions-on-this-site">The functions on this site</a></li>
+  </ul></li>
   <li><a href="#windows-powershell-5.1-and-powershell-7" id="toc-windows-powershell-5.1-and-powershell-7" class="nav-link" data-scroll-target="#windows-powershell-5.1-and-powershell-7">Windows PowerShell 5.1 and PowerShell 7</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -230,7 +236,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Turning a repetitive task into something repeatable.</li>
 </ul>
 <p>PowerShell commands return <strong>objects</strong>, not text. A file has a <code>Length</code> and a <code>LastWriteTimeUtc</code>; an event has an <code>Id</code> and a <code>TimeCreated</code>. You filter and sort on those properties directly instead of cutting columns out of text, and the result is the same whether the output is 10 lines or 10 million.</p>
-<p>Everything on this page runs in Windows PowerShell 5.1 and PowerShell 7 unless noted. Examples were tested in PowerShell 7.6.7 and Windows PowerShell 5.1.26100 on Windows 11.</p>
+<p>Everything on this page runs in Windows PowerShell 5.1 and PowerShell 7 unless noted.</p>
 </section>
 <section id="finding-commands" class="level2">
 <h2 class="anchored" data-anchor-id="finding-commands">Finding commands</h2>
@@ -346,38 +352,161 @@ Name              Property   string Name {get;}</code></pre>
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="op">.</span>\Case <span class="op">-</span>Recurse <span class="op">-</span>File <span class="op">|</span></span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">LastWriteTimeUtc</span> <span class="op">-ge</span> <span class="va">$Start</span><span class="op">.</span><span class="fu">ToUniversalTime</span><span class="op">()</span> <span class="op">-and</span> <span class="va">$_</span><span class="op">.</span><span class="fu">LastWriteTimeUtc</span> <span class="op">-lt</span> <span class="va">$End</span><span class="op">.</span><span class="fu">ToUniversalTime</span><span class="op">()</span> <span class="op">}</span> <span class="op">|</span></span>
 <span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> LastWriteTimeUtc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The <a href="#scripts"><code>Get-FileInventory.ps1</code></a> script combines these into one inventory.</p>
+<p>Once you have typed the same pipeline twice, make it a function. <code>Get-FileInventory</code> combines the listing and the hashing into one object per file:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> Get-FileInventory <span class="op">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&lt;#</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">    .SYNOPSIS</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">        Lists every file under a folder with its size, UTC timestamps and hash.</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">    .DESCRIPTION</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">        For a collection of files you were given. Reading a file can update its last access</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">        time on the analysis machine, so work on a copy.</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">    .EXAMPLE</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">        Get-FileInventory -Path D:\Case\Collected | Sort-Object Length -Descending | Select-Object -First 10</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">    .EXAMPLE</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">        Get-FileInventory -Path D:\Case\Collected | Export-Csv D:\Case\Output\Inventory.csv -NoTypeInformation</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">    #&gt;</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>CmdletBinding<span class="op">()]</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span><span class="op">(</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># The folder to inventory</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>ValidateScript<span class="op">({</span> Test-Path -Path <span class="va">$_</span> -PathType Container <span class="op">})]</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Path</span><span class="op">,</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Any algorithm Get-FileHash supports</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>ValidateSet<span class="op">(</span><span class="st">'MD5'</span><span class="op">,</span> <span class="st">'SHA1'</span><span class="op">,</span> <span class="st">'SHA256'</span><span class="op">,</span> <span class="st">'SHA512'</span><span class="op">)]</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Algorithm</span> <span class="op">=</span> <span class="st">'SHA256'</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The folder's full path, so each file can be shown relative to it</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Root</span> <span class="op">=</span> <span class="op">(</span><span class="fu">Resolve-Path</span> <span class="op">-</span>Path <span class="va">$Path</span><span class="op">).</span><span class="fu">ProviderPath</span><span class="op">.</span><span class="fu">TrimEnd</span><span class="op">(</span><span class="st">'\'</span><span class="op">)</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># -Force includes hidden and system files</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Get-ChildItem</span> <span class="op">-</span>LiteralPath <span class="va">$Root</span> <span class="op">-</span>Recurse <span class="op">-</span>File <span class="op">-</span>Force <span class="op">|</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>            <span class="va">$Hash</span> <span class="op">=</span> Get-FileHash <span class="op">-</span>LiteralPath <span class="va">$_</span><span class="op">.</span><span class="fu">FullName</span> <span class="op">-</span>Algorithm <span class="va">$Algorithm</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>            <span class="op">[</span>pscustomobject<span class="op">]</span>@<span class="op">{</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>                RelativePath     <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">FullName</span><span class="op">.</span><span class="fu">Substring</span><span class="op">(</span><span class="va">$Root</span><span class="op">.</span><span class="fu">Length</span> <span class="op">+</span> <span class="dv">1</span><span class="op">)</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>                Extension        <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Extension</span><span class="op">.</span><span class="fu">ToLower</span><span class="op">()</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>                Length           <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Length</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>                CreationTimeUtc  <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">CreationTimeUtc</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>                LastWriteTimeUtc <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">LastWriteTimeUtc</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>                Hash             <span class="op">=</span> <span class="va">$Hash</span><span class="op">.</span><span class="fu">Hash</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>Get-FileInventory <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected <span class="op">|</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Length <span class="op">-</span>Descending <span class="op">|</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> <span class="op">-</span>First <span class="dv">10</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Get</span><span class="op">-</span>FileInventory <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected <span class="op">|</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Export-Csv</span> D<span class="op">:</span>\Case\Output\Inventory<span class="op">.</span><span class="fu">csv</span> <span class="op">-</span>NoTypeInformation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The function returns objects and leaves the CSV to <code>Export-Csv</code>. That keeps it small, and the same output can go to the screen, a CSV or the next command.</p>
 </section>
 <section id="looking-at-collected-windows-event-logs-with-get-winevent" class="level3">
 <h3 class="anchored" data-anchor-id="looking-at-collected-windows-event-logs-with-get-winevent">Looking at collected Windows event logs with <code>Get-WinEvent</code></h3>
 <p>Query the <strong>copied</strong> <code>.evtx</code> file with <code>-Path</code>, not the live log on the analysis machine (<a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent">Get-WinEvent</a>).</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What providers and IDs are in this log, and how many</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-WinEvent</span> <span class="op">-</span>Path <span class="op">.</span>\Case\Logs\System<span class="op">.</span><span class="fu">evtx</span> <span class="op">|</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Group-Object</span> ProviderName<span class="op">,</span> Id <span class="op">|</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Count <span class="op">-</span>Descending <span class="op">|</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> <span class="op">-</span>First <span class="dv">15</span> Count<span class="op">,</span> Name</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Logons and failed logons, filtered at the source</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-WinEvent</span> <span class="op">-</span>FilterHashtable @<span class="op">{</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    Path <span class="op">=</span> <span class="st">'.\Case\Logs\Security.evtx'</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    Id <span class="op">=</span> <span class="dv">4624</span><span class="op">,</span> <span class="dv">4625</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    StartTime <span class="op">=</span> <span class="op">[</span>datetime<span class="op">]</span><span class="st">'2026-10-01'</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="op">|</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Group-Object</span> Id <span class="op">|</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> Count<span class="op">,</span> Name</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Event properties hold the event’s data fields. To get named fields (for example <code>TargetUserName</code> and <code>IpAddress</code> in a 4624), read the event XML:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-WinEvent</span> <span class="op">-</span>FilterHashtable @<span class="op">{</span> Path <span class="op">=</span> <span class="st">'.\Case\Logs\Security.evtx'</span><span class="op">;</span> Id <span class="op">=</span> <span class="dv">4624</span> <span class="op">}</span> <span class="op">-</span>MaxEvents <span class="dv">100</span> <span class="op">|</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">$Data</span> <span class="op">=</span> @<span class="op">{}</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">([</span>xml<span class="op">]</span><span class="va">$_</span><span class="op">.</span><span class="fu">ToXml</span><span class="op">()).</span><span class="fu">Event</span><span class="op">.</span><span class="fu">EventData</span><span class="op">.</span><span class="fu">Data</span> <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="va">$Data</span><span class="op">[</span><span class="va">$_</span><span class="op">.</span><span class="fu">Name</span><span class="op">]</span> <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="st">'#text'</span> <span class="op">}</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>pscustomobject<span class="op">]</span>@<span class="op">{</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>            TimeCreated <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">TimeCreated</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>            User <span class="op">=</span> <span class="st">'{0}\{1}'</span> <span class="op">-</span>f <span class="va">$Data</span><span class="op">.</span><span class="fu">TargetDomainName</span><span class="op">,</span> <span class="va">$Data</span><span class="op">.</span><span class="fu">TargetUserName</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>            LogonType <span class="op">=</span> <span class="va">$Data</span><span class="op">.</span><span class="fu">LogonType</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>            IpAddress <span class="op">=</span> <span class="va">$Data</span><span class="op">.</span><span class="fu">IpAddress</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><code>Get-WinEvent</code> throws “No events were found that match the specified selection criteria” when a filter matches nothing; scripts should treat that as an empty result, as <a href="#scripts"><code>Get-EvtxSummary.ps1</code></a> does.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What providers and IDs are in this log, and how many</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-WinEvent</span> <span class="op">-</span>Path <span class="op">.</span>\Case\Logs\System<span class="op">.</span><span class="fu">evtx</span> <span class="op">|</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Group-Object</span> ProviderName<span class="op">,</span> Id <span class="op">|</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Count <span class="op">-</span>Descending <span class="op">|</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> <span class="op">-</span>First <span class="dv">15</span> Count<span class="op">,</span> Name</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Logons and failed logons, filtered at the source</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-WinEvent</span> <span class="op">-</span>FilterHashtable @<span class="op">{</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    Path <span class="op">=</span> <span class="st">'.\Case\Logs\Security.evtx'</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    Id <span class="op">=</span> <span class="dv">4624</span><span class="op">,</span> <span class="dv">4625</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    StartTime <span class="op">=</span> <span class="op">[</span>datetime<span class="op">]</span><span class="st">'2026-10-01'</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="op">|</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Group-Object</span> Id <span class="op">|</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> Count<span class="op">,</span> Name</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>Get-EvtxSummary</code> turns the first example into a function, with the first and last time each event appears:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> Get-EvtxSummary <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&lt;#</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">    .SYNOPSIS</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">        Counts the events in a collected .evtx file by provider and event ID, with the first and last time each appears.</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">    .EXAMPLE</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">        Get-EvtxSummary -Path .\Case\Logs\System.evtx | Format-Table</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">    .EXAMPLE</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">        Get-ChildItem .\Case\Logs -Filter *.evtx | Get-EvtxSummary -Id 4624, 4625, 7045</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">    #&gt;</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>CmdletBinding<span class="op">()]</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span><span class="op">(</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># A saved .evtx file; also accepts files piped from Get-ChildItem</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">,</span> ValueFromPipelineByPropertyName<span class="op">)]</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Alias<span class="op">(</span><span class="st">'FullName'</span><span class="op">)]</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Path</span><span class="op">,</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Only count these event IDs</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">int</span><span class="op">[]]</span><span class="va">$Id</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">process</span> <span class="op">{</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Path reads the saved file instead of the live log on this machine</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">$Filter</span> <span class="op">=</span> @<span class="op">{</span> Path <span class="op">=</span> <span class="op">(</span><span class="fu">Resolve-Path</span> <span class="op">-</span>Path <span class="va">$Path</span><span class="op">).</span><span class="fu">ProviderPath</span> <span class="op">}</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span><span class="va">$Id</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>            <span class="va">$Filter</span><span class="op">.</span><span class="fu">Id</span> <span class="op">=</span> <span class="va">$Id</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Get-WinEvent reports "no events found" as an error; SilentlyContinue turns that into no output</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>        <span class="fu">Get-WinEvent</span> <span class="op">-</span>FilterHashtable <span class="va">$Filter</span> <span class="op">-</span>ErrorAction SilentlyContinue <span class="op">|</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>            <span class="fu">Group-Object</span> ProviderName<span class="op">,</span> Id <span class="op">|</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>            <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>                <span class="va">$Times</span> <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Group</span><span class="op">.</span><span class="fu">TimeCreated</span> <span class="op">|</span> <span class="fu">Sort-Object</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>                <span class="op">[</span>pscustomobject<span class="op">]</span>@<span class="op">{</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>                    File         <span class="op">=</span> <span class="fu">Split-Path</span> <span class="op">-</span>Path <span class="va">$Path</span> <span class="op">-</span>Leaf</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>                    ProviderName <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Group</span><span class="op">[</span><span class="dv">0</span><span class="op">].</span><span class="fu">ProviderName</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>                    Id           <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Group</span><span class="op">[</span><span class="dv">0</span><span class="op">].</span><span class="fu">Id</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>                    Count        <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Count</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>                    First        <span class="op">=</span> <span class="va">$Times</span><span class="op">[</span><span class="dv">0</span><span class="op">]</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>                    Last         <span class="op">=</span> <span class="va">$Times</span><span class="op">[</span>-1<span class="op">]</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>                <span class="op">}</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span> <span class="op">|</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>            <span class="fu">Sort-Object</span> Count <span class="op">-</span>Descending</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>Get-EvtxSummary <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected\Logs\System<span class="op">.</span><span class="fu">evtx</span> <span class="op">|</span> <span class="fu">Format-Table</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Service installs (7045) in every log under the case</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> D<span class="op">:</span>\Case\Collected <span class="op">-</span>Filter <span class="op">*.</span><span class="fu">evtx</span> <span class="op">-</span>Recurse <span class="op">|</span> Get-EvtxSummary <span class="op">-</span>Id <span class="dv">7045</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre class="text"><code>File        ProviderName              Id Count First                 Last
+----        ------------              -- ----- -----                 ----
+System.evtx Service Control Manager 7045     4 10/16/2026 9:27:25 PM 10/16/2026 11:09:27 PM</code></pre>
+<p>Event properties hold the event’s data fields. To get named fields, such as <code>TargetUserName</code> and <code>IpAddress</code> in a 4624, read the event XML. <code>Get-LogonEvent</code> does that for successful logons:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> Get-LogonEvent <span class="op">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&lt;#</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">    .SYNOPSIS</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">        Successful logons (event 4624) from a collected Security.evtx, with the user, logon type and source address.</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">    .EXAMPLE</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">        Get-LogonEvent -Path .\Case\Logs\Security.evtx | Group-Object LogonType</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">    #&gt;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>CmdletBinding<span class="op">()]</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span><span class="op">(</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># A saved Security.evtx</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Path</span><span class="op">,</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Stop after this many events, newest first; a Security log can hold millions</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">int</span><span class="op">]</span><span class="va">$MaxEvents</span> <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Filter</span> <span class="op">=</span> @<span class="op">{</span> Path <span class="op">=</span> <span class="op">(</span><span class="fu">Resolve-Path</span> <span class="op">-</span>Path <span class="va">$Path</span><span class="op">).</span><span class="fu">ProviderPath</span><span class="op">;</span> Id <span class="op">=</span> <span class="dv">4624</span> <span class="op">}</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Get-WinEvent</span> <span class="op">-</span>FilterHashtable <span class="va">$Filter</span> <span class="op">-</span>MaxEvents <span class="va">$MaxEvents</span> <span class="op">|</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>            <span class="co"># The named fields (TargetUserName, LogonType, IpAddress...) are in the event's XML</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>            <span class="va">$Data</span> <span class="op">=</span> @<span class="op">{}</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>            <span class="op">([</span>xml<span class="op">]</span><span class="va">$_</span><span class="op">.</span><span class="fu">ToXml</span><span class="op">()).</span><span class="fu">Event</span><span class="op">.</span><span class="fu">EventData</span><span class="op">.</span><span class="fu">Data</span> <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="va">$Data</span><span class="op">[</span><span class="va">$_</span><span class="op">.</span><span class="fu">Name</span><span class="op">]</span> <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="st">'#text'</span> <span class="op">}</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>            <span class="op">[</span>pscustomobject<span class="op">]</span>@<span class="op">{</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>                TimeCreated <span class="op">=</span> <span class="va">$_</span><span class="op">.</span><span class="fu">TimeCreated</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>                User        <span class="op">=</span> <span class="st">'{0}\{1}'</span> <span class="op">-</span>f <span class="va">$Data</span><span class="op">.</span><span class="fu">TargetDomainName</span><span class="op">,</span> <span class="va">$Data</span><span class="op">.</span><span class="fu">TargetUserName</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>                LogonType   <span class="op">=</span> <span class="va">$Data</span><span class="op">.</span><span class="fu">LogonType</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>                IpAddress   <span class="op">=</span> <span class="va">$Data</span><span class="op">.</span><span class="fu">IpAddress</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>Get-LogonEvent <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected\Logs\Security<span class="op">.</span><span class="fu">evtx</span> <span class="op">|</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Group-Object</span> LogonType <span class="op">|</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> Count<span class="op">,</span> Name</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="making-a-script-reusable" class="level2">
@@ -385,48 +514,56 @@ Name              Property   string Name {get;}</code></pre>
 <ul>
 <li>Parameters instead of hard-coded values.</li>
 <li>Functions, <code>-Verbose</code>, <code>-WhatIf</code> where applicable.</li>
-<li>An example of automating part of the DFIR box build: see the <a href="./dfir.html#build-automation">DFIR box build scripts</a>.</li>
+<li>An example of automating part of the DFIR box build: <code>New-CaseFolder</code>, below, creates the folders for each case.</li>
 </ul>
 <section id="parameters" class="level3">
 <h3 class="anchored" data-anchor-id="parameters">Parameters</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">[</span>CmdletBinding<span class="op">()]</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">param</span><span class="op">(</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>ValidateScript<span class="op">({</span> Test-Path -Path <span class="va">$_</span> -PathType Container <span class="op">})]</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Path</span><span class="op">,</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>ValidateSet<span class="op">(</span><span class="st">'SHA1'</span><span class="op">,</span> <span class="st">'SHA256'</span><span class="op">,</span> <span class="st">'SHA512'</span><span class="op">)]</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Algorithm</span> <span class="op">=</span> <span class="st">'SHA256'</span><span class="op">,</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="dt">switch</span><span class="op">]</span><span class="va">$IncludeHidden</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><code>[CmdletBinding()]</code> makes a script or function an <strong>advanced function</strong>: it gets <code>-Verbose</code>, <code>-Debug</code>, <code>-ErrorAction</code> and the other common parameters for free. Validation attributes reject bad input before your code runs.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">[</span>CmdletBinding<span class="op">()]</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">param</span><span class="op">(</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>ValidateScript<span class="op">({</span> Test-Path -Path <span class="va">$_</span> -PathType Container <span class="op">})]</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Path</span><span class="op">,</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>ValidateSet<span class="op">(</span><span class="st">'SHA1'</span><span class="op">,</span> <span class="st">'SHA256'</span><span class="op">,</span> <span class="st">'SHA512'</span><span class="op">)]</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Algorithm</span> <span class="op">=</span> <span class="st">'SHA256'</span><span class="op">,</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="dt">switch</span><span class="op">]</span><span class="va">$IncludeHidden</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>[CmdletBinding()]</code> makes a script or function an <strong>advanced function</strong>: it gets <code>-Verbose</code>, <code>-Debug</code>, <code>-ErrorAction</code> and the other common parameters for free. Validation attributes reject bad input before your code runs. A comment on the line above a parameter becomes its help text in <code>Get-Help</code>.</p>
 </section>
 <section id="shouldprocess" class="level3">
 <h3 class="anchored" data-anchor-id="shouldprocess"><code>-WhatIf</code>, <code>-Confirm</code> and <code>ShouldProcess</code></h3>
 <p>Anything that changes state should support <code>-WhatIf</code>. Declare <code>SupportsShouldProcess</code> and wrap each change in <code>$PSCmdlet.ShouldProcess()</code> (<a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute">about_Functions_CmdletBindingAttribute</a>):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> New-CaseFolder <span class="op">{</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>CmdletBinding<span class="op">(</span>SupportsShouldProcess<span class="op">)]</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span><span class="op">(</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$CaseRoot</span><span class="op">,</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$CaseNumber</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">$CasePath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="op">-</span>Path <span class="va">$CaseRoot</span> <span class="op">-</span>ChildPath <span class="va">$CaseNumber</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Collected'</span><span class="op">,</span> <span class="st">'Output'</span><span class="op">,</span> <span class="st">'Notes'</span> <span class="op">|</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="fu">Join-Path</span> <span class="op">-</span>Path <span class="va">$CasePath</span> <span class="op">-</span>ChildPath <span class="va">$_</span> <span class="op">}</span> <span class="op">|</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">Where-Object</span> <span class="op">{</span> <span class="op">-not</span> <span class="op">(</span><span class="fu">Test-Path</span> <span class="op">-</span>Path <span class="va">$_</span><span class="op">)</span> <span class="op">}</span> <span class="op">|</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span><span class="va">$PSCmdlet</span><span class="op">.</span><span class="fu">ShouldProcess</span><span class="op">(</span><span class="va">$_</span><span class="op">,</span> <span class="st">'Create folder'</span><span class="op">))</span> <span class="op">{</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>                <span class="fu">New-Item</span> <span class="op">-</span>Path <span class="va">$_</span> <span class="op">-</span>ItemType Directory <span class="op">|</span> <span class="fu">Out-Null</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>                <span class="fu">Write-Verbose</span> <span class="st">"Created </span><span class="va">$_</span><span class="st">"</span></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>New-CaseFolder <span class="op">-</span>CaseRoot E<span class="op">:</span>\Cases <span class="op">-</span>CaseNumber <span class="dv">2026</span><span class="op">-</span><span class="dv">0142</span> <span class="op">-</span>WhatIf</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> New-CaseFolder <span class="op">{</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&lt;#</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">    .SYNOPSIS</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">        Creates the Collected, Output and Notes folders for a case. Supports -WhatIf.</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">    .EXAMPLE</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">        New-CaseFolder -CaseRoot E:\Cases -CaseNumber 2026-0142 -WhatIf</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">    #&gt;</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>CmdletBinding<span class="op">(</span>SupportsShouldProcess<span class="op">)]</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span><span class="op">(</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Where case folders live, such as a persistent disk or share</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$CaseRoot</span><span class="op">,</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$CaseNumber</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">$CasePath</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="op">-</span>Path <span class="va">$CaseRoot</span> <span class="op">-</span>ChildPath <span class="va">$CaseNumber</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Collected'</span><span class="op">,</span> <span class="st">'Output'</span><span class="op">,</span> <span class="st">'Notes'</span> <span class="op">|</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="fu">Join-Path</span> <span class="op">-</span>Path <span class="va">$CasePath</span> <span class="op">-</span>ChildPath <span class="va">$_</span> <span class="op">}</span> <span class="op">|</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">Where-Object</span> <span class="op">{</span> <span class="op">-not</span> <span class="op">(</span><span class="fu">Test-Path</span> <span class="op">-</span>Path <span class="va">$_</span><span class="op">)</span> <span class="op">}</span> <span class="op">|</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>            <span class="co"># ShouldProcess returns $false under -WhatIf, and prints what would have happened</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span><span class="va">$PSCmdlet</span><span class="op">.</span><span class="fu">ShouldProcess</span><span class="op">(</span><span class="va">$_</span><span class="op">,</span> <span class="st">'Create folder'</span><span class="op">))</span> <span class="op">{</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>                <span class="fu">New-Item</span> <span class="op">-</span>Path <span class="va">$_</span> <span class="op">-</span>ItemType Directory <span class="op">|</span> <span class="fu">Out-Null</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>                <span class="fu">Write-Verbose</span> <span class="st">"Created </span><span class="va">$_</span><span class="st">"</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>New-CaseFolder <span class="op">-</span>CaseRoot E<span class="op">:</span>\Cases <span class="op">-</span>CaseNumber <span class="dv">2026</span><span class="op">-</span><span class="dv">0142</span> <span class="op">-</span>WhatIf</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <pre class="text"><code>What if: Performing the operation "Create folder" on target "E:\Cases\2026-0142\Collected".
 What if: Performing the operation "Create folder" on target "E:\Cases\2026-0142\Output".
 What if: Performing the operation "Create folder" on target "E:\Cases\2026-0142\Notes".</code></pre>
@@ -435,64 +572,137 @@ What if: Performing the operation "Create folder" on target "E:\Cases\2026-0142\
 <section id="error-handling" class="level3">
 <h3 class="anchored" data-anchor-id="error-handling">Error handling</h3>
 <p>PowerShell has <strong>non-terminating</strong> errors (the command reports and keeps going: one unreadable file in a recursive listing) and <strong>terminating</strong> errors (the command stops). <code>try</code>/<code>catch</code> only catches terminating errors, so add <code>-ErrorAction Stop</code> where you want to handle a failure:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span> <span class="op">{</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Events</span> <span class="op">=</span> <span class="fu">Get-WinEvent</span> <span class="op">-</span>FilterHashtable <span class="va">$Filter</span> <span class="op">-</span>ErrorAction Stop</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="cf">catch</span> <span class="op">{</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span><span class="va">$_</span><span class="op">.</span><span class="fu">FullyQualifiedErrorId</span> <span class="op">-like</span> <span class="st">'NoMatchingEventsFound*'</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">$Events</span> <span class="op">=</span> <span class="op">@()</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>To collect non-terminating errors without stopping, use <code>-ErrorAction SilentlyContinue -ErrorVariable Problems</code> and report <code>$Problems</code> afterward, as <code>Get-FileInventory.ps1</code> does for files it cannot read.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span> <span class="op">{</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Events</span> <span class="op">=</span> <span class="fu">Get-WinEvent</span> <span class="op">-</span>FilterHashtable <span class="va">$Filter</span> <span class="op">-</span>ErrorAction Stop</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="cf">catch</span> <span class="op">{</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span><span class="va">$_</span><span class="op">.</span><span class="fu">FullyQualifiedErrorId</span> <span class="op">-like</span> <span class="st">'NoMatchingEventsFound*'</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">$Events</span> <span class="op">=</span> <span class="op">@()</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>Get-WinEvent</code> reports “No events were found that match the specified selection criteria” as an error. <code>Get-EvtxSummary</code> uses <code>-ErrorAction SilentlyContinue</code> instead, which is simpler but also hides other problems, such as a damaged file. To collect non-terminating errors without stopping, add <code>-ErrorVariable Problems</code> and look at <code>$Problems</code> afterward.</p>
 </section>
 <section id="building-collections" class="level3">
 <h3 class="anchored" data-anchor-id="building-collections">Building collections</h3>
 <p>Let the pipeline build arrays. <code>$Results = foreach (...) { [pscustomobject]@{...} }</code> and <code>$Results = ... | ForEach-Object { ... }</code> collect output efficiently; appending with <code>$Results += $Item</code> copies the whole array on every addition and gets slow with large data. When you do need to add items one by one, use <code>[System.Collections.Generic.List[object]]::new()</code> and <code>.Add()</code>.</p>
 </section>
 </section>
-<section id="scripts" class="level2">
-<h2 class="anchored" data-anchor-id="scripts">Scripts</h2>
-<p>Analysis of existing files and logs, not evidence acquisition. Download, read, then run. Source is also on <a href="https://github.com/dzampino/crt-essentials-2026/tree/main/scripts">GitHub</a>.</p>
+<section id="module" class="level2">
+<h2 class="anchored" data-anchor-id="module">Your own module</h2>
+<p>A function you paste into a window is gone when the window closes. A <strong>module</strong> keeps your functions in one file that PowerShell loads for you: type the function name in any new window and it works.</p>
+<p>A script module is a <code>.psm1</code> file inside a folder with the same name, in one of the folders listed in <code>$env:PSModulePath</code> (<a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules">about_Modules</a>). Your personal folder is under Documents:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
-<th>Script</th>
-<th>What it does</th>
+<th></th>
+<th>Personal module folder</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="files/scripts/Get-FileInventory.ps1">Get-FileInventory.ps1</a></td>
-<td>Relative path, extension, size, UTC timestamps and hash for every file under a folder; optional CSV with <code>-WhatIf</code> support</td>
+<td>PowerShell 7</td>
+<td><code>Documents\PowerShell\Modules</code></td>
 </tr>
 <tr class="even">
-<td><a href="files/scripts/Get-EvtxSummary.ps1">Get-EvtxSummary.ps1</a></td>
-<td>Counts by provider and event ID, with first and last time, for collected <code>.evtx</code> files; <code>-Detail</code> returns the events</td>
+<td>Windows PowerShell 5.1</td>
+<td><code>Documents\WindowsPowerShell\Modules</code></td>
 </tr>
 </tbody>
 </table>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Get-FileInventory<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected <span class="op">|</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Length <span class="op">-</span>Descending <span class="op">|</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Select-Object</span> <span class="op">-</span>First <span class="dv">10</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Get-FileInventory<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected <span class="op">-</span>OutputPath D<span class="op">:</span>\Case\Output\Inventory<span class="op">.</span><span class="fu">csv</span> <span class="op">-</span>Verbose</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Get-EvtxSummary<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected\Logs <span class="op">|</span> <span class="fu">Format-Table</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\Get-EvtxSummary<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Path D<span class="op">:</span>\Case\Collected\Logs\Security<span class="op">.</span><span class="fu">evtx</span> <span class="op">-</span>Id <span class="dv">4624</span><span class="op">,</span> <span class="dv">4625</span> <span class="op">-</span>Detail <span class="op">|</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Export-Csv</span> D<span class="op">:</span>\Case\Output\Logons<span class="op">.</span><span class="fu">csv</span> <span class="op">-</span>NoTypeInformation</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> D<span class="op">:</span>\Case\Collected <span class="op">-</span>Filter <span class="op">*.</span><span class="fu">evtx</span> <span class="op">-</span>Recurse <span class="op">|</span> <span class="op">.</span>\Get-EvtxSummary<span class="op">.</span><span class="fu">ps1</span> <span class="op">-</span>Id <span class="dv">7045</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Sample output of <code>Get-EvtxSummary.ps1</code> against a week of an exported System log:</p>
-<pre class="text"><code>File        ProviderName                            Id Count First               Last
-----        ------------                            -- ----- -----               ----
-System.evtx Microsoft-Windows-WindowsUpdateClient   44  1148 2026-10-09 15:51:20 2026-10-16 06:43:23
-System.evtx Microsoft-Windows-Kernel-General        16    98 2026-10-09 15:53:25 2026-10-16 14:32:46
-System.evtx Service Control Manager               7040    75 2026-10-09 15:54:14 2026-10-16 15:21:15</code></pre>
-<p>Downloaded scripts carry a mark of the web. If the execution policy blocks them, read them first, then <code>Unblock-File .\Get-FileInventory.ps1</code>.</p>
+<section id="create-the-module" class="level3">
+<h3 class="anchored" data-anchor-id="create-the-module">1. Create the module</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Your Documents folder (it may have been moved to OneDrive)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="va">$Documents</span> <span class="op">=</span> <span class="op">[</span>Environment<span class="op">]::</span>GetFolderPath<span class="op">(</span><span class="st">'MyDocuments'</span><span class="op">)</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># For Windows PowerShell 5.1, use 'WindowsPowerShell\Modules\MyTools' instead</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="va">$ModuleFolder</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="op">-</span>Path <span class="va">$Documents</span> <span class="op">-</span>ChildPath <span class="st">'PowerShell\Modules\MyTools'</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">New-Item</span> <span class="op">-</span>Path <span class="va">$ModuleFolder</span> <span class="op">-</span>ItemType Directory <span class="op">-</span>Force</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co"># The .psm1 file must have the same name as its folder</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="va">$ModuleFile</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="op">-</span>Path <span class="va">$ModuleFolder</span> <span class="op">-</span>ChildPath <span class="st">'MyTools.psm1'</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="fu">New-Item</span> <span class="op">-</span>Path <span class="va">$ModuleFile</span> <span class="op">-</span>ItemType File</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>notepad <span class="va">$ModuleFile</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="add-functions" class="level3">
+<h3 class="anchored" data-anchor-id="add-functions">2. Add functions</h3>
+<p>Every function on this site is in a code block of its own, separate from the examples that use it. Use the copy button at the top right of the block, paste it into <code>MyTools.psm1</code>, and save. Add as many as you like, one after another.</p>
+</section>
+<section id="use-it" class="level3">
+<h3 class="anchored" data-anchor-id="use-it">3. Use it</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Import-Module</span> MyTools <span class="op">-</span>Force       <span class="co"># load it now; run again after each edit</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Command</span> <span class="op">-</span>Module MyTools        <span class="co"># what it contains</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Help</span> Get-PasswordEntropy       <span class="co"># the help block at the top of each function</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>In a new window you do not need <code>Import-Module</code>: PowerShell loads the module the first time you use one of its functions.</p>
+<p>If you see “running scripts is disabled on this system”, Windows PowerShell 5.1 is using the default <code>Restricted</code> execution policy. <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> allows your own files to run, and still blocks unsigned scripts downloaded from the internet.</p>
+</section>
+<section id="the-functions-on-this-site" class="level3">
+<h3 class="anchored" data-anchor-id="the-functions-on-this-site">The functions on this site</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>What it does</th>
+<th>Page</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Get-PasswordEntropy</code></td>
+<td>Bits of entropy from alphabet size and length</td>
+<td><a href="./passwords.html#entropy-in-powershell">Passwords</a></td>
+</tr>
+<tr class="even">
+<td><code>Get-PasswordLength</code></td>
+<td>Length needed to reach a number of bits</td>
+<td><a href="./passwords.html#entropy-in-powershell">Passwords</a></td>
+</tr>
+<tr class="odd">
+<td><code>Test-PwnedPassword</code></td>
+<td>Check a password against Pwned Passwords without sending it</td>
+<td><a href="./passwords.html#check-a-password-against-pwned-passwords">Passwords</a></td>
+</tr>
+<tr class="even">
+<td><code>Get-CertificateInfo</code></td>
+<td>Main fields and SAN names of a certificate file</td>
+<td><a href="./pki.html#powershell-and-.net">PKI</a></td>
+</tr>
+<tr class="odd">
+<td><code>Get-MailHeader</code></td>
+<td>One object per header of a saved message</td>
+<td><a href="./email.html#pulling-headers-apart-in-powershell">Email security</a></td>
+</tr>
+<tr class="even">
+<td><code>Get-FileInventory</code></td>
+<td>Size, timestamps and hash of every file under a folder</td>
+<td><a href="#working-with-an-existing-collection-of-files">above</a></td>
+</tr>
+<tr class="odd">
+<td><code>Get-EvtxSummary</code></td>
+<td>Event counts by provider and ID in a saved <code>.evtx</code></td>
+<td><a href="#looking-at-collected-windows-event-logs-with-get-winevent">above</a></td>
+</tr>
+<tr class="even">
+<td><code>Get-LogonEvent</code></td>
+<td>User, logon type and address from 4624 events</td>
+<td><a href="#looking-at-collected-windows-event-logs-with-get-winevent">above</a></td>
+</tr>
+<tr class="odd">
+<td><code>New-CaseFolder</code></td>
+<td>Create a case’s folders, with <code>-WhatIf</code></td>
+<td><a href="#shouldprocess">above</a></td>
+</tr>
+</tbody>
+</table>
+<p>All of them are also packaged as the <strong>CrtEssentials</strong> module: <a href="files/CrtEssentials.zip">download CrtEssentials.zip</a>, or browse the source on <a href="https://github.com/dzampino/crt-essentials-2026/tree/main/scripts/CrtEssentials">GitHub</a>. It keeps each function in its own file under <code>Functions\</code>, and <code>CrtEssentials.psm1</code> loads them all, which is a common layout once a module grows. To install it, unblock the download, then extract the <code>CrtEssentials</code> folder into your personal module folder:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Unblock-File</span> <span class="op">-</span>Path <span class="op">.</span>\CrtEssentials<span class="op">.</span><span class="fu">zip</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="va">$Modules</span> <span class="op">=</span> <span class="fu">Join-Path</span> <span class="op">-</span>Path <span class="op">([</span>Environment<span class="op">]::</span>GetFolderPath<span class="op">(</span><span class="st">'MyDocuments'</span><span class="op">))</span> <span class="op">-</span>ChildPath <span class="st">'PowerShell\Modules'</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>Expand-Archive <span class="op">-</span>Path <span class="op">.</span>\CrtEssentials<span class="op">.</span><span class="fu">zip</span> <span class="op">-</span>DestinationPath <span class="va">$Modules</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-Command</span> <span class="op">-</span>Module CrtEssentials</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>When a module is worth sharing, <code>New-ModuleManifest</code> adds a <code>.psd1</code> with a version number, author and list of exported functions (<a href="https://learn.microsoft.com/en-us/powershell/scripting/developer/module/how-to-write-a-powershell-module-manifest">about_Module_Manifests</a>).</p>
+</section>
 </section>
 <section id="windows-powershell-5.1-and-powershell-7" class="level2">
 <h2 class="anchored" data-anchor-id="windows-powershell-5.1-and-powershell-7">Windows PowerShell 5.1 and PowerShell 7</h2>
@@ -557,6 +767,14 @@ System.evtx Service Control Manager               7040    75 2026-10-09 15:54:14
 <tbody>
 <tr class="odd">
 <td><a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines">about_Pipelines</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="even">
+<td><a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules">about_Modules</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="odd">
+<td><a href="https://learn.microsoft.com/en-us/powershell/scripting/developer/module/how-to-write-a-powershell-module-manifest">How to write a module manifest</a></td>
 <td>Microsoft Learn</td>
 </tr>
 <tr class="even">

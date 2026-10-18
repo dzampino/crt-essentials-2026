@@ -261,8 +261,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td><strong>MSA</strong>, Mail Submission Agent</td>
-<td>Accepts mail from authenticated users</td>
-<td>SMTP submission, 587 (STARTTLS) or 465 (implicit TLS)</td>
+<td>Accepts new mail from users and applications, usually after they authenticate</td>
+<td>SMTP submission: 587 (STARTTLS), 465 (implicit TLS), and sometimes 25</td>
 </tr>
 <tr class="odd">
 <td><strong>MTA</strong>, Mail Transfer Agent</td>
@@ -276,34 +276,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+<p><strong>An MSA does not have to require authentication, or use port 587.</strong> <a href="https://www.rfc-editor.org/rfc/rfc6409.html">RFC 6409</a> §4.3 says an MSA must reject unauthenticated mail by default “unless it has already independently established authentication or authorization (such as being within a protected subnetwork)”, and §3.1 says “A site MAY choose to use port 25 for message submission.” That is how printers, scanners and line-of-business applications send: an unauthenticated relay on port 25 that trusts their IP addresses, such as an Exchange receive connector or a Microsoft 365 connector. It is also why an internal relay that accepts anything from the network is worth finding during an incident. Port 465 with TLS from the first byte is <a href="https://www.rfc-editor.org/rfc/rfc8314.html">RFC 8314</a>.</p>
 <p>A sending MTA finds where to deliver by looking up the recipient domain’s <strong>MX</strong> records in DNS, then connects to port 25 on the lowest-preference host that answers. In Microsoft 365 or Google Workspace, one service performs every role; the distinctions still show up in the headers.</p>
 </section>
 <section id="the-envelope-versus-the-message" class="level2">
 <h2 class="anchored" data-anchor-id="the-envelope-versus-the-message">The envelope versus the message</h2>
 <p>SMTP (<a href="https://www.rfc-editor.org/rfc/rfc5321.html">RFC 5321</a>) carries a message (<a href="https://www.rfc-editor.org/rfc/rfc5322.html">RFC 5322</a>) the way an envelope carries a letter. They have separate addresses, and they do not have to agree.</p>
-<pre class="text"><code>S: 220 mx1.example.net ESMTP
-C: EHLO out-12.esp.example
-S: 250-mx1.example.net
-C: MAIL FROM:&lt;bounce-7731@mailer.esp.example&gt;      &lt;- envelope sender (RFC5321.MailFrom)
-S: 250 2.1.0 Ok
-C: RCPT TO:&lt;pat@example.net&gt;                         &lt;- envelope recipient
-S: 250 2.1.5 Ok
-C: DATA
-S: 354 End data with &lt;CR&gt;&lt;LF&gt;.&lt;CR&gt;&lt;LF&gt;
-C: From: "Example County IT" &lt;it-alerts@example.org&gt;   &lt;- message author (RFC5322.From)
-C: To: pat@example.net
-C: Subject: Scheduled maintenance this weekend
-C:
-C: ...
-C: .
-S: 250 2.0.0 Ok: queued</code></pre>
+<p>In the transcripts on this page, <span class="smtp-client">what the client sends</span> and <span class="smtp-server">what the server answers</span> are colored differently, and <span class="smtp-note">annotations</span> are gray.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode smtp code-with-copy"><code class="sourceCode smtp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="st">S: 220 mx1.example.net ESMTP</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">C: EHLO out-12.esp.example</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">S: 250-mx1.example.net</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">C: MAIL FROM:&lt;bounce-7731@mailer.esp.example&gt;      </span><span class="co">&lt;- envelope sender (RFC5321.MailFrom)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">S: 250 2.1.0 Ok</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">C: RCPT TO:&lt;pat@example.net&gt;                         </span><span class="co">&lt;- envelope recipient</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">S: 250 2.1.5 Ok</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">C: DATA</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">S: 354 End data with &lt;CR&gt;&lt;LF&gt;.&lt;CR&gt;&lt;LF&gt;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">C: From: "Example County IT" &lt;it-alerts@example.org&gt;   </span><span class="co">&lt;- message author (RFC5322.From)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">C: To: pat@example.net</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">C: Subject: Scheduled maintenance this weekend</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">C:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">C: ...</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">C: .</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="st">S: 250 2.0.0 Ok: queued</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="output-note">
-<p>Constructed transcript with reserved example names. The two <code>From</code> addresses are different on purpose: this is how every email service provider and mailing list works.</p>
+<p>Constructed transcript with reserved example names. Each client command gets a numbered reply from the server before the next one. The two <code>From</code> addresses are different on purpose: this is how every email service provider and mailing list works.</p>
 </div>
 <ul>
 <li><code>MAIL FROM</code> and <code>RCPT TO</code> are SMTP commands, not message headers. <code>RCPT TO</code> is why Bcc works: the recipient is on the envelope, not in the message.</li>
 <li><strong><code>From</code></strong> is the author. It is what the user sees, and it is what DMARC protects.</li>
-<li><strong><code>Sender</code></strong> names who actually sent the message on the author’s behalf, when that differs (RFC 5322 §3.6.2). Few clients show it.</li>
+<li><strong><code>Sender</code></strong> names who actually sent the message on the author’s behalf, when that differs (RFC 5322 §3.6.2). Outlook shows it as “<em>Sender</em> on behalf of <em>From</em>”.</li>
 <li><strong><code>Return-Path</code></strong> is added by the final delivering server, recording the <code>MAIL FROM</code> address (RFC 5321 §4.4). Bounces go there.</li>
 <li><strong><code>Reply-To</code></strong> is where replies go. A mismatched <code>Reply-To</code> is common in business email compromise.</li>
 </ul>
@@ -311,6 +313,7 @@ S: 250 2.0.0 Ok: queued</code></pre>
 <section id="reading-email-headers" class="level2">
 <h2 class="anchored" data-anchor-id="reading-email-headers">Reading email headers</h2>
 <p>Download the <a href="files/samples/email/constructed-headers.eml">constructed sample message</a> to follow along. It uses reserved names (RFC 2606) and documentation addresses (RFC 5737).</p>
+<p><strong>Use Microsoft’s Message Header Analyzer.</strong> Paste headers into the <a href="https://mha.azurewebsites.net/pages/mha.html">web version</a>, or install the <a href="https://appsource.microsoft.com/en-us/product/office/WA104005406">Outlook add-in</a>, and it lays out the hops with the delay at each one, the authentication results, and the anti-spam headers Microsoft 365 adds. It is open source (<a href="https://github.com/microsoft/MHA">github.com/microsoft/MHA</a>). The add-in needs mailbox permissions, so an administrator usually deploys it. Reading the raw headers yourself, as below, is still worth practicing: it is what you do when a tool’s interpretation looks wrong.</p>
 <pre class="text"><code>Return-Path: &lt;bounce-7731@mailer.esp.example&gt;
 Received: from mx1.example.net (mx1.example.net [198.51.100.25])
     by mbox1.example.net (Postfix) with ESMTPS id 4F2A11C0042
@@ -391,30 +394,42 @@ Message-ID: &lt;20261016190208.12345@app01.example.org&gt;</code></pre>
 <h3 class="anchored" data-anchor-id="pulling-headers-apart-in-powershell">Pulling headers apart in PowerShell</h3>
 <p>Header lines are folded: a line beginning with a space or tab continues the previous header. Unfold first, then parse:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> Get-MailHeader <span class="op">{</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>CmdletBinding<span class="op">()]</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span><span class="op">(</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Path</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Raw</span> <span class="op">=</span> <span class="fu">Get-Content</span> <span class="op">-</span>LiteralPath <span class="va">$Path</span> <span class="op">-</span>Raw</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">$HeaderBlock</span> <span class="op">=</span> <span class="op">(</span><span class="va">$Raw</span> <span class="op">-split</span> <span class="st">"\r?\n\r?\n"</span><span class="op">,</span> <span class="dv">2</span><span class="op">)[</span><span class="dv">0</span><span class="op">]</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Unfolded</span> <span class="op">=</span> <span class="va">$HeaderBlock</span> <span class="op">-replace</span> <span class="st">'\r?\n[ \t]+'</span><span class="op">,</span> <span class="st">' '</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Order</span> <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Unfolded</span> <span class="op">-split</span> <span class="st">'\r?\n'</span> <span class="op">|</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>            <span class="va">$Name</span><span class="op">,</span> <span class="va">$Value</span> <span class="op">=</span> <span class="va">$_</span> <span class="op">-split</span> <span class="st">':\s*'</span><span class="op">,</span> <span class="dv">2</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            <span class="op">[</span>pscustomobject<span class="op">]</span>@<span class="op">{</span> Order <span class="op">=</span> <span class="va">$Order</span><span class="op">++;</span> Name <span class="op">=</span> <span class="va">$Name</span><span class="op">;</span> Value <span class="op">=</span> <span class="va">$Value</span> <span class="op">}</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Path, oldest hop first</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>Get-MailHeader <span class="op">-</span>Path <span class="op">.</span>\constructed-headers<span class="op">.</span><span class="fu">eml</span> <span class="op">|</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> Name <span class="op">-eq</span> <span class="st">'Received'</span> <span class="op">|</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Order <span class="op">-</span>Descending <span class="op">|</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Format-Table</span> Order<span class="op">,</span> Value <span class="op">-</span>Wrap</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>Get-MailHeader <span class="op">-</span>Path <span class="op">.</span>\constructed-headers<span class="op">.</span><span class="fu">eml</span> <span class="op">|</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> Name <span class="op">-</span>in <span class="st">'Return-Path'</span><span class="op">,</span> <span class="st">'From'</span><span class="op">,</span> <span class="st">'Reply-To'</span><span class="op">,</span> <span class="st">'Authentication-Results'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&lt;#</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">    .SYNOPSIS</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">        Splits the headers of a saved message (.eml) into one object per header, in the order they appear.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">    .EXAMPLE</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">        Get-MailHeader -Path .\constructed-headers.eml | Where-Object Name -eq 'Received'</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">    #&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>CmdletBinding<span class="op">()]</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span><span class="op">(</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span>Parameter<span class="op">(</span>Mandatory<span class="op">)]</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$Path</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">)</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Raw</span> <span class="op">=</span> <span class="fu">Get-Content</span> <span class="op">-</span>LiteralPath <span class="va">$Path</span> <span class="op">-</span>Raw</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The headers end at the first blank line</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">$HeaderBlock</span> <span class="op">=</span> <span class="op">(</span><span class="va">$Raw</span> <span class="op">-split</span> <span class="st">"\r?\n\r?\n"</span><span class="op">,</span> <span class="dv">2</span><span class="op">)[</span><span class="dv">0</span><span class="op">]</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># A line starting with a space or tab continues the header above it ("folding"); join them back up</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Unfolded</span> <span class="op">=</span> <span class="va">$HeaderBlock</span> <span class="op">-replace</span> <span class="st">'\r?\n[ \t]+'</span><span class="op">,</span> <span class="st">' '</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Order 0 is the top header, which the last server added</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Order</span> <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Unfolded</span> <span class="op">-split</span> <span class="st">'\r?\n'</span> <span class="op">|</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>            <span class="va">$Name</span><span class="op">,</span> <span class="va">$Value</span> <span class="op">=</span> <span class="va">$_</span> <span class="op">-split</span> <span class="st">':\s*'</span><span class="op">,</span> <span class="dv">2</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>            <span class="op">[</span>pscustomobject<span class="op">]</span>@<span class="op">{</span> Order <span class="op">=</span> <span class="va">$Order</span><span class="op">++;</span> Name <span class="op">=</span> <span class="va">$Name</span><span class="op">;</span> Value <span class="op">=</span> <span class="va">$Value</span> <span class="op">}</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Path, oldest hop first</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Get-MailHeader <span class="op">-</span>Path <span class="op">.</span>\constructed-headers<span class="op">.</span><span class="fu">eml</span> <span class="op">|</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> Name <span class="op">-eq</span> <span class="st">'Received'</span> <span class="op">|</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sort-Object</span> Order <span class="op">-</span>Descending <span class="op">|</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Format-Table</span> Order<span class="op">,</span> Value <span class="op">-</span>Wrap</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>Get-MailHeader <span class="op">-</span>Path <span class="op">.</span>\constructed-headers<span class="op">.</span><span class="fu">eml</span> <span class="op">|</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> Name <span class="op">-</span>in <span class="st">'Return-Path'</span><span class="op">,</span> <span class="st">'From'</span><span class="op">,</span> <span class="st">'Reply-To'</span><span class="op">,</span> <span class="st">'Authentication-Results'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="spf" class="level2">
@@ -655,21 +670,21 @@ esp2026._domainkey.example.org.  TXT  "v=DKIM1; k=rsa; p=MIIBIjANBgkqh..."</code
 <p>These three exercises are from <a href="https://www.learndmarc.com/">learndmarc.com</a>, which builds and sends a test message and shows each step. Transcripts are reproduced as text. For each one, identify the sender identities, the SPF and DKIM results, and whether the message passes DMARC, and why.</p>
 <section id="example-1" class="level4">
 <h4 class="anchored" data-anchor-id="example-1">Example 1</h4>
-<pre class="text"><code>. 220 smtp.learndmarc.com ESMTP Postfix
-&gt; HELO red.secondary.com
-. 250 smtp.learndmarc.com Hello red.secondary.com &lt;153.112.107.49&gt;
-&gt; MAIL FROM: &lt;gina@red.secondary.com&gt;
-. 250 Ok
-&gt; RCPT TO: &lt;someone@yahoo.com&gt;
-&gt; DATA
-&gt; From: "Gina" &lt;gina@blue.secondary.com&gt;
-&gt; DKIM-Signature: v=1; a=rsa-sha256; d=primary.com; s=selector; (DKIM Auth Result: PASS)
-&gt; Subject: Who reads the subject anyway?
-
-Policies:
-DMARC policy _dmarc.blue.secondary.com: "v=DMARC1; p=quarantine; t=y;"
-SPF policy red.secondary.com: "v=spf1 ip4:182.107.92.190 -all"
-SPF policy blue.secondary.com: "v=spf1 ip4:24.121.50.128 ~all"</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode smtp code-with-copy"><code class="sourceCode smtp"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="st">. 220 smtp.learndmarc.com ESMTP Postfix</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; HELO red.secondary.com</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="st">. 250 smtp.learndmarc.com Hello red.secondary.com &lt;153.112.107.49&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; MAIL FROM: &lt;gina@red.secondary.com&gt;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="st">. 250 Ok</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; RCPT TO: &lt;someone@yahoo.com&gt;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; DATA</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; From: "Gina" &lt;gina@blue.secondary.com&gt;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; DKIM-Signature: v=1; a=rsa-sha256; d=primary.com; s=selector; </span><span class="co">(DKIM Auth Result: PASS)</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; Subject: Who reads the subject anyway?</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">Policies:</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="fu">DMARC policy _dmarc.blue.secondary.com: "v=DMARC1; p=quarantine; t=y;"</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="fu">SPF policy red.secondary.com: "v=spf1 ip4:182.107.92.190 -all"</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="fu">SPF policy blue.secondary.com: "v=spf1 ip4:24.121.50.128 ~all"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <details>
 <summary>
 Answer
@@ -690,21 +705,21 @@ Answer
 </section>
 <section id="example-2" class="level4">
 <h4 class="anchored" data-anchor-id="example-2">Example 2</h4>
-<pre class="text"><code>. 220 smtp.learndmarc.com ESMTP Postfix
-&gt; HELO red.primary.com
-. 250 smtp.learndmarc.com Hello red.primary.com &lt;97.196.174.88&gt;
-&gt; MAIL FROM: &lt;terry@red.primary.com&gt;
-. 250 Ok
-&gt; RCPT TO: &lt;someone@hotmail.com&gt;
-&gt; DATA
-&gt; From: "Terry" &lt;terry@blue.primary.com&gt;
-&gt; DKIM-Signature: v=1; a=rsa-sha256; d=secondary.com; s=selector; (DKIM Auth Result: FAIL)
-&gt; Subject: I'll let myself out
-
-Policies:
-DMARC policy _dmarc.blue.primary.com: "v=DMARC1; p=quarantine; adkim=s; aspf=s;"
-SPF policy red.primary.com: "v=spf1 ip4:95.129.128.101 ~all"
-SPF policy blue.primary.com: "v=spf1 ip4:44.62.173.139 ~all"</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode smtp code-with-copy"><code class="sourceCode smtp"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="st">. 220 smtp.learndmarc.com ESMTP Postfix</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; HELO red.primary.com</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="st">. 250 smtp.learndmarc.com Hello red.primary.com &lt;97.196.174.88&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; MAIL FROM: &lt;terry@red.primary.com&gt;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="st">. 250 Ok</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; RCPT TO: &lt;someone@hotmail.com&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; DATA</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; From: "Terry" &lt;terry@blue.primary.com&gt;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; DKIM-Signature: v=1; a=rsa-sha256; d=secondary.com; s=selector; </span><span class="co">(DKIM Auth Result: FAIL)</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; Subject: I'll let myself out</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="fu">Policies:</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="fu">DMARC policy _dmarc.blue.primary.com: "v=DMARC1; p=quarantine; adkim=s; aspf=s;"</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="fu">SPF policy red.primary.com: "v=spf1 ip4:95.129.128.101 ~all"</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">SPF policy blue.primary.com: "v=spf1 ip4:44.62.173.139 ~all"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <details>
 <summary>
 Answer
@@ -724,21 +739,21 @@ Answer
 </section>
 <section id="example-3" class="level4">
 <h4 class="anchored" data-anchor-id="example-3">Example 3</h4>
-<pre class="text"><code>. 220 smtp.learndmarc.com ESMTP Postfix
-&gt; HELO blue.secondary.com
-. 250 smtp.learndmarc.com Hello blue.secondary.com &lt;156.157.23.197&gt;
-&gt; MAIL FROM: &lt;ray@blue.secondary.com&gt;
-. 250 Ok
-&gt; RCPT TO: &lt;someone@gmail.com&gt;
-&gt; DATA
-&gt; From: "Ray" &lt;ray@red.primary.com&gt;
-&gt; DKIM-Signature: v=1; a=rsa-sha256; d=blue.primary.com; s=selector; (DKIM Auth Result: PASS)
-&gt; Subject: DMARC test
-
-Policies:
-DMARC policy _dmarc.red.primary.com: "v=DMARC1; p=none; adkim=s; aspf=s;"
-SPF policy blue.secondary.com: "v=spf1 ip4:62.165.120.61 ~all"
-SPF policy red.primary.com: "v=spf1 ip4:156.157.23.197 -all"</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode smtp code-with-copy"><code class="sourceCode smtp"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="st">. 220 smtp.learndmarc.com ESMTP Postfix</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; HELO blue.secondary.com</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="st">. 250 smtp.learndmarc.com Hello blue.secondary.com &lt;156.157.23.197&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; MAIL FROM: &lt;ray@blue.secondary.com&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st">. 250 Ok</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; RCPT TO: &lt;someone@gmail.com&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; DATA</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; From: "Ray" &lt;ray@red.primary.com&gt;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; DKIM-Signature: v=1; a=rsa-sha256; d=blue.primary.com; s=selector; </span><span class="co">(DKIM Auth Result: PASS)</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="kw">&gt; Subject: DMARC test</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="fu">Policies:</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="fu">DMARC policy _dmarc.red.primary.com: "v=DMARC1; p=none; adkim=s; aspf=s;"</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">SPF policy blue.secondary.com: "v=spf1 ip4:62.165.120.61 ~all"</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="fu">SPF policy red.primary.com: "v=spf1 ip4:156.157.23.197 -all"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <details>
 <summary>
 Answer
@@ -756,21 +771,21 @@ Answer
 </ul>
 <em>Notes:</em> the sending IP <strong>is</strong> listed in <code>red.primary.com</code>’s SPF record, which is a trap: SPF is evaluated for the <code>MAIL FROM</code> domain, not the <code>From</code> domain. And under relaxed alignment, the DKIM signature from <code>blue.primary.com</code> would have aligned with <code>red.primary.com</code>.
 </details>
-<p>The answers above are learndmarc’s explanations; the notes are additions for this guide.</p>
+<p>The answers above are learndmarc’s explanations; the notes are additions.</p>
 </section>
 </section>
 </section>
 <section id="dns-records-lookups-and-troubleshooting" class="level2">
 <h2 class="anchored" data-anchor-id="dns-records-lookups-and-troubleshooting">DNS records: lookups and troubleshooting</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name example<span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type MX</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name example<span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT <span class="op">|</span> <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Strings</span> <span class="op">-match</span> <span class="st">'^v=spf1'</span> <span class="op">}</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name esp2026<span class="op">.</span><span class="fu">_domainkey</span><span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name _dmarc<span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name _mta-sts<span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name _smtp<span class="op">.</span><span class="fu">_tls</span><span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dig</span> +short MX example.org</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dig</span> +short TXT _dmarc.example.org</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">nslookup</span> <span class="at">-type</span><span class="op">=</span>txt _dmarc.example.org</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name example<span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type MX</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name example<span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT <span class="op">|</span> <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Strings</span> <span class="op">-match</span> <span class="st">'^v=spf1'</span> <span class="op">}</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name esp2026<span class="op">.</span><span class="fu">_domainkey</span><span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name _dmarc<span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name _mta-sts<span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>Resolve-DnsName <span class="op">-</span>Name _smtp<span class="op">.</span><span class="fu">_tls</span><span class="op">.</span><span class="fu">example</span><span class="op">.</span><span class="fu">org</span> <span class="op">-</span>Type TXT</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dig</span> +short MX example.org</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dig</span> +short TXT _dmarc.example.org</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">nslookup</span> <span class="at">-type</span><span class="op">=</span>txt _dmarc.example.org</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Common problems:</p>
 <table class="caption-top table">
 <colgroup>
@@ -910,6 +925,14 @@ max_age: 604800</code></pre>
 <td>Simple Mail Transfer Protocol</td>
 </tr>
 <tr class="odd">
+<td><a href="https://www.rfc-editor.org/rfc/rfc6409.html">RFC 6409</a></td>
+<td>Message Submission for Mail</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.rfc-editor.org/rfc/rfc8314.html">RFC 8314</a></td>
+<td>Implicit TLS for email submission and access</td>
+</tr>
+<tr class="odd">
 <td><a href="https://www.rfc-editor.org/rfc/rfc5322.html">RFC 5322</a></td>
 <td>Internet Message Format</td>
 </tr>
@@ -956,6 +979,10 @@ max_age: 604800</code></pre>
 <tr class="even">
 <td><a href="https://www.learndmarc.com/">learndmarc.com</a></td>
 <td>Source of the three worked examples</td>
+</tr>
+<tr class="odd">
+<td><a href="https://mha.azurewebsites.net/pages/mha.html">Message Header Analyzer</a></td>
+<td>Microsoft; <a href="https://github.com/microsoft/MHA">source</a> and <a href="https://appsource.microsoft.com/en-us/product/office/WA104005406">Outlook add-in</a></td>
 </tr>
 </tbody>
 </table>
