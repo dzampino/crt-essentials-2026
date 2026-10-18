@@ -313,7 +313,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="reading-email-headers" class="level2">
 <h2 class="anchored" data-anchor-id="reading-email-headers">Reading email headers</h2>
 <p>Download the <a href="files/samples/email/constructed-headers.eml">constructed sample message</a> to follow along. It uses reserved names (RFC 2606) and documentation addresses (RFC 5737).</p>
-<p><strong>Use Microsoft’s Message Header Analyzer.</strong> Paste headers into the <a href="https://mha.azurewebsites.net/pages/mha.html">web version</a>, or install the <a href="https://appsource.microsoft.com/en-us/product/office/WA104005406">Outlook add-in</a>, and it lays out the hops with the delay at each one, the authentication results, and the anti-spam headers Microsoft 365 adds. It is open source (<a href="https://github.com/microsoft/MHA">github.com/microsoft/MHA</a>). The add-in needs mailbox permissions, so an administrator usually deploys it. Reading the raw headers yourself, as below, is still worth practicing: it is what you do when a tool’s interpretation looks wrong.</p>
+<p><strong>Use Microsoft’s Message Header Analyzer.</strong> Paste headers into the <a href="https://mha.azurewebsites.net/pages/mha.html">web version</a>, or install the <a href="https://appsource.microsoft.com/en-us/product/office/WA104005406">Outlook add-in</a>, and it lays out the hops with the delay at each one, the authentication results, and the anti-spam headers Microsoft 365 adds. The add-in needs mailbox permissions, so an administrator usually deploys it. Reading the raw headers yourself, as below, is still worth practicing: it is what you do when a tool’s interpretation looks wrong.</p>
 <pre class="text"><code>Return-Path: &lt;bounce-7731@mailer.esp.example&gt;
 Received: from mx1.example.net (mx1.example.net [198.51.100.25])
     by mbox1.example.net (Postfix) with ESMTPS id 4F2A11C0042
@@ -633,16 +633,16 @@ esp2026._domainkey.example.org.  TXT  "v=DKIM1; k=rsa; p=MIIBIjANBgkqh..."</code
 </section>
 <section id="alignment-checker" class="level3">
 <h3 class="anchored" data-anchor-id="alignment-checker">Alignment checker</h3>
-<p>Enter the identities from a message, or load one of the worked examples. The organizational domain is filled in as the last two labels of the <code>From</code> domain; that is an approximation. Real receivers find it with the DNS tree walk in RFC 9989 §4.10, so correct it for names like <code>example.k12.wi.us</code>.</p>
+<p>Pick a worked example, or enter the identities from your own message. Work out the result, then select <strong>Show answer</strong>. The organizational domain is filled in as the last two labels of the <code>From</code> domain; that is an approximation. Real receivers find it with the DNS tree walk in RFC 9989 §4.10, so correct it for names like <code>example.k12.wi.us</code>.</p>
 <div class="tool" id="dmarc-tool">
 <div class="tool-controls">
 <label>Load example
 <select id="dm-preset">
-<option value="">—</option>
-<option value="1">learndmarc example 1</option>
+<option value="1" selected="">learndmarc example 1</option>
 <option value="2">learndmarc example 2</option>
 <option value="3">learndmarc example 3</option>
 <option value="4">Constructed sample message</option>
+<option value="custom">Your own message</option>
 </select></label>
 </div>
 <div class="tool-controls">
@@ -661,8 +661,11 @@ esp2026._domainkey.example.org.  TXT  "v=DKIM1; k=rsa; p=MIIBIjANBgkqh..."</code
 <label>p<select id="dm-p"><option>none</option><option selected="">quarantine</option><option>reject</option></select></label>
 <label>t<select id="dm-t"><option value="n">n</option><option value="y" selected="">y (test mode)</option></select></label>
 </div>
+<button type="button" id="dm-reveal" class="reveal-button">Show answer</button>
+<div id="dm-answer" hidden="">
 <div id="dm-verdict" class="verdict"></div>
 <ul id="dm-reasons" class="tool-note" style="font-size:0.92rem;color:#1A1D23"></ul>
+</div>
 </div>
 </section>
 <section id="work-through-email-headers" class="level3">

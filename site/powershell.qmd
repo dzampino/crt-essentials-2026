@@ -302,7 +302,7 @@ They are starting points for learning, kept short so they are easy to read. Copy
 | Function | What it does | Page |
 | --- | --- | --- |
 | `Get-PasswordEntropy` | Bits of entropy from alphabet size and length | [Passwords](passwords.qmd#entropy-in-powershell) |
-| `Get-PasswordLength` | Length needed to reach a number of bits | [Passwords](passwords.qmd#entropy-in-powershell) |
+| `Get-PasswordLengthForEntropy` | Length needed to reach a number of bits | [Passwords](passwords.qmd#entropy-in-powershell) |
 | `Test-PwnedPassword` | Check a password against Pwned Passwords without sending it | [Passwords](passwords.qmd#check-a-password-against-pwned-passwords) |
 | `Get-CertificateInfo` | Main fields and SAN names of a certificate file | [PKI](pki.qmd#powershell-and-.net) |
 | `Get-MailHeader` | One object per header of a saved message | [Email security](email.qmd#pulling-headers-apart-in-powershell) |

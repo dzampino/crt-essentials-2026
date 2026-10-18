@@ -98,7 +98,7 @@ The alphabet/length formula assumes each character, or word, is chosen uniformly
 
 Bits = log~2~(alphabet^length^) = length × log~2~(alphabet). xkcd 936 uses 11 bits per word (2,048 words). The EFF large wordlist has 7,776 words (five dice): https://www.eff.org/dice
 
-Get-PasswordEntropy and Get-PasswordLength on the companion site calculate these.
+Get-PasswordEntropy and Get-PasswordLengthForEntropy on the companion site calculate these.
 :::
 
 ## Entropy calculator
@@ -418,6 +418,26 @@ RFC 7208: SPF checks the MAIL FROM domain (or the HELO domain when MAIL FROM is 
 Record from learndmarc.com example 1.
 :::
 
+## SPF record terms
+
+| Term | Meaning |
+|------|---------|
+| `v=spf1` | Version; must come first |
+| `ip4:` / `ip6:` | This address or range may send |
+| `a` / `mx` | The domain's A/AAAA or MX hosts may send |
+| `include:` | Matches if the other domain's SPF check passes |
+| `redirect=` | Use another domain's record instead of this one |
+| `all` | Matches everything; the last term, so the default answer |
+| `+` `-` `~` `?` | Qualifier in front of a term: pass (the default), fail, softfail, neutral |
+
+<!-- PROPOSED: slide added so the audience can work the examples. -->
+
+::: notes
+RFC 7208 sections 4.6.2 (qualifiers), 5 (mechanisms) and 6 (modifiers): https://www.rfc-editor.org/rfc/rfc7208.html
+Section 4.6.4: include, a, mx, ptr, exists and redirect cause DNS lookups; more than 10 in one evaluation is a permerror.
+ptr SHOULD NOT be published (section 5.5). exists and exp= are the other terms.
+:::
+
 ## DKIM
 
 - What DKIM signs and verifies: selected headers and the body
@@ -433,6 +453,28 @@ selector._domainkey.primary.com  TXT  "v=DKIM1; k=rsa; p=..."
 ::: notes
 RFC 6376: https://www.rfc-editor.org/rfc/rfc6376.html
 The d= domain does not have to match the From domain; DMARC is what requires alignment.
+:::
+
+## DKIM signature tags
+
+| Tag | Meaning |
+|-----|---------|
+| `v=1` | Version |
+| `a=` | Algorithm: `rsa-sha256` (or `ed25519-sha256`) |
+| `d=` | Signing domain; DMARC aligns this with `From` |
+| `s=` | Selector: the public key is at `s._domainkey.d` |
+| `h=` | The header fields that were signed |
+| `bh=` / `b=` | Hash of the body / the signature itself |
+| `c=` | Canonicalization, header/body: `simple` or `relaxed`; default `simple/simple` |
+| `l=` | Only this many body bytes are signed; text can be added after them |
+
+<!-- PROPOSED: slide added so the audience can work the examples. -->
+
+::: notes
+RFC 6376 section 3.5 (signature tags) and 3.6.1 (key record): https://www.rfc-editor.org/rfc/rfc6376.html
+Key record: v=DKIM1; k=rsa (the default); p= is the public key, and an empty p= means the key has been revoked.
+t= and x= are the signing time and expiry; i= is the identity on whose behalf it was signed.
+RFC 8301: signers must not use rsa-sha1. RFC 8463 adds ed25519-sha256.
 :::
 
 ## DMARC
@@ -643,6 +685,30 @@ about_Objects: https://learn.microsoft.com/en-us/powershell/module/microsoft.pow
 ::: notes
 Differences between Windows PowerShell 5.1 and PowerShell 7.x: https://learn.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell
 The ones that bite: default file encoding, Export-Csv's type line in 5.1, and modules folders in different places. The companion site has a table.
+:::
+
+## Default security settings
+
+- Double-clicking a `.ps1` opens it in Notepad; it does not run
+- A script runs only by path: `.\Get-Report.ps1`, not `Get-Report.ps1`
+- Execution policy
+  - Windows PowerShell 5.1: `Restricted` on Windows clients, `RemoteSigned` on Windows Server
+  - PowerShell 7 on Windows: `RemoteSigned`
+  - `RemoteSigned`: scripts downloaded from the internet must be signed, or unblocked with `Unblock-File`
+- Not a security boundary: the commands can always be pasted in
+
+```powershell
+Get-ExecutionPolicy -List
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+<!-- PROPOSED: slide added for default security settings. -->
+
+::: notes
+about_Scripts: "As a security feature, PowerShell does not run scripts when you double-click the script icon in File Explorer or when you type the script name without a full path, even when the script is in the current directory." Right-click, Run with PowerShell, does run it.
+about_Execution_Policies: if every scope is Undefined, the effective policy is Restricted for Windows clients and RemoteSigned for Windows Server. "The execution policy isn't a security boundary, it's defense in depth." On Linux and macOS it is Unrestricted and cannot be changed.
+PowerShell 7 sets RemoteSigned in $PSHOME\powershell.config.json.
+https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies
 :::
 
 ## Finding commands

@@ -125,6 +125,18 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
   - Plaso capitalized (project's own spelling); pestudio, oletools and capa are lowercase by their authors.
 - [x] Deck: drop Wrap-up and the slides after it; end with a thank-you slide.
 
+## 14. Sixth request list (October 18, 2026)
+
+- [x] Rename Get-PasswordLength so the name says it is about entropy.
+  - Now Get-PasswordLengthForEntropy (scripts/Get-PasswordLengthForEntropy.ps1); tested in 7.6.7 and 5.1.
+- [x] Email page: keep the GitHub link for MHA, drop the sentence "It is open source (github.com/microsoft/MHA)."
+- [x] Alignment checker: answer blank by default, a reveal button; fix the "--" example that has no example.
+  - Opens on example 1 (the "—" option is gone; "Your own message" is selected when a field is edited). Show/Hide answer button; any change hides it again. Test-mode verdict corrected to RFC 9989 (reject drops to quarantine, quarantine to no action).
+- [x] Deck: SPF and DKIM tag tables like the DMARC one.
+  - From RFC 7208 and RFC 6376 (PROPOSED slides).
+- [x] Deck: PowerShell default security settings (what Open does with a .ps1, execution policy).
+  - From about_Scripts and about_Execution_Policies; PowerShell 7's RemoteSigned checked in $PSHOME\powershell.config.json on this PC (PROPOSED slide).
+
 ## Open decisions
 
 - [ ] Review the `<!-- PROPOSED -->` wording in `quarto/slides.qmd` (wording that is not David's).

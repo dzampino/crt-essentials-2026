@@ -1,5 +1,6 @@
 // DMARC alignment checker for email.qmd. No dependencies.
 // Organizational domains are approximated; RFC 9989 section 4.10 uses a DNS tree walk.
+// The answer stays hidden until "Show answer" is selected, and hides again when anything changes.
 (function () {
 	"use strict";
 
@@ -63,8 +64,9 @@
 		let verdict;
 		if (pass) {
 			verdict = "DMARC passes (" + [spfOk ? "SPF" : null, dkimOk ? "DKIM" : null].filter(Boolean).join(" and ") + " aligned).";
-		} else if (t === "y") {
-			verdict = "DMARC fails; t=y (test mode) asks receivers not to apply p=" + p + ".";
+		} else if (t === "y" && p !== "none") {
+			// RFC 9989 section 4.7: test mode applies the policy one level below
+			verdict = "DMARC fails; t=y (test mode) asks receivers to apply " + (p === "reject" ? "quarantine" : "no action") + " instead of p=" + p + ".";
 		} else if (p === "none") {
 			verdict = "DMARC fails; p=none, so no action is requested.";
 		} else {
@@ -77,8 +79,27 @@
 		$("dm-reasons").innerHTML = reasons.map((r) => "<li>" + r + "</li>").join("");
 	}
 
+	function hideAnswer() {
+		$("dm-answer").hidden = true;
+		$("dm-reveal").textContent = "Show answer";
+	}
+
+	function toggleAnswer() {
+		const show = $("dm-answer").hidden;
+		if (show) evaluate();
+		$("dm-answer").hidden = !show;
+		$("dm-reveal").textContent = show ? "Hide answer" : "Show answer";
+	}
+
+	// A field edited by hand no longer matches the loaded example
+	function edited() {
+		$("dm-preset").value = "custom";
+		hideAnswer();
+	}
+
 	function load(n) {
 		const pr = PRESETS[n];
+		hideAnswer();
 		if (!pr) return;
 		$("dm-from").value = pr.from;
 		$("dm-org").value = pr.org;
@@ -90,18 +111,17 @@
 		$("dm-adkim").value = pr.adkim;
 		$("dm-p").value = pr.p;
 		$("dm-t").value = pr.t;
-		evaluate();
 	}
 
 	function init() {
 		if (!$("dmarc-tool")) return;
 		$("dm-from").addEventListener("change", () => {
 			$("dm-org").value = lastTwo(clean($("dm-from").value));
-			evaluate();
 		});
-		FIELDS.forEach((id) => $(id).addEventListener("input", evaluate));
+		FIELDS.forEach((id) => $(id).addEventListener("input", edited));
 		$("dm-preset").addEventListener("change", (e) => load(e.target.value));
-		evaluate();
+		$("dm-reveal").addEventListener("click", toggleAnswer);
+		load($("dm-preset").value);
 	}
 
 	if (document.readyState === "loading") {

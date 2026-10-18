@@ -51,6 +51,8 @@ a { color: var(--crt-blue); }
 .verdict { font-weight: 600; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--crt-line); background: #FFFFFF; }
 .verdict.pass::before { content: "✔ "; color: #1E7B34; }
 .verdict.fail::before { content: "✖ "; color: var(--crt-red); }
+.reveal-button { font-size: 0.95rem; font-weight: 600; padding: 0.4rem 0.9rem; border: 0; border-radius: 4px; background: var(--crt-navy); color: #FFFFFF; cursor: pointer; margin-bottom: 0.75rem; }
+.reveal-button:hover { opacity: 0.9; }
 
 /* Field reference and command output */
 .output-note { font-size: 0.85rem; color: var(--crt-muted); margin-top: -0.5rem; }

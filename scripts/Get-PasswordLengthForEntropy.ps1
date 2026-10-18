@@ -1,9 +1,9 @@
-function Get-PasswordLength {
+function Get-PasswordLengthForEntropy {
 	<#
 	.SYNOPSIS
 		How long a random password must be to reach a number of bits of entropy.
 	.EXAMPLE
-		Get-PasswordLength -AlphabetSize 26 -Bits 52.6
+		Get-PasswordLengthForEntropy -AlphabetSize 26 -Bits 52.6
 	#>
 	[CmdletBinding()]
 	param(
