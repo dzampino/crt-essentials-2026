@@ -43,6 +43,8 @@ format:
     code-copy: true
     code-overflow: wrap
     highlight-style: github
+    syntax-definitions:
+      - ../syntax/smtp.xml
     anchor-sections: true
     smooth-scroll: true
     link-external-newwindow: true

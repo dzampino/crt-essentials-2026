@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<!--
+	Highlighting for SMTP transcripts in the deck and on the site (code blocks marked ```smtp).
+	Client lines start with "C:" or ">", server lines with "S:" or ".".
+	Policy lines are DNS records shown under a transcript. "<- ..." is an annotation.
+-->
+<language name="SMTP" section="Other" version="1" kateversion="5.0" extensions="*.smtp" author="CRT Essentials" license="MIT">
+	<highlighting>
+		<contexts>
+			<context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+				<RegExpr String="^(C:|&gt;)(\s|$)" attribute="Client" context="Client" column="0"/>
+				<RegExpr String="^(S:|\.)(\s|$)" attribute="Server" context="Server" column="0"/>
+				<RegExpr String="^(Policies:|DMARC policy|SPF policy|\S+:\s+&quot;v=)" attribute="Policy" context="Policy" column="0"/>
+				<RegExpr String="\(DKIM Auth Result: \w+\)" attribute="Note"/>
+				<RegExpr String="&lt;-.*$" attribute="Note"/>
+			</context>
+			<context name="Client" attribute="Client" lineEndContext="#pop">
+				<RegExpr String="&lt;-.*$" attribute="Note"/>
+				<RegExpr String="\(DKIM Auth Result: \w+\)" attribute="Note"/>
+			</context>
+			<context name="Server" attribute="Server" lineEndContext="#pop">
+				<RegExpr String="&lt;-.*$" attribute="Note"/>
+			</context>
+			<context name="Policy" attribute="Policy" lineEndContext="#pop"/>
+		</contexts>
+		<itemDatas>
+			<itemData name="Normal Text" defStyleNum="dsNormal"/>
+			<itemData name="Client" defStyleNum="dsKeyword"/>
+			<itemData name="Server" defStyleNum="dsString"/>
+			<itemData name="Policy" defStyleNum="dsFunction"/>
+			<itemData name="Note" defStyleNum="dsComment"/>
+		</itemDatas>
+	</highlighting>
+	<general>
+		<keywords casesensitive="1"/>
+	</general>
+</language>

@@ -12,9 +12,11 @@ The roles come from [RFC 5598](https://www.rfc-editor.org/rfc/rfc5598.html), Int
 | Role | What it does | Typical protocol and port |
 | --- | --- | --- |
 | **MUA**, Mail User Agent | The author's or recipient's client: Outlook, a phone, a web client | Submission out, IMAP/POP/HTTPS in |
-| **MSA**, Mail Submission Agent | Accepts mail from authenticated users | SMTP submission, 587 (STARTTLS) or 465 (implicit TLS) |
+| **MSA**, Mail Submission Agent | Accepts new mail from users and applications, usually after they authenticate | SMTP submission: 587 (STARTTLS), 465 (implicit TLS), and sometimes 25 |
 | **MTA**, Mail Transfer Agent | Relays between servers; the receiving one is the **MX** | SMTP, port 25 |
 | **MDA**, Mail Delivery Agent | Puts the message in the mailbox | Local |
+
+**An MSA does not have to require authentication, or use port 587.** [RFC 6409](https://www.rfc-editor.org/rfc/rfc6409.html) §4.3 says an MSA must reject unauthenticated mail by default "unless it has already independently established authentication or authorization (such as being within a protected subnetwork)", and §3.1 says "A site MAY choose to use port 25 for message submission." That is how printers, scanners and line-of-business applications send: an unauthenticated relay on port 25 that trusts their IP addresses, such as an Exchange receive connector or a Microsoft 365 connector. It is also why an internal relay that accepts anything from the network is worth finding during an incident. Port 465 with TLS from the first byte is [RFC 8314](https://www.rfc-editor.org/rfc/rfc8314.html).
 
 A sending MTA finds where to deliver by looking up the recipient domain's **MX** records in DNS, then connects to port 25 on the lowest-preference host that answers. In Microsoft 365 or Google Workspace, one service performs every role; the distinctions still show up in the headers.
 
@@ -22,7 +24,9 @@ A sending MTA finds where to deliver by looking up the recipient domain's **MX**
 
 SMTP ([RFC 5321](https://www.rfc-editor.org/rfc/rfc5321.html)) carries a message ([RFC 5322](https://www.rfc-editor.org/rfc/rfc5322.html)) the way an envelope carries a letter. They have separate addresses, and they do not have to agree.
 
-```text
+In the transcripts on this page, [what the client sends]{.smtp-client} and [what the server answers]{.smtp-server} are colored differently, and [annotations]{.smtp-note} are gray.
+
+```smtp
 S: 220 mx1.example.net ESMTP
 C: EHLO out-12.esp.example
 S: 250-mx1.example.net
@@ -42,18 +46,20 @@ S: 250 2.0.0 Ok: queued
 ```
 
 ::: {.output-note}
-Constructed transcript with reserved example names. The two `From` addresses are different on purpose: this is how every email service provider and mailing list works.
+Constructed transcript with reserved example names. Each client command gets a numbered reply from the server before the next one. The two `From` addresses are different on purpose: this is how every email service provider and mailing list works.
 :::
 
 - `MAIL FROM` and `RCPT TO` are SMTP commands, not message headers. `RCPT TO` is why Bcc works: the recipient is on the envelope, not in the message.
 - **`From`** is the author. It is what the user sees, and it is what DMARC protects.
-- **`Sender`** names who actually sent the message on the author's behalf, when that differs (RFC 5322 §3.6.2). Few clients show it.
+- **`Sender`** names who actually sent the message on the author's behalf, when that differs (RFC 5322 §3.6.2). Outlook shows it as "*Sender* on behalf of *From*".
 - **`Return-Path`** is added by the final delivering server, recording the `MAIL FROM` address (RFC 5321 §4.4). Bounces go there.
 - **`Reply-To`** is where replies go. A mismatched `Reply-To` is common in business email compromise.
 
 ## Reading email headers
 
 Download the [constructed sample message](files/samples/email/constructed-headers.eml) to follow along. It uses reserved names (RFC 2606) and documentation addresses (RFC 5737).
+
+**Use Microsoft's Message Header Analyzer.** Paste headers into the [web version](https://mha.azurewebsites.net/pages/mha.html), or install the [Outlook add-in](https://appsource.microsoft.com/en-us/product/office/WA104005406), and it lays out the hops with the delay at each one, the authentication results, and the anti-spam headers Microsoft 365 adds. It is open source ([github.com/microsoft/MHA](https://github.com/microsoft/MHA)). The add-in needs mailbox permissions, so an administrator usually deploys it. Reading the raw headers yourself, as below, is still worth practicing: it is what you do when a tool's interpretation looks wrong.
 
 ```text
 Return-Path: <bounce-7731@mailer.esp.example>
@@ -264,7 +270,7 @@ These three exercises are from [learndmarc.com](https://www.learndmarc.com/), wh
 
 #### Example 1
 
-```text
+```smtp
 . 220 smtp.learndmarc.com ESMTP Postfix
 > HELO red.secondary.com
 . 250 smtp.learndmarc.com Hello red.secondary.com <153.112.107.49>
@@ -300,7 +306,7 @@ SPF policy blue.secondary.com: "v=spf1 ip4:24.121.50.128 ~all"
 
 #### Example 2
 
-```text
+```smtp
 . 220 smtp.learndmarc.com ESMTP Postfix
 > HELO red.primary.com
 . 250 smtp.learndmarc.com Hello red.primary.com <97.196.174.88>
@@ -335,7 +341,7 @@ SPF policy blue.primary.com: "v=spf1 ip4:44.62.173.139 ~all"
 
 #### Example 3
 
-```text
+```smtp
 . 220 smtp.learndmarc.com ESMTP Postfix
 > HELO blue.secondary.com
 . 250 smtp.learndmarc.com Hello blue.secondary.com <156.157.23.197>
@@ -473,6 +479,8 @@ Microsoft's Sender ID (RFC 4406) checked a "purported responsible address" taken
 | --- | --- |
 | [RFC 5598](https://www.rfc-editor.org/rfc/rfc5598.html) | Internet Mail Architecture |
 | [RFC 5321](https://www.rfc-editor.org/rfc/rfc5321.html) | Simple Mail Transfer Protocol |
+| [RFC 6409](https://www.rfc-editor.org/rfc/rfc6409.html) | Message Submission for Mail |
+| [RFC 8314](https://www.rfc-editor.org/rfc/rfc8314.html) | Implicit TLS for email submission and access |
 | [RFC 5322](https://www.rfc-editor.org/rfc/rfc5322.html) | Internet Message Format |
 | [RFC 8601](https://datatracker.ietf.org/doc/html/rfc8601) | Authentication-Results header field |
 | [RFC 7208](https://www.rfc-editor.org/rfc/rfc7208.html) | SPF |
@@ -485,5 +493,6 @@ Microsoft's Sender ID (RFC 4406) checked a "purported responsible address" taken
 | [RFC 8460](https://www.rfc-editor.org/rfc/rfc8460.html) | SMTP TLS reporting |
 | [RFC 6686](https://www.rfc-editor.org/rfc/rfc6686.html) | Resolution of the SPF and Sender ID experiments |
 | [learndmarc.com](https://www.learndmarc.com/) | Source of the three worked examples |
+| [Message Header Analyzer](https://mha.azurewebsites.net/pages/mha.html) | Microsoft; [source](https://github.com/microsoft/MHA) and [Outlook add-in](https://appsource.microsoft.com/en-us/product/office/WA104005406) |
 
 <script src="js/dmarc.js"></script>

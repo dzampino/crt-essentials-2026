@@ -55,3 +55,9 @@ a { color: var(--crt-blue); }
 /* Field reference and command output */
 .output-note { font-size: 0.85rem; color: var(--crt-muted); margin-top: -0.5rem; }
 figure img { border: 1px solid var(--crt-line); border-radius: 6px; }
+
+/* SMTP transcripts (```smtp, syntax/smtp.xml): client, server and notes, in the deck's code colors */
+code.sourceCode.smtp span.kw, .smtp-client { color: var(--crt-navy); font-weight: 600; }
+code.sourceCode.smtp span.st, .smtp-server { color: #B3352F; }
+code.sourceCode.smtp span.fu { color: var(--crt-blue); }
+code.sourceCode.smtp span.co, .smtp-note { color: var(--crt-muted); font-style: italic; }

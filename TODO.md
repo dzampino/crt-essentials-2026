@@ -36,10 +36,12 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 
 ## 4. Email security
 
-- [ ] Confirm that an MSA can also be unauthenticated and use port 25.
-- [ ] Highlighting in email examples to show the back-and-forth.
-- [ ] Replace "Few clients show it" with Outlook's "on behalf of".
-- [ ] Link and recommend Microsoft's Message Header Analyzer.
+- [x] Confirm that an MSA can also be unauthenticated and use port 25.
+  - Confirmed: RFC 6409 §4.3 (unauthenticated when authorization is established otherwise, e.g. a protected subnetwork) and §3.1 ("A site MAY choose to use port 25 for message submission"). Added to the MSA row and a paragraph on the site.
+- [~] Highlighting in email examples to show the back-and-forth.
+  - `syntax/smtp.xml` (KDE syntax: client = Keyword, server = String, DNS policy = Function, notes = Comment). Site done (```smtp blocks, CSS in styles.css). Slides in the section 7 pass.
+- [x] Replace "Few clients show it" with Outlook's "on behalf of".
+- [x] Link and recommend Microsoft's Message Header Analyzer.
 
 ## 5. PowerShell
 
