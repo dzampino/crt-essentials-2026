@@ -80,8 +80,9 @@ NOTE: swap to site for entropy calculation
 
 #### 1.1 Password Supplementary Material
 
-1. Site should include an interactive entropy calculator. Should have an input for alphabet size. Graph should should length on x axis and bits of entropy on y axis (no more than 128). This should be shaded down from line to bottom of graph. A second line should be halfway to show average time to guess and should be shaded down with a different color.
-2. There should be another interactive portion that shows 1) different hashing algorithms, 2) different threat levels (show purchase cost of equipment, i.e. cracking potential of a $50k box or cracking potential of nationstate distributed datacenter), 3) time to crack and cost of cracking (don't include initial equipment costs)
+1. Site should include an interactive entropy calculator. Should have an input for alphabet size. Graph should should length on x axis and bits of entropy on y axis (no more than 128). This should be shaded down from line to bottom of graph. (The average-case line was dropped from the site.)
+2. There should be another interactive portion that shows 1) different hashing algorithms, 2) different threat levels (show purchase cost of equipment, i.e. cracking potential of a $50k box or cracking potential of nationstate distributed datacenter), 3) time to crack and cost of cracking (don't include initial equipment costs), 4) the power and cooling each threat level needs
+3. Simple PowerShell functions: entropy from alphabet size and length, and the length needed to reach a given entropy
 
 
 ### 2. PKI

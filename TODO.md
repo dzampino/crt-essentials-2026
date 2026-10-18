@@ -15,15 +15,16 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 - [x] Site home: drop or rewrite the intro (everything before Topics).
 - [x] Site home: drop the session plan.
 - [x] Site home: drop "How to read this site".
-- [~] Drop "Tested in PowerShell..." lines.
-  - Done on PowerShell and PKI pages; the Passwords one goes with section 2.
+- [x] Drop "Tested in PowerShell..." lines.
 
 ## 2. Passwords
 
-- [ ] Use superscript for exponents (site and slides).
-- [ ] Site: drop the average case.
-- [ ] Site: add the cooling required for the wattage in the cracking scenario.
-- [ ] Very simple PowerShell functions: (1) password entropy from alphabet size and length, (2) length needed to reach a given entropy with a given alphabet size.
+- [~] Use superscript for exponents (site and slides).
+  - Site done (page text and calculator output). Slides in the section 7 pass.
+- [x] Site: drop the average case.
+- [x] Site: add the cooling required for the wattage in the cracking scenario.
+- [x] Very simple PowerShell functions: (1) password entropy from alphabet size and length, (2) length needed to reach a given entropy with a given alphabet size.
+  - `scripts/CrtEssentials/Functions/Get-PasswordEntropy.ps1`, `Get-PasswordLength.ps1`; included on the page with `{{< include >}}` so the module and site share one source.
 
 ## 3. PKI
 
