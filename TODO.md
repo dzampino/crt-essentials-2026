@@ -1,0 +1,75 @@
+# To do
+
+Working tracker for agents. Items are in the order they are being worked, grouped so each file is edited as few times as possible. Mark an item `[x]` when it is committed, and note the commit or any follow-up under it. Anything that needs David's decision goes under **Open decisions** at the end.
+
+The original request list (October 18, 2026) is preserved, reworded only to group it.
+
+## 0. Setup
+
+- [ ] Tracker (this file). Quarto available for rendering (portable copy in `.tools/`, ignored by Git).
+
+## 1. No instructions or context in published output
+
+- [ ] Site, PowerPoint and GitHub README never show instructions or context (for example "a two-hour session" in the site description; editorial notes in speaker notes).
+- [ ] Site home: drop or rewrite the intro (everything before Topics).
+- [ ] Site home: drop the session plan.
+- [ ] Site home: drop "How to read this site".
+- [ ] Drop "Tested in PowerShell..." lines.
+
+## 2. Passwords
+
+- [ ] Use superscript for exponents (site and slides).
+- [ ] Site: drop the average case.
+- [ ] Site: add the cooling required for the wattage in the cracking scenario.
+- [ ] Very simple PowerShell functions: (1) password entropy from alphabet size and length, (2) length needed to reach a given entropy with a given alphabet size.
+
+## 3. PKI
+
+- [ ] Fun sample domain and details for the PKI sample files (regenerate files and every output shown).
+- [ ] Recommendations for installing OpenSSL on Windows.
+- [ ] Link to XCA, David's preferred graphical certificate tool.
+
+## 4. Email security
+
+- [ ] Confirm that an MSA can also be unauthenticated and use port 25.
+- [ ] Highlighting in email examples to show the back-and-forth.
+- [ ] Replace "Few clients show it" with Outlook's "on behalf of".
+- [ ] Link and recommend Microsoft's Message Header Analyzer.
+
+## 5. PowerShell
+
+- [ ] Introduce creating your own PowerShell module (site and slides); turn site examples into reusable functions for that module.
+- [ ] Separate functions from usage examples so the copy button copies just the function.
+- [ ] Keep scripts simple for PowerShell beginners; comment where needed.
+
+## 6. Windows DFIR box
+
+- [ ] Remove the scripts portion from the DFIR section.
+- [ ] Recommend automating the Windows install with unattend files: <https://schneegans.de/windows/unattend-generator/>
+- [ ] Opinionated box: Windows Server 2025 (stable, Defender removable as a feature, no TPM requirement); VMware Workstation (non-persistent disks, Shared Folders with one read-only); Windows settings (long paths, show extensions and hidden files, disable UAC, etc.); tools via Chocolatey/Scoop (EZ Tools, KAPE, FTK Imager mounting, Volatility, log2timeline, Office if licensed, Chainsaw, Hayabusa, Autopsy, etc.).
+
+## 7. PowerPoint
+
+- [ ] Site URL and QR code at the beginning of the presentation.
+
+## 8. Publish
+
+- [ ] Render deck and site, commit `docs/`, push to github.com/dzampino/crt-essentials-2026.
+
+## Open decisions
+
+Carried over from README.md, which no longer holds working notes.
+
+Presentation:
+
+- [ ] Speaker notes marked as needing David's notes (see `<!-- David's notes to add -->` comments in `quarto/slides.qmd`).
+- [ ] Image alt text in the .pptx is the file path (Pandoc limitation); set real alt text in PowerPoint before sharing.
+- [ ] Confirm the proposed timing in outline section 3.
+
+Site:
+
+- [ ] Cracking explorer defaults ($/kWh, $/GPU-hour, tier GPU counts and prices) are placeholders; replace with figures David wants to stand behind.
+
+Windows DFIR box:
+
+- [ ] Confirm which KAPE license applies to CRT work.
