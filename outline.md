@@ -243,7 +243,7 @@ NOTE: swap to site for entropy calculation
   - Other Windows security settings as decisions specific to this machine, not general recommendations
 5. Tools for analysis
   - Select the tools and versions
-  - KAPE modules for processing already-collected artifacts (confirm intended tool name)
+  - KAPE modules for processing already-collected artifacts
 6. Using and resetting the box
   - Run tools against existing artifacts
   - Retain the results and relevant logs
@@ -252,8 +252,12 @@ NOTE: swap to site for entropy calculation
 
 #### 5.2 Windows DFIR Box Supplementary Material
 
-1. Build instructions and automation scripts, including the selected Windows image, tools, versions, and configuration.
-2. Tool inventory and references. Keep the exact list open until selected.
-3. A working example of processing an existing artifact set with a module, without adding an evidence collection workflow.
-4. VM reset/persistence instructions and checks to confirm outputs are retained.
-5. A list of open implementation decisions: Windows version, hypervisor, networking, UAC/Defender configuration, reset method, and persistent case storage.
+An opinionated build (David's choices), without build scripts:
+
+1. Windows Server 2025 (Desktop Experience): stable, Defender can be removed as a feature, no TPM requirement.
+2. VMware Workstation Pro: independent non-persistent system disk; Shared Folders, evidence read-only and case output read-write.
+3. Automate the Windows install with an unattend file: https://schneegans.de/windows/unattend-generator/
+4. Windows settings: UAC disabled, Defender removed, long paths enabled, file extensions and hidden files shown, and similar.
+5. Tools through Chocolatey/Scoop where packaged: Eric Zimmerman's tools, KAPE, FTK Imager (mounting), Volatility, log2timeline/plaso, Office if licensed, Chainsaw, Hayabusa, Autopsy.
+6. A working example of processing an existing artifact set with a KAPE module, without adding an evidence collection workflow.
+7. Reset and retention checks: what is discarded at power-off and what is kept on the shared folders.

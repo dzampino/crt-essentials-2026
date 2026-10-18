@@ -11,6 +11,7 @@ subtitle: "Primary sources for each section."
 - Microsoft, Passwords technical overview: <https://learn.microsoft.com/en-us/windows-server/security/kerberos/passwords-technical-overview>
 - Have I Been Pwned, Pwned Passwords: <https://haveibeenpwned.com/Passwords>
 - EFF dice-generated passphrases and word lists: <https://www.eff.org/dice>
+- NIST SP 811, *Guide for the Use of the International System of Units*, Appendix B (BTU/h and ton of refrigeration conversions): <https://www.nist.gov/pml/special-publication-811>
 - Hashcat 6.2.6 benchmark, RTX 5090 FE, Chick3nman (February 2025): <https://gist.github.com/Chick3nman/09bac0775e6393468c2925c1e1363d5c>
 - NVIDIA GeForce RTX 5090 specifications (575 W total graphics power): <https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/>
 - M. Tribus and E. C. McIrvine, "Energy and Information," *Scientific American* 225(3), 1971 (source of the Shannon quotation)
@@ -30,11 +31,15 @@ subtitle: "Primary sources for each section."
 - Let's Encrypt, OCSP service has reached end of life (August 6, 2025): <https://letsencrypt.org/2025/08/06/ocsp-service-has-reached-end-of-life>
 - CA/Browser Forum, TLS Baseline Requirements (validity schedule in §1.2.2): <https://cabforum.org/working-groups/server/baseline-requirements/requirements/>
 - CA/Browser Forum, Ballot SC-081v3: <https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/>
+- XCA: <https://hohnstaedt.de/xca/>
+- OpenSSL binaries for Windows (third-party list): <https://github.com/openssl/openssl/wiki/Binaries>
 - SpecterOps, *Certified Pre-Owned* (AD CS abuse): <https://specterops.io/wp-content/uploads/sites/3/2022/06/Certified_Pre-Owned.pdf>
 
 ## Email security
 
 - RFC 5321, SMTP: <https://www.rfc-editor.org/rfc/rfc5321.html>
+- RFC 6409, Message Submission for Mail: <https://www.rfc-editor.org/rfc/rfc6409.html>
+- RFC 8314, Implicit TLS for email submission and access: <https://www.rfc-editor.org/rfc/rfc8314.html>
 - RFC 5322, Internet Message Format: <https://www.rfc-editor.org/rfc/rfc5322.html>
 - RFC 5598, Internet Mail Architecture: <https://www.rfc-editor.org/rfc/rfc5598.html>
 - RFC 7208, SPF: <https://www.rfc-editor.org/rfc/rfc7208.html>
@@ -48,9 +53,11 @@ subtitle: "Primary sources for each section."
 - RFC 8460, SMTP TLS Reporting: <https://www.rfc-editor.org/rfc/rfc8460.html>
 - RFC 6686, Resolution of the SPF and Sender ID Experiments: <https://www.rfc-editor.org/rfc/rfc6686.html>
 - learndmarc.com (source of the worked examples): <https://www.learndmarc.com/>
+- Microsoft Message Header Analyzer: <https://mha.azurewebsites.net/pages/mha.html> (source: <https://github.com/microsoft/MHA>)
 
 ## PowerShell
 
+- about_Modules: <https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules>
 - about_Pipelines: <https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines>
 - about_Functions_CmdletBindingAttribute: <https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute>
 - Export-Csv: <https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/export-csv>
@@ -59,9 +66,20 @@ subtitle: "Primary sources for each section."
 
 ## Windows DFIR box
 
-- KAPE documentation: <https://ericzimmerman.github.io/KapeDocs/>
-- KapeFiles (targets and modules): <https://github.com/EricZimmerman/KapeFiles>
-- Kroll, KAPE license agreement: <https://www.kroll.com/en/kape-license-agreement>
-- Kroll, Detecting and analyzing timestomping with KAPE: <https://www.kroll.com/en/publications/cyber/anti-forensic-tactics/detecting-analyzing-timestomping-with-kape>
-- Eric Zimmerman's tools: <https://ericzimmerman.github.io/>
+- Microsoft, Hardware requirements for Windows Server: <https://learn.microsoft.com/en-us/windows-server/get-started/hardware-requirements>
+- Microsoft, Configure Microsoft Defender Antivirus on Windows Server: <https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure>
+- Microsoft Evaluation Center, Windows Server 2025: <https://www.microsoft.com/en-us/evalcenter/download-windows-server-2025>
 - Microsoft, User Account Control settings and configuration: <https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/settings-and-configuration>
+- VMware Workstation Pro 17, independent disks: <https://docs.vmware.com/en/VMware-Workstation-Pro/17/com.vmware.ws.using.doc/GUID-A6792F54-2734-4AF4-9473-C8B9AD8321AF.html>
+- Broadcom, Download and license VMware Desktop Hypervisor: <https://knowledge.broadcom.com/external/article/368667/download-and-license-vmware-desktop-hypervisor.html>
+- Christoph Schneegans, Unattend generator: <https://schneegans.de/windows/unattend-generator/>
+- Chocolatey: <https://chocolatey.org/install>; Scoop: <https://scoop.sh/>
+- KAPE: <https://www.kroll.com/kape>; documentation: <https://ericzimmerman.github.io/KapeDocs/>; KapeFiles: <https://github.com/EricZimmerman/KapeFiles>
+- Kroll, KAPE license agreement: <https://www.kroll.com/en/kape-license-agreement>
+- Eric Zimmerman's tools: <https://ericzimmerman.github.io/>
+- FTK Imager: <https://www.exterro.com/digital-forensics-software/ftk-imager>
+- Volatility 3: <https://github.com/volatilityfoundation/volatility3>
+- Plaso (log2timeline): <https://plaso.readthedocs.io/>
+- Chainsaw: <https://github.com/WithSecureLabs/chainsaw>
+- Hayabusa: <https://github.com/Yamato-Security/hayabusa>
+- Autopsy: <https://www.sleuthkit.org/autopsy/>

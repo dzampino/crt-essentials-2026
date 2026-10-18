@@ -11,7 +11,7 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 ## 1. No instructions or context in published output
 
 - [~] Site, PowerPoint and GitHub README never show instructions or context (for example "a two-hour session" in the site description; editorial notes in speaker notes).
-  - Done: site description, home page, README (working notes moved here), references subtitle, PKI and email wording. AGENTS.md now points to TODO.md. Remaining: speaker notes in `quarto/slides.qmd` (done in the section 7 slide pass) and the DFIR page (section 6).
+  - Done: site description, home page, README (working notes moved here), references subtitle, PKI and email wording, DFIR page. AGENTS.md now points to TODO.md. Remaining: speaker notes in `quarto/slides.qmd` (section 7 slide pass).
 - [x] Site home: drop or rewrite the intro (everything before Topics).
 - [x] Site home: drop the session plan.
 - [x] Site home: drop "How to read this site".
@@ -52,9 +52,11 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 
 ## 6. Windows DFIR box
 
-- [ ] Remove the scripts portion from the DFIR section.
-- [ ] Recommend automating the Windows install with unattend files: <https://schneegans.de/windows/unattend-generator/>
-- [ ] Opinionated box: Windows Server 2025 (stable, Defender removable as a feature, no TPM requirement); VMware Workstation (non-persistent disks, Shared Folders with one read-only); Windows settings (long paths, show extensions and hidden files, disable UAC, etc.); tools via Chocolatey/Scoop (EZ Tools, KAPE, FTK Imager mounting, Volatility, log2timeline, Office if licensed, Chainsaw, Hayabusa, Autopsy, etc.).
+- [x] Remove the scripts portion from the DFIR section.
+  - Removed from the page, and `DfirTools.psd1`, `Install-DfirTools.ps1`, `Set-DfirAnalysisSettings.ps1`, `Test-DfirBox.ps1` deleted (in Git history). Settings are shown as one-line commands instead.
+- [x] Recommend automating the Windows install with unattend files: <https://schneegans.de/windows/unattend-generator/>
+- [x] Opinionated box: Windows Server 2025 (stable, Defender removable as a feature, no TPM requirement); VMware Workstation (non-persistent disks, Shared Folders with one read-only); Windows settings (long paths, show extensions and hidden files, disable UAC, etc.); tools via Chocolatey/Scoop (EZ Tools, KAPE, FTK Imager mounting, Volatility, log2timeline, Office if licensed, Chainsaw, Hayabusa, Autopsy, etc.).
+  - Notes from verification: the unattend generator targets Windows 10/11 (page says to test on Server 2025); Server 2025 evaluation must be activated online within 10 days; Chocolatey's `chainsaw` is Apache Chainsaw, and the Microsoft Store "Hayabusa" is not from Yamato Security, so both point to GitHub releases; plaso on Windows is Docker only. The DFIR open decisions (Windows, hypervisor, networking, UAC/Defender, reset, storage, tools) are settled by this; KAPE licensing stays open below.
 
 ## 7. PowerPoint
 
