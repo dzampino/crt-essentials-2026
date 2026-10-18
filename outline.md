@@ -256,8 +256,8 @@ An opinionated build (David's choices), without build scripts:
 
 1. Windows Server 2025 (Desktop Experience): stable, Defender can be removed as a feature, no TPM requirement.
 2. VMware Workstation Pro: independent non-persistent system disk; Shared Folders, evidence read-only and case output read-write.
-3. Automate the Windows install with an unattend file: https://schneegans.de/windows/unattend-generator/ (for Server 2025, add a generic or real product key and select the image by name or index).
-4. Windows settings: UAC disabled, Defender removed, long paths enabled, file extensions and hidden files shown, and similar.
+3. Automate the Windows install with an unattend file: https://schneegans.de/windows/unattend-generator/ (for Server 2025, add a generic or real product key and select the image by name or index). Basic instructions for using the file and customizing the ISO.
+4. Windows settings: UAC disabled, Defender removed, long paths enabled, file extensions and hidden files shown, and similar. Clock: UTC as the system time zone, or a second clock set to UTC.
 5. Tools through Chocolatey/Scoop where packaged: Eric Zimmerman's tools, KAPE, FTK Imager (mounting), Volatility, log2timeline/plaso, Office if licensed, Chainsaw, Hayabusa, Autopsy. No version pinning: the non-persistent disk fixes the versions, and the VM stays off the internet during cases. KAPE is free for CRT members; commercial use requires a Kroll enterprise license.
 6. A working example of processing an existing artifact set with a KAPE module, without adding an evidence collection workflow.
 7. Reset and retention checks: what is discarded at power-off and what is kept on the shared folders.

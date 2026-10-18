@@ -752,6 +752,7 @@ Windows Server hardware requirements list a TPM as required only for certain fea
 Defender on Windows Server is the Windows-Defender feature: https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure
 The 180-day evaluation must be activated online within its first 10 days.
 The unattend generator is written for Windows 10 and 11. For Server 2025, enter the product key (generic or real) and select the image by name or index.
+Setup finds Autounattend.xml at the root of removable media: a second small ISO, or the Windows ISO rebuilt with oscdimg. Steps are on the companion site.
 :::
 
 ## Configuring Windows for analysis
@@ -761,6 +762,9 @@ The unattend generator is written for Windows 10 and 11. For Server 2025, enter 
 - Other Windows security settings as decisions specific to this machine, not general recommendations
   - Defender removed, long paths on
   - File extensions and hidden files shown
+- Clock: UTC, or a second clock set to UTC
+
+<!-- PROPOSED: the clock bullet, from David's suggestion. -->
 
 ::: notes
 UAC off: EnableLUA = 0. Defender: Uninstall-WindowsFeature -Name Windows-Defender. Long paths: LongPathsEnabled = 1. All of these are options in the unattend generator. Commands are on the companion site.

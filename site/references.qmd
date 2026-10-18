@@ -73,6 +73,12 @@ subtitle: "Primary sources for each section."
 - VMware Workstation Pro 17, independent disks: <https://docs.vmware.com/en/VMware-Workstation-Pro/17/com.vmware.ws.using.doc/GUID-A6792F54-2734-4AF4-9473-C8B9AD8321AF.html>
 - Broadcom, Download and license VMware Desktop Hypervisor: <https://knowledge.broadcom.com/external/article/368667/download-and-license-vmware-desktop-hypervisor.html>
 - Christoph Schneegans, Unattend generator: <https://schneegans.de/windows/unattend-generator/>
+- Microsoft, Windows Setup Automation Overview (answer file search order): <https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-automation-overview>
+- Microsoft, Oscdimg command-line options: <https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/oscdimg-command-line-options>
+- Microsoft, Download and install the Windows ADK: <https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install>
+- Microsoft, KMS client product keys: <https://learn.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys>
+- Microsoft, File Times: <https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times>
+- Set-TimeZone: <https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-timezone>
 - Chocolatey: <https://chocolatey.org/install>; Scoop: <https://scoop.sh/>
 - KAPE: <https://www.kroll.com/kape>; documentation: <https://ericzimmerman.github.io/KapeDocs/>; KapeFiles: <https://github.com/EricZimmerman/KapeFiles>
 - Kroll, KAPE license agreement: <https://www.kroll.com/en/kape-license-agreement>

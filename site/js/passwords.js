@@ -95,11 +95,13 @@
 		host.innerHTML = "";
 		const W = 720, H = 320, m = { t: 14, r: 120, b: 38, l: 60 };
 		const bpc = bitsPerChar();
-		// x covers the whole length slider; y grows to fit the longest password, so the line is never clipped
-		const xMax = Number($("ent-length").max);
+		// Both axes end at the chosen length, so the chart grows as the length or alphabet grows
+		const xMax = state.length;
+		const xStep = xMax <= 12 ? 1 : niceStep(xMax / 2);
 		const yStep = niceStep(xMax * bpc);
-		const yMax = Math.ceil((xMax * bpc) / yStep) * yStep;
-		const x = (len) => m.l + ((len - 1) / (xMax - 1)) * (W - m.l - m.r);
+		const yTicks = Math.ceil((xMax * bpc) / yStep - 1e-9);
+		const yMax = yTicks * yStep;
+		const x = (len) => m.l + (len / xMax) * (W - m.l - m.r);
 		const y = (bits) => H - m.b - (bits / yMax) * (H - m.t - m.b);
 
 		const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img",
@@ -108,7 +110,8 @@
 		// grid and y axis
 		const grid = svgEl("g", { class: "grid" });
 		const axis = svgEl("g", { class: "axis" });
-		for (let b = 0; b <= yMax; b += yStep) {
+		for (let i = 0; i <= yTicks; i++) {
+			const b = i * yStep;
 			grid.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: y(b), y2: y(b) }));
 			const t = svgEl("text", { x: m.l - 8, y: y(b) + 4, "text-anchor": "end" });
 			t.textContent = b.toLocaleString();
@@ -119,8 +122,7 @@
 		axis.appendChild(yl);
 
 		// x axis ticks
-		const step = Math.max(1, Math.ceil(xMax / 10));
-		for (let len = 1; len <= xMax; len += step) {
+		for (let len = 0; len <= xMax; len += xStep) {
 			const t = svgEl("text", { x: x(len), y: H - m.b + 16, "text-anchor": "middle" });
 			t.textContent = len;
 			axis.appendChild(t);
@@ -135,7 +137,7 @@
 		// areas and lines
 		function series() {
 			const pts = [];
-			for (let len = 1; len <= xMax; len++) pts.push([x(len), y(len * bpc)]);
+			for (let len = 0; len <= xMax; len++) pts.push([x(len), y(len * bpc)]);
 			return pts;
 		}
 		function area(pts) {
@@ -172,7 +174,7 @@
 		hit.addEventListener("mousemove", (ev) => {
 			const r = svg.getBoundingClientRect();
 			const sx = ((ev.clientX - r.left) / r.width) * W;
-			const len = Math.min(xMax, Math.max(1, Math.round(1 + ((sx - m.l) / (W - m.l - m.r)) * (xMax - 1))));
+			const len = Math.min(xMax, Math.max(1, Math.round(((sx - m.l) / (W - m.l - m.r)) * xMax)));
 			cross.setAttribute("x1", x(len));
 			cross.setAttribute("x2", x(len));
 			cross.setAttribute("visibility", "visible");

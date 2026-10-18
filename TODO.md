@@ -88,7 +88,17 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 - [x] The deck subtitle appears only in the deck; drop it everywhere else.
   - Removed from the site home, README, outline and AGENTS.md (which now states the rule without naming it). `quarto/passwords.qmd` and `quarto/template.qmd` are decks, so they keep it.
 
+## 11. Third request list (October 18, 2026)
+
+- [x] Entropy chart: default view only as tall as the current length needs; x steps 1, 2, 3, 4 at small lengths; both axes grow as alphabet or length increase.
+  - x runs 0 to the chosen length (step 1 up to 12, then 2/5/10); y rounds up to a 1/2/5 step. Default (95, length 8): x 0 to 8, y 0 to 60. Line straight in every case tested.
+- [x] DFIR: basic instructions for using unattend files and customizing the ISO.
+  - Second small ISO or rebuilt Windows ISO (oscdimg, BIOS and UEFI, efisys_noprompt, boot order file); install steps; delete the cached answer file in C:\Windows\Panther. Boot-order generation tested on a mock folder; oscdimg itself not run (no ADK or Server ISO on this machine).
+- [x] DFIR: David's suggestion of a second clock set to UTC, or UTC as the system time zone.
+  - Clock section on the site (generator setting, Set-TimeZone -Id 'UTC', Control Panel Additional Clocks); slide bullet marked PROPOSED.
+
 ## Open decisions
 
 - [ ] Review the `<!-- PROPOSED -->` wording in `quarto/slides.qmd` (wording that is not David's).
 - [ ] Chocolatey and old versions: David said Chocolatey and Scoop keep old versions by default; only Scoop's behavior is confirmed and stated on the site.
+- [ ] Run the ISO rebuild on the DFIR page end to end with the ADK and a Server 2025 ISO.

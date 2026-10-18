@@ -188,6 +188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#configuring-windows-for-analysis" id="toc-configuring-windows-for-analysis" class="nav-link" data-scroll-target="#configuring-windows-for-analysis">Configuring Windows for analysis</a>
   <ul class="collapse">
   <li><a href="#uac" id="toc-uac" class="nav-link" data-scroll-target="#uac">UAC</a></li>
+  <li><a href="#clock" id="toc-clock" class="nav-link" data-scroll-target="#clock">Clock</a></li>
   <li><a href="#network-and-updates" id="toc-network-and-updates" class="nav-link" data-scroll-target="#network-and-updates">Network and updates</a></li>
   </ul></li>
   <li><a href="#tools-for-analysis" id="toc-tools-for-analysis" class="nav-link" data-scroll-target="#tools-for-analysis">Tools for analysis</a>
@@ -372,14 +373,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Reading a file on the box does not change its last access time</td>
 </tr>
 <tr class="even">
+<td>Set your time zone explicitly: (UTC) Coordinated Universal Time</td>
+<td>See <a href="#clock">Clock</a> below</td>
+</tr>
+<tr class="odd">
 <td>Disable SmartScreen</td>
 <td>Tools downloaded during the build are not blocked</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Remove bloatware</td>
 <td>Fewer distractions and background updates</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>FirstLogon scripts</td>
 <td>Install Chocolatey and the tools (<a href="#tools-for-analysis">below</a>)</td>
 </tr>
@@ -391,7 +396,60 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Image.</strong> Choose <em>Select image with this name</em> or <em>Select image with this index</em>, and pick a Desktop Experience image. To list the images on the ISO, mount it and run <code>Get-WindowsImage -ImagePath D:\sources\install.wim</code> in an elevated PowerShell (D: being the mounted ISO).</li>
 </ul>
 <p>Generate the file again when you change the build, rather than editing the XML by hand.</p>
-<p>Windows Setup looks for <code>autounattend.xml</code> in the root of removable media. In Workstation, create the VM with <strong>I will install the operating system later</strong> (so VMware’s Easy Install does not supply its own answers), attach the Windows ISO, and attach a second small ISO, or a floppy image, containing <code>autounattend.xml</code>.</p>
+<section id="using-the-file" class="level4">
+<h4 class="anchored" data-anchor-id="using-the-file">Using the file</h4>
+<p>Windows Setup looks for a file named <code>Autounattend.xml</code> at the root of removable media, including read-only media such as a DVD or a mounted ISO (<a href="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-automation-overview">Windows Setup Automation Overview</a>). The generator’s download already has that name. There are two ways to give it to Setup in a VM:</p>
+<ul>
+<li><strong>A second, small ISO</strong> that holds only <code>autounattend.xml</code>, attached as a second CD/DVD drive. The Windows ISO stays untouched, and you can swap answer files without rebuilding anything.</li>
+<li><strong>A customized Windows ISO</strong> with <code>autounattend.xml</code> added at its root. One ISO to attach, and it works the same on a physical machine.</li>
+</ul>
+<p>Both need <code>oscdimg.exe</code>, which comes with the <a href="https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install">Windows ADK</a> (install only the <em>Deployment Tools</em> feature).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Where the ADK installs oscdimg</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">$Oscdimg</span> <span class="op">=</span> <span class="st">'C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\Oscdimg\oscdimg.exe'</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># A folder holding only the answer file, made into a small ISO</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">New-Item</span> <span class="op">-</span>Path C<span class="op">:</span>\Build\Answer <span class="op">-</span>ItemType Directory <span class="op">-</span>Force</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">Copy-Item</span> <span class="op">-</span>Path <span class="st">"</span><span class="va">$HOME</span><span class="st">\Downloads\autounattend.xml"</span> <span class="op">-</span>Destination C<span class="op">:</span>\Build\Answer</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">&amp;</span> <span class="va">$Oscdimg</span> <span class="op">-</span>u2 <span class="op">-</span>udfver102 C<span class="op">:</span>\Build\Answer C<span class="op">:</span>\Build\autounattend<span class="op">.</span><span class="fu">iso</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="customizing-the-windows-iso" class="level4">
+<h4 class="anchored" data-anchor-id="customizing-the-windows-iso">Customizing the Windows ISO</h4>
+<p>Copy the contents of the Windows ISO to a folder, add the answer file at its root, and build a new bootable ISO. <code>efisys_noprompt.bin</code> is the UEFI boot file that skips “Press any key to boot from CD or DVD,” so the install runs with no one at the keyboard; use <code>efisys.bin</code> to keep the prompt. Images over 4.5 GB need a boot order file that puts the boot files first (<a href="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/oscdimg-command-line-options">Oscdimg command-line options</a>); the script writes one from the <code>boot</code> and <code>efi</code> folders.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Paths without spaces: oscdimg's -bootdata and -yo options do not accept them</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="va">$IsoPath</span> <span class="op">=</span> <span class="st">'C:\Build\Server2025.iso'</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="va">$Build</span> <span class="op">=</span> <span class="st">'C:\Build\Server2025'</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy everything off the Windows ISO</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="va">$Drive</span> <span class="op">=</span> <span class="op">(</span>Mount-DiskImage <span class="op">-</span>ImagePath <span class="va">$IsoPath</span> <span class="op">-</span>PassThru <span class="op">|</span> Get-Volume<span class="op">).</span><span class="fu">DriveLetter</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">New-Item</span> <span class="op">-</span>Path <span class="va">$Build</span> <span class="op">-</span>ItemType Directory <span class="op">-</span>Force</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">Copy-Item</span> <span class="op">-</span>Path <span class="st">"</span><span class="pp">${</span><span class="va">Drive</span><span class="pp">}</span><span class="st">:\*"</span> <span class="op">-</span>Destination <span class="va">$Build</span> <span class="op">-</span>Recurse</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>Dismount-DiskImage <span class="op">-</span>ImagePath <span class="va">$IsoPath</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the answer file at the root</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">Copy-Item</span> <span class="op">-</span>Path <span class="st">"</span><span class="va">$HOME</span><span class="st">\Downloads\autounattend.xml"</span> <span class="op">-</span>Destination <span class="va">$Build</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Boot order file: the boot files, then boot.wim, as paths relative to the root</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="va">$Order</span> <span class="op">=</span> <span class="st">'C:\Build\BootOrder.txt'</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="st">"</span><span class="va">$Build</span><span class="st">\boot"</span><span class="op">,</span> <span class="st">"</span><span class="va">$Build</span><span class="st">\efi"</span> <span class="op">-</span>Recurse <span class="op">-</span>File <span class="op">|</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">FullName</span><span class="op">.</span><span class="fu">Substring</span><span class="op">(</span><span class="va">$Build</span><span class="op">.</span><span class="fu">Length</span> <span class="op">+</span> <span class="dv">1</span><span class="op">)</span> <span class="op">}</span> <span class="op">|</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Set-Content</span> <span class="op">-</span>Path <span class="va">$Order</span> <span class="op">-</span>Encoding Ascii</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="fu">Add-Content</span> <span class="op">-</span>Path <span class="va">$Order</span> <span class="op">-</span>Value <span class="st">'sources\boot.wim'</span> <span class="op">-</span>Encoding Ascii</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># A new ISO that boots on BIOS and UEFI</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="va">$BootData</span> <span class="op">=</span> <span class="st">"2#p0,e,b</span><span class="va">$Build</span><span class="st">\boot\etfsboot.com#pEF,e,b</span><span class="va">$Build</span><span class="st">\efi\microsoft\boot\efisys_noprompt.bin"</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="op">&amp;</span> <span class="va">$Oscdimg</span> <span class="op">-</span>m <span class="op">-</span>o <span class="op">-</span>u2 <span class="op">-</span>udfver102 <span class="st">"-bootdata:</span><span class="va">$BootData</span><span class="st">"</span> <span class="st">"-yo</span><span class="va">$Order</span><span class="st">"</span> <span class="va">$Build</span> C<span class="op">:</span>\Build\Server2025-unattend<span class="op">.</span><span class="fu">iso</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="installing" class="level4">
+<h4 class="anchored" data-anchor-id="installing">Installing</h4>
+<ol type="1">
+<li>In Workstation, create the VM with <strong>I will install the operating system later</strong>, so VMware’s Easy Install does not supply its own answers. Keep the default UEFI firmware.</li>
+<li>Attach the Windows ISO and the answer-file ISO (or only the customized ISO).</li>
+<li>Power on. With the generator’s disk and account settings, Setup partitions the disk, installs and signs in without asking anything; the FirstLogon scripts run at the first sign-in.</li>
+<li>Check the result, then remove the ISOs from the VM.</li>
+</ol>
+<p>Setup caches the answer file in <code>C:\Windows\Panther</code>, with the administrator password and product key in it. Delete it before you make the disk non-persistent, so it is not part of every case:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path C<span class="op">:</span>\Windows\Panther <span class="op">-</span>Filter <span class="op">*</span>unattend<span class="op">*.</span><span class="fu">xml</span> <span class="op">|</span> <span class="fu">Remove-Item</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
 </section>
 </section>
 <section id="configuring-windows-for-analysis" class="level2">
@@ -452,6 +510,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="uac">UAC</h3>
 <p>With <code>EnableLUA</code> = 0, Admin Approval Mode is off and administrators run everything elevated, so tools that need administrator rights simply work. The middle ground is <code>ConsentPromptBehaviorAdmin</code> = 0: UAC stays on and elevates without prompting, but programs still start unelevated unless asked. See Microsoft’s <a href="https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/settings-and-configuration">User Account Control settings and configuration</a>.</p>
 </section>
+<section id="clock" class="level3">
+<h3 class="anchored" data-anchor-id="clock">Clock</h3>
+<p>Analysis output is easier to read when the screen agrees with it. NTFS stores file times in UTC (<a href="https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times">File Times</a>), and many forensic tools, including Eric Zimmerman’s tools and plaso, report UTC, while Windows (Explorer, Event Viewer) shows times in the system’s time zone. Either:</p>
+<ul>
+<li><strong>Use UTC as the system time zone.</strong> Everything on screen is UTC. In the unattend generator, set the time zone explicitly to <em>(UTC) Coordinated Universal Time</em>, or run <code>Set-TimeZone -Id 'UTC'</code> (<a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-timezone">Set-TimeZone</a>).</li>
+<li><strong>Keep local time and add a second clock set to UTC.</strong> Control Panel → <strong>Date and Time</strong> → <strong>Additional Clocks</strong>: tick <em>Show this clock</em>, choose <em>(UTC) Coordinated Universal Time</em> and name it <code>UTC</code>. Hovering over the taskbar clock shows both.</li>
+</ul>
+</section>
 <section id="network-and-updates" class="level3">
 <h3 class="anchored" data-anchor-id="network-and-updates">Network and updates</h3>
 <p>Analysis rarely needs the internet; installs and tool updates do. Connect the VM during the build, then keep it off the internet during cases: a host-only network, or none. Hostile files cannot reach out, and the tools stay at the versions in the image. Windows Update in the middle of a case changes the system under the analysis; update the clean image on a schedule instead.</p>
@@ -466,9 +532,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="chocolatey-and-scoop" class="level3">
 <h3 class="anchored" data-anchor-id="chocolatey-and-scoop">Chocolatey and Scoop</h3>
 <p><a href="https://chocolatey.org/install">Chocolatey</a> installs most of the list from one command, which makes the FirstLogon step one line. Its community packages are maintained by volunteers, separately from the tools’ authors: check the package page links to the real project before adding it. <a href="https://scoop.sh/">Scoop</a> is an alternative that installs per user without administrator rights; it has fewer DFIR tools.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>choco install <span class="op">-</span>y 7zip sysinternals pwsh ericzimmermantools volatility3 autopsy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>choco install <span class="op">-</span>y 7zip sysinternals pwsh ericzimmermantools volatility3 autopsy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>There is no need to pin versions. The non-persistent disk keeps every tool at the version in the image until you deliberately update it, and Scoop keeps earlier versions side by side when it updates an app (<code>scoop cleanup</code> removes them). Record what is installed for the case notes:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>choco list <span class="op">|</span> <span class="fu">Out-File</span> <span class="op">-</span>FilePath <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Notes\Tools.txt"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>choco list <span class="op">|</span> <span class="fu">Out-File</span> <span class="op">-</span>FilePath <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Notes\Tools.txt"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="the-tool-list" class="level3">
 <h3 class="anchored" data-anchor-id="the-tool-list">The tool list</h3>
@@ -538,8 +604,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="processing-an-existing-artifact-set-with-kape-modules" class="level3">
 <h3 class="anchored" data-anchor-id="processing-an-existing-artifact-set-with-kape-modules">Processing an existing artifact set with KAPE modules</h3>
 <p>KAPE has two halves: <strong>targets</strong> collect files from a system, and <strong>modules</strong> run programs against files already collected. For this box only modules apply. Modules are defined in <code>.mkape</code> files; the community set is maintained in <a href="https://github.com/EricZimmerman/KapeFiles">KapeFiles</a>, which includes the compound module <code>!EZParser</code> (runs Eric Zimmerman’s parsers over a collection).</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Module source is a collection that already exists; output goes to case storage.</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\kape<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>msource <span class="st">"\\vmware-host\Shared Folders\Evidence\2026-0142\C"</span> <span class="op">--</span>mdest <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Output\EZParser"</span> <span class="op">--</span>module <span class="op">!</span>EZParser</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Module source is a collection that already exists; output goes to case storage.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>\kape<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>msource <span class="st">"\\vmware-host\Shared Folders\Evidence\2026-0142\C"</span> <span class="op">--</span>mdest <span class="st">"\\vmware-host\Shared Folders\Cases\2026-0142\Output\EZParser"</span> <span class="op">--</span>module <span class="op">!</span>EZParser</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Check the switches against <code>kape.exe --help</code> and the <a href="https://ericzimmerman.github.io/KapeDocs/">KAPE documentation</a> for the version you install.</p>
 <p><strong>Licensing.</strong> KAPE is free for CRT members. Commercial use, such as paid engagements, requires an enterprise license from Kroll: <a href="https://www.kroll.com/en/kape-license-agreement">KAPE license agreement</a>.</p>
 </section>
@@ -587,6 +653,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td><a href="https://schneegans.de/windows/unattend-generator/">Unattend generator</a></td>
 <td>Christoph Schneegans</td>
+</tr>
+<tr class="odd">
+<td><a href="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-automation-overview">Windows Setup Automation Overview</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="even">
+<td><a href="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/oscdimg-command-line-options">Oscdimg command-line options</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="odd">
+<td><a href="https://learn.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys">KMS client product keys</a></td>
+<td>Microsoft Learn</td>
+</tr>
+<tr class="even">
+<td><a href="https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times">File Times</a> and <a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-timezone">Set-TimeZone</a></td>
+<td>Microsoft Learn</td>
 </tr>
 <tr class="odd">
 <td><a href="https://chocolatey.org/install">Chocolatey</a></td>

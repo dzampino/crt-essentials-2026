@@ -46,3 +46,9 @@ Reviewed October 16, 2026. These are reference links, not copied standards text.
 | server-defender | [https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure](https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure) |
 | vmware-disks | [https://docs.vmware.com/en/VMware-Workstation-Pro/17/com.vmware.ws.using.doc/GUID-A6792F54-2734-4AF4-9473-C8B9AD8321AF.html](https://docs.vmware.com/en/VMware-Workstation-Pro/17/com.vmware.ws.using.doc/GUID-A6792F54-2734-4AF4-9473-C8B9AD8321AF.html) |
 | unattend | [https://schneegans.de/windows/unattend-generator/](https://schneegans.de/windows/unattend-generator/) |
+| setup-answer | [https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-automation-overview](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-automation-overview) |
+| oscdimg | [https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/oscdimg-command-line-options](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/oscdimg-command-line-options) |
+| adk | [https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install) |
+| kms-keys | [https://learn.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys](https://learn.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys) |
+| file-times | [https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times](https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times) |
+| set-timezone | [https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-timezone](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-timezone) |

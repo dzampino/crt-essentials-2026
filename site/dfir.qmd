@@ -68,6 +68,7 @@ An unattend file (`autounattend.xml`) answers every question Windows Setup asks 
 | Enable long paths | Deep paths inside collections otherwise fail |
 | Always show file extensions; show all files | `invoice.pdf.exe` and hidden files are visible |
 | Do not update Last Access Time stamp | Reading a file on the box does not change its last access time |
+| Set your time zone explicitly: (UTC) Coordinated Universal Time | See [Clock](#clock) below |
 | Disable SmartScreen | Tools downloaded during the build are not blocked |
 | Remove bloatware | Fewer distractions and background updates |
 | FirstLogon scripts | Install Chocolatey and the tools ([below](#tools-for-analysis)) |
@@ -79,7 +80,67 @@ The generator is written for Windows 10 and 11, and its files work for Windows S
 
 Generate the file again when you change the build, rather than editing the XML by hand.
 
-Windows Setup looks for `autounattend.xml` in the root of removable media. In Workstation, create the VM with **I will install the operating system later** (so VMware's Easy Install does not supply its own answers), attach the Windows ISO, and attach a second small ISO, or a floppy image, containing `autounattend.xml`.
+#### Using the file
+
+Windows Setup looks for a file named `Autounattend.xml` at the root of removable media, including read-only media such as a DVD or a mounted ISO ([Windows Setup Automation Overview](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-automation-overview)). The generator's download already has that name. There are two ways to give it to Setup in a VM:
+
+- **A second, small ISO** that holds only `autounattend.xml`, attached as a second CD/DVD drive. The Windows ISO stays untouched, and you can swap answer files without rebuilding anything.
+- **A customized Windows ISO** with `autounattend.xml` added at its root. One ISO to attach, and it works the same on a physical machine.
+
+Both need `oscdimg.exe`, which comes with the [Windows ADK](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install) (install only the *Deployment Tools* feature).
+
+```powershell
+# Where the ADK installs oscdimg
+$Oscdimg = 'C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\Oscdimg\oscdimg.exe'
+
+# A folder holding only the answer file, made into a small ISO
+New-Item -Path C:\Build\Answer -ItemType Directory -Force
+Copy-Item -Path "$HOME\Downloads\autounattend.xml" -Destination C:\Build\Answer
+& $Oscdimg -u2 -udfver102 C:\Build\Answer C:\Build\autounattend.iso
+```
+
+#### Customizing the Windows ISO
+
+Copy the contents of the Windows ISO to a folder, add the answer file at its root, and build a new bootable ISO. `efisys_noprompt.bin` is the UEFI boot file that skips "Press any key to boot from CD or DVD," so the install runs with no one at the keyboard; use `efisys.bin` to keep the prompt. Images over 4.5 GB need a boot order file that puts the boot files first ([Oscdimg command-line options](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/oscdimg-command-line-options)); the script writes one from the `boot` and `efi` folders.
+
+```powershell
+# Paths without spaces: oscdimg's -bootdata and -yo options do not accept them
+$IsoPath = 'C:\Build\Server2025.iso'
+$Build = 'C:\Build\Server2025'
+
+# Copy everything off the Windows ISO
+$Drive = (Mount-DiskImage -ImagePath $IsoPath -PassThru | Get-Volume).DriveLetter
+New-Item -Path $Build -ItemType Directory -Force
+Copy-Item -Path "${Drive}:\*" -Destination $Build -Recurse
+Dismount-DiskImage -ImagePath $IsoPath
+
+# Add the answer file at the root
+Copy-Item -Path "$HOME\Downloads\autounattend.xml" -Destination $Build
+
+# Boot order file: the boot files, then boot.wim, as paths relative to the root
+$Order = 'C:\Build\BootOrder.txt'
+Get-ChildItem -Path "$Build\boot", "$Build\efi" -Recurse -File |
+	ForEach-Object { $_.FullName.Substring($Build.Length + 1) } |
+	Set-Content -Path $Order -Encoding Ascii
+Add-Content -Path $Order -Value 'sources\boot.wim' -Encoding Ascii
+
+# A new ISO that boots on BIOS and UEFI
+$BootData = "2#p0,e,b$Build\boot\etfsboot.com#pEF,e,b$Build\efi\microsoft\boot\efisys_noprompt.bin"
+& $Oscdimg -m -o -u2 -udfver102 "-bootdata:$BootData" "-yo$Order" $Build C:\Build\Server2025-unattend.iso
+```
+
+#### Installing
+
+1. In Workstation, create the VM with **I will install the operating system later**, so VMware's Easy Install does not supply its own answers. Keep the default UEFI firmware.
+2. Attach the Windows ISO and the answer-file ISO (or only the customized ISO).
+3. Power on. With the generator's disk and account settings, Setup partitions the disk, installs and signs in without asking anything; the FirstLogon scripts run at the first sign-in.
+4. Check the result, then remove the ISOs from the VM.
+
+Setup caches the answer file in `C:\Windows\Panther`, with the administrator password and product key in it. Delete it before you make the disk non-persistent, so it is not part of every case:
+
+```powershell
+Get-ChildItem -Path C:\Windows\Panther -Filter *unattend*.xml | Remove-Item
+```
 
 ## Configuring Windows for analysis
 
@@ -103,6 +164,13 @@ These are the settings, and the command for each if you apply it after setup ins
 ### UAC {#uac}
 
 With `EnableLUA` = 0, Admin Approval Mode is off and administrators run everything elevated, so tools that need administrator rights simply work. The middle ground is `ConsentPromptBehaviorAdmin` = 0: UAC stays on and elevates without prompting, but programs still start unelevated unless asked. See Microsoft's [User Account Control settings and configuration](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/settings-and-configuration).
+
+### Clock {#clock}
+
+Analysis output is easier to read when the screen agrees with it. NTFS stores file times in UTC ([File Times](https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times)), and many forensic tools, including Eric Zimmerman's tools and plaso, report UTC, while Windows (Explorer, Event Viewer) shows times in the system's time zone. Either:
+
+- **Use UTC as the system time zone.** Everything on screen is UTC. In the unattend generator, set the time zone explicitly to *(UTC) Coordinated Universal Time*, or run `Set-TimeZone -Id 'UTC'` ([Set-TimeZone](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-timezone)).
+- **Keep local time and add a second clock set to UTC.** Control Panel → **Date and Time** → **Additional Clocks**: tick *Show this clock*, choose *(UTC) Coordinated Universal Time* and name it `UTC`. Hovering over the taskbar clock shows both.
 
 ### Network and updates
 
@@ -181,6 +249,10 @@ A per-case checklist:
 | [Independent disks](https://docs.vmware.com/en/VMware-Workstation-Pro/17/com.vmware.ws.using.doc/GUID-A6792F54-2734-4AF4-9473-C8B9AD8321AF.html) | VMware Workstation Pro documentation |
 | [Desktop Hypervisor licensing](https://knowledge.broadcom.com/external/article/368667/download-and-license-vmware-desktop-hypervisor.html) | Broadcom |
 | [Unattend generator](https://schneegans.de/windows/unattend-generator/) | Christoph Schneegans |
+| [Windows Setup Automation Overview](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-automation-overview) | Microsoft Learn |
+| [Oscdimg command-line options](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/oscdimg-command-line-options) | Microsoft Learn |
+| [KMS client product keys](https://learn.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys) | Microsoft Learn |
+| [File Times](https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times) and [Set-TimeZone](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-timezone) | Microsoft Learn |
 | [Chocolatey](https://chocolatey.org/install) | Installation |
 | [KAPE documentation](https://ericzimmerman.github.io/KapeDocs/) and [KapeFiles](https://github.com/EricZimmerman/KapeFiles) | Eric Zimmerman |
 | [KAPE license agreement](https://www.kroll.com/en/kape-license-agreement) | Kroll |
