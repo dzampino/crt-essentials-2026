@@ -646,6 +646,7 @@ Get-Member shows the properties and methods of whatever a command returns.
 ```powershell
 Get-Verb                       # the approved verbs
 Get-Command -Noun Service      # every verb that works on services
+Get-Command Get-*Event         # * matches anything: Get-Event, Get-WinEvent
 Get-Service -Name Spooler
 ```
 

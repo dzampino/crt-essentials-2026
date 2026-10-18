@@ -143,6 +143,7 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 - [x] Deck footer: link to the GitHub repository.
   - Template footer now "CRT Annual Training Conference 2026 · github.com/dzampino/crt-essentials-2026", the address linked and in the footer's text color (quarto/add_footer_link.py). build.ps1 adds the link target Pandoc leaves out; all 65 footer links resolve and PowerPoint opens the deck cleanly.
 - [x] Deck SPF slide: where the IP and domain come from (the connecting server; MAIL FROM, or HELO/EHLO when MAIL FROM is empty), from RFC 7208 sections 2.3, 2.4 and 4.1 (PROPOSED sub-points).
+- [x] Deck Verb-Noun slide: wildcard example `Get-Command Get-*Event` (returns Get-Event and Get-WinEvent in 7.6.7 and 5.1).
 
 ## Open decisions
 
