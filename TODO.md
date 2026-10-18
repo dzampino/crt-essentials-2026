@@ -28,9 +28,11 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 
 ## 3. PKI
 
-- [ ] Fun sample domain and details for the PKI sample files (regenerate files and every output shown).
-- [ ] Recommendations for installing OpenSSL on Windows.
-- [ ] Link to XCA, David's preferred graphical certificate tool.
+- [x] Fun sample domain and details for the PKI sample files (regenerate files and every output shown).
+  - Squeaky Curd Root CA / `squeakycurds.example`. Site outputs re-captured with OpenSSL 3.5.5, certutil and .NET; slide outputs in the section 7 pass. Keys were generated in a scratch folder and deleted.
+- [x] Recommendations for installing OpenSSL on Windows.
+- [x] Link to XCA, David's preferred graphical certificate tool.
+  - Also added `Get-CertificateInfo` to the module.
 
 ## 4. Email security
 
