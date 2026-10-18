@@ -13,11 +13,11 @@ The profile for certificates on the internet is [RFC 5280](https://www.rfc-edito
 
 ## Sample files {#sample-files}
 
-Fictional public certificate and CSR samples. **Do not install the training root.** No private keys are included. The private training CA's lifetime is not a statement of public Web PKI issuance policy.
+Training certificate and CSR samples. **Do not install the training root.** No private keys are included. The private training CA's lifetime is not a statement of public Web PKI issuance policy.
 
 | File | What it is |
 | --- | --- |
-| [training-root.pem](files/samples/pki/training-root.pem) | Self-signed root CA, `CN=Squeaky Curd Root CA`, of the Fictional Cheese Curd Authority, PEM |
+| [training-root.pem](files/samples/pki/training-root.pem) | Self-signed root CA, `CN=Squeaky Curd Root CA`, of the Cheese Curd Authority, PEM |
 | [training-leaf.pem](files/samples/pki/training-leaf.pem) | Server certificate for `squeakycurds.example`, the Squeaky Curds Co-op of Curdsville, Wisconsin, issued by the root, PEM |
 | [training-leaf.der](files/samples/pki/training-leaf.der) | The same leaf certificate, DER |
 | [training-request.csr](files/samples/pki/training-request.csr) | The PKCS #10 request the leaf was issued from |
@@ -35,9 +35,9 @@ Certificate:
     Data:
         Version: 3 (0x2)
         Serial Number:
-            3e:23:6d:a6:5a:1d:83:f6:90:7d:a6:b9:68:8c:2a:c5:ce:d7:8e:0c
+            55:25:8b:df:e8:83:4d:47:5c:a1:59:29:20:9e:59:cb:4f:92:68:17
         Signature Algorithm: sha256WithRSAEncryption
-        Issuer: C=US, ST=Wisconsin, O=Fictional Cheese Curd Authority, CN=Squeaky Curd Root CA
+        Issuer: C=US, ST=Wisconsin, O=Cheese Curd Authority, CN=Squeaky Curd Root CA
         Validity
             Not Before: Oct  1 00:00:00 2026 GMT
             Not After : Oct  1 00:00:00 2027 GMT
@@ -45,7 +45,7 @@ Certificate:
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
                 Public-Key: (2048 bit)
-                Modulus: 00:c3:1f:e5:27:e9:45:43:e1: ...
+                Modulus: 00:e5:37:5c:d1:85:f9:43:92: ...
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
             X509v3 Basic Constraints: critical
@@ -55,7 +55,7 @@ Certificate:
             X509v3 Extended Key Usage:
                 TLS Web Server Authentication
     Signature Algorithm: sha256WithRSAEncryption
-    Signature Value: 87:93:0d:c5:a3:69:27:44: ...
+    Signature Value: 49:06:a2:1b:9b:5a:6a:a3: ...
 ```
 
 The root has `Basic Constraints: critical, CA:TRUE, pathlen:0` and `Key Usage: critical, Certificate Sign, CRL Sign`: it may sign certificates and CRLs, but no CA below it may.
@@ -113,12 +113,12 @@ certutil -dump training-leaf.der
 ```text
 X509 Certificate:
 Version: 3
-Serial Number: 3e236da65a1d83f6907da6b9688c2ac5ced78e0c
+Serial Number: 55258bdfe8834d475ca15929209e59cb4f926817
 Signature Algorithm:
     Algorithm ObjectId: 1.2.840.113549.1.1.11 sha256RSA
 Issuer:
     CN=Squeaky Curd Root CA
-    O=Fictional Cheese Curd Authority
+    O=Cheese Curd Authority
     S=Wisconsin
     C=US
 
@@ -132,7 +132,7 @@ Subject:
     S=Wisconsin
     C=US
 ...
-Cert Hash(sha256): d1b7d4595cd352eb0c67dbdaa54a6f8ff1a7631c9b26495a139317ee97d0c0e5
+Cert Hash(sha256): 566d45250ce6aa7ff4c7db5576b81eb8b657c2c6067d5faa812d395bee69ae67
 ```
 
 ::: {.output-note}
@@ -153,12 +153,12 @@ Get-CertificateInfo -Path .\training-leaf.pem
 
 ```text
 Subject      : CN=squeakycurds.example, O=Squeaky Curds Co-op, L=Curdsville, S=Wisconsin, C=US
-Issuer       : CN=Squeaky Curd Root CA, O=Fictional Cheese Curd Authority, S=Wisconsin, C=US
+Issuer       : CN=Squeaky Curd Root CA, O=Cheese Curd Authority, S=Wisconsin, C=US
 NotBefore    : 9/30/2026 7:00:00 PM
 NotAfter     : 9/30/2027 7:00:00 PM
 DnsNames     : squeakycurds.example
-Thumbprint   : AE2C904DF148CD5A8135E8D95014C8935ADEE1F6
-SerialNumber : 3E236DA65A1D83F6907DA6B9688C2AC5CED78E0C
+Thumbprint   : D3A4DAB5033F7341F308383338E64AF8C1CD56C3
+SerialNumber : 55258BDFE8834D475CA15929209E59CB4F926817
 ```
 
 To see every extension with its OID:
@@ -232,7 +232,7 @@ After installing, open a new PowerShell window and run `openssl version`. If an 
 **Same certificate, two encodings.** `training-leaf.pem` and `training-leaf.der` are the same certificate. Their certificate fingerprints match:
 
 ```text
-sha256 Fingerprint=D1:B7:D4:59:5C:D3:52:EB:0C:67:DB:DA:A5:4A:6F:8F:F1:A7:63:1C:9B:26:49:5A:13:93:17:EE:97:D0:C0:E5
+sha256 Fingerprint=56:6D:45:25:0C:E6:AA:7F:F4:C7:DB:55:76:B8:1E:B8:B6:57:C2:C6:06:7D:5F:AA:81:2D:39:5B:EE:69:AE:67
 ```
 
 The SHA-256 **file** hash of the DER file is the same value, because a certificate fingerprint is the hash of its DER encoding. The PEM file's hash differs, because it is text.
@@ -279,7 +279,7 @@ The CSR and the issued certificate carry the same public key:
 ```bash
 openssl req  -in training-request.csr -noout -pubkey | openssl sha256
 openssl x509 -in training-leaf.pem    -noout -pubkey | openssl sha256
-# both: 6f1329425fd7b20283a0be2f1bd09e207c6d002acc258130f68e54979952284a
+# both: 7a764e059181f774138b29119eab1ab71dce68e5829aba787c3a7f3fb9deecb0
 ```
 
 Creating a key pair and request with OpenSSL (the key stays with you):
@@ -415,7 +415,7 @@ A certificate chain could not be built to a trusted root authority. 0x800b010a (
 ------------------------------------
 Incomplete certificate chain
 Cannot find certificate:
-    CN=Squeaky Curd Root CA, O=Fictional Cheese Curd Authority, S=Wisconsin, C=US
+    CN=Squeaky Curd Root CA, O=Cheese Curd Authority, S=Wisconsin, C=US
 Cert is an End Entity certificate
 
 ERROR: Verifying leaf certificate revocation status returned The revocation function was unable to check revocation because the revocation server was offline. 0x80092013 (-2146885613 CRYPT_E_REVOCATION_OFFLINE)

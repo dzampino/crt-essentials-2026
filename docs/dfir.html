@@ -513,7 +513,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="clock" class="level3">
 <h3 class="anchored" data-anchor-id="clock">Clock</h3>
-<p>Analysis output is easier to read when the screen agrees with it. NTFS stores file times in UTC (<a href="https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times">File Times</a>), and many forensic tools, including Eric Zimmerman’s tools and plaso, report UTC, while Windows (Explorer, Event Viewer) shows times in the system’s time zone. Either:</p>
+<p>Analysis output is easier to read when the screen agrees with it. NTFS stores file times in UTC (<a href="https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times">File Times</a>), and many forensic tools, including Eric Zimmerman’s tools and Plaso, report UTC, while Windows (Explorer, Event Viewer) shows times in the system’s time zone. Either:</p>
 <ul>
 <li><strong>Use UTC as the system time zone.</strong> Everything on screen is UTC. In the unattend generator, set the time zone explicitly to <em>(UTC) Coordinated Universal Time</em>, or run <code>Set-TimeZone -Id 'UTC'</code> (<a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-timezone">Set-TimeZone</a>).</li>
 <li><strong>Keep local time and add a second clock set to UTC.</strong> Control Panel → <strong>Date and Time</strong> → <strong>Additional Clocks</strong>: tick <em>Show this clock</em>, choose <em>(UTC) Coordinated Universal Time</em> and name it <code>UTC</code>. Hovering over the taskbar clock shows both.</li>
@@ -578,9 +578,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Release zip from GitHub</td>
 </tr>
 <tr class="even">
-<td><a href="https://plaso.readthedocs.io/">log2timeline / plaso</a></td>
+<td><a href="https://plaso.readthedocs.io/">log2timeline / Plaso</a></td>
 <td>Super timelines</td>
-<td>In <a href="#wsl">WSL</a>, from the GIFT PPA as the <a href="https://plaso.readthedocs.io/en/latest/sources/user/Ubuntu-Packaged-Release.html">plaso documentation</a> describes: <code>sudo add-apt-repository ppa:gift/stable</code>, then <code>sudo apt install plaso-tools</code></td>
+<td>In <a href="#wsl">WSL</a>, from the GIFT PPA as the <a href="https://plaso.readthedocs.io/en/latest/sources/user/Ubuntu-Packaged-Release.html">Plaso documentation</a> describes: <code>sudo add-apt-repository ppa:gift/stable</code>, then <code>sudo apt install plaso-tools</code></td>
 </tr>
 <tr class="odd">
 <td><strong>Disk images and memory</strong></td>
@@ -664,7 +664,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="wsl" class="level3">
 <h3 class="anchored" data-anchor-id="wsl">WSL</h3>
-<p>The Windows Subsystem for Linux runs Linux command-line tools, such as plaso, next to the Windows tools, on the same files. Windows Server 2025 installs it with <code>wsl.exe --install</code> (<a href="https://learn.microsoft.com/en-us/windows/wsl/install-on-server">Microsoft Learn</a>).</p>
+<p>The Windows Subsystem for Linux runs Linux command-line tools, such as Plaso, next to the Windows tools, on the same files. Windows Server 2025 installs it with <code>wsl.exe --install</code> (<a href="https://learn.microsoft.com/en-us/windows/wsl/install-on-server">Microsoft Learn</a>).</p>
 <p><strong>Inside VMware Workstation, use WSL 1.</strong> WSL 2 runs Linux in a lightweight virtual machine, so inside this VM it needs nested virtualization: <strong>VM Settings → Processors → Virtualize Intel VT-x/EPT or AMD-V/RVI</strong>. Workstation cannot provide that while the host itself runs Hyper-V or virtualization-based security, which Memory Integrity, Credential Guard, WSL 2 and Docker Desktop on the host all turn on (<a href="https://knowledge.broadcom.com/external/article/389469/virtualized-intel-vtxept-is-not-supporte.html">Broadcom KB 389469</a>). On a Windows 11 host with virtualization-based security running, Workstation 25.0.1 refused to power on a VM with that option set: “Virtualized Intel VT-x/EPT is not supported on this platform.” WSL 1 does not use virtualization, so it works whatever the host runs.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># WSL with the WSL 1 component, and no distribution yet; restart afterwards</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>wsl<span class="op">.</span><span class="fu">exe</span> <span class="op">--</span>install <span class="op">--</span>enable-wsl1 <span class="op">--</span>no-distribution</span>

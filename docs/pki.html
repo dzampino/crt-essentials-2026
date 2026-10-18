@@ -244,7 +244,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="sample-files" class="level2">
 <h2 class="anchored" data-anchor-id="sample-files">Sample files</h2>
-<p>Fictional public certificate and CSR samples. <strong>Do not install the training root.</strong> No private keys are included. The private training CA’s lifetime is not a statement of public Web PKI issuance policy.</p>
+<p>Training certificate and CSR samples. <strong>Do not install the training root.</strong> No private keys are included. The private training CA’s lifetime is not a statement of public Web PKI issuance policy.</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -255,7 +255,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td><a href="files/samples/pki/training-root.pem">training-root.pem</a></td>
-<td>Self-signed root CA, <code>CN=Squeaky Curd Root CA</code>, of the Fictional Cheese Curd Authority, PEM</td>
+<td>Self-signed root CA, <code>CN=Squeaky Curd Root CA</code>, of the Cheese Curd Authority, PEM</td>
 </tr>
 <tr class="even">
 <td><a href="files/samples/pki/training-leaf.pem">training-leaf.pem</a></td>
@@ -286,9 +286,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     Data:
         Version: 3 (0x2)
         Serial Number:
-            3e:23:6d:a6:5a:1d:83:f6:90:7d:a6:b9:68:8c:2a:c5:ce:d7:8e:0c
+            55:25:8b:df:e8:83:4d:47:5c:a1:59:29:20:9e:59:cb:4f:92:68:17
         Signature Algorithm: sha256WithRSAEncryption
-        Issuer: C=US, ST=Wisconsin, O=Fictional Cheese Curd Authority, CN=Squeaky Curd Root CA
+        Issuer: C=US, ST=Wisconsin, O=Cheese Curd Authority, CN=Squeaky Curd Root CA
         Validity
             Not Before: Oct  1 00:00:00 2026 GMT
             Not After : Oct  1 00:00:00 2027 GMT
@@ -296,7 +296,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
                 Public-Key: (2048 bit)
-                Modulus: 00:c3:1f:e5:27:e9:45:43:e1: ...
+                Modulus: 00:e5:37:5c:d1:85:f9:43:92: ...
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
             X509v3 Basic Constraints: critical
@@ -306,7 +306,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             X509v3 Extended Key Usage:
                 TLS Web Server Authentication
     Signature Algorithm: sha256WithRSAEncryption
-    Signature Value: 87:93:0d:c5:a3:69:27:44: ...</code></pre>
+    Signature Value: 49:06:a2:1b:9b:5a:6a:a3: ...</code></pre>
 <p>The root has <code>Basic Constraints: critical, CA:TRUE, pathlen:0</code> and <code>Key Usage: critical, Certificate Sign, CRL Sign</code>: it may sign certificates and CRLs, but no CA below it may.</p>
 <section id="field-reference" class="level3">
 <h3 class="anchored" data-anchor-id="field-reference">Field reference</h3>
@@ -480,12 +480,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>certutil <span class="op">-</span>dump training-leaf<span class="op">.</span><span class="fu">der</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <pre class="text"><code>X509 Certificate:
 Version: 3
-Serial Number: 3e236da65a1d83f6907da6b9688c2ac5ced78e0c
+Serial Number: 55258bdfe8834d475ca15929209e59cb4f926817
 Signature Algorithm:
     Algorithm ObjectId: 1.2.840.113549.1.1.11 sha256RSA
 Issuer:
     CN=Squeaky Curd Root CA
-    O=Fictional Cheese Curd Authority
+    O=Cheese Curd Authority
     S=Wisconsin
     C=US
 
@@ -499,7 +499,7 @@ Subject:
     S=Wisconsin
     C=US
 ...
-Cert Hash(sha256): d1b7d4595cd352eb0c67dbdaa54a6f8ff1a7631c9b26495a139317ee97d0c0e5</code></pre>
+Cert Hash(sha256): 566d45250ce6aa7ff4c7db5576b81eb8b657c2c6067d5faa812d395bee69ae67</code></pre>
 <div class="output-note">
 <p>certutil shows validity in local time (here US Central, UTC−5): <code>9/30/2026 7:00 PM</code> is <code>Oct 1 00:00:00 2026 GMT</code>. It also lists distinguished names in the opposite order from OpenSSL, and calls the state <code>S</code> rather than <code>ST</code>. When you compare timestamps across tools, check the time zone.</p>
 </div>
@@ -550,12 +550,12 @@ Cert Hash(sha256): d1b7d4595cd352eb0c67dbdaa54a6f8ff1a7631c9b26495a139317ee97d0c
 <span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Get-CertificateInfo <span class="op">-</span>Path <span class="op">.</span>\training-leaf<span class="op">.</span><span class="fu">pem</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <pre class="text"><code>Subject      : CN=squeakycurds.example, O=Squeaky Curds Co-op, L=Curdsville, S=Wisconsin, C=US
-Issuer       : CN=Squeaky Curd Root CA, O=Fictional Cheese Curd Authority, S=Wisconsin, C=US
+Issuer       : CN=Squeaky Curd Root CA, O=Cheese Curd Authority, S=Wisconsin, C=US
 NotBefore    : 9/30/2026 7:00:00 PM
 NotAfter     : 9/30/2027 7:00:00 PM
 DnsNames     : squeakycurds.example
-Thumbprint   : AE2C904DF148CD5A8135E8D95014C8935ADEE1F6
-SerialNumber : 3E236DA65A1D83F6907DA6B9688C2AC5CED78E0C</code></pre>
+Thumbprint   : D3A4DAB5033F7341F308383338E64AF8C1CD56C3
+SerialNumber : 55258BDFE8834D475CA15929209E59CB4F926817</code></pre>
 <p>To see every extension with its OID:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="va">$Cert</span> <span class="op">=</span> <span class="op">[</span>System<span class="op">.</span><span class="fu">Security</span><span class="op">.</span><span class="fu">Cryptography</span><span class="op">.</span><span class="fu">X509Certificates</span><span class="op">.</span><span class="fu">X509Certificate2</span><span class="op">]::</span>new<span class="op">((</span><span class="fu">Resolve-Path</span> <span class="op">.</span>\training-leaf<span class="op">.</span><span class="fu">pem</span><span class="op">).</span><span class="fu">Path</span><span class="op">)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="va">$Cert</span><span class="op">.</span><span class="fu">Extensions</span> <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span> <span class="st">'{0} ({1}): {2}'</span> <span class="op">-</span>f <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">FriendlyName</span><span class="op">,</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Oid</span><span class="op">.</span><span class="fu">Value</span><span class="op">,</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Format</span><span class="op">(</span><span class="va">$false</span><span class="op">)</span> <span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -678,7 +678,7 @@ Enhanced Key Usage (2.5.29.37): Server Authentication (1.3.6.1.5.5.7.3.1)</code>
 </tbody>
 </table>
 <p><strong>Same certificate, two encodings.</strong> <code>training-leaf.pem</code> and <code>training-leaf.der</code> are the same certificate. Their certificate fingerprints match:</p>
-<pre class="text"><code>sha256 Fingerprint=D1:B7:D4:59:5C:D3:52:EB:0C:67:DB:DA:A5:4A:6F:8F:F1:A7:63:1C:9B:26:49:5A:13:93:17:EE:97:D0:C0:E5</code></pre>
+<pre class="text"><code>sha256 Fingerprint=56:6D:45:25:0C:E6:AA:7F:F4:C7:DB:55:76:B8:1E:B8:B6:57:C2:C6:06:7D:5F:AA:81:2D:39:5B:EE:69:AE:67</code></pre>
 <p>The SHA-256 <strong>file</strong> hash of the DER file is the same value, because a certificate fingerprint is the hash of its DER encoding. The PEM file’s hash differs, because it is text.</p>
 <section id="converting" class="level3">
 <h3 class="anchored" data-anchor-id="converting">Converting</h3>
@@ -709,7 +709,7 @@ Certificate Request:
 <p>The CSR and the issued certificate carry the same public key:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req  <span class="at">-in</span> training-request.csr <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> x509 <span class="at">-in</span> training-leaf.pem    <span class="at">-noout</span> <span class="at">-pubkey</span> <span class="kw">|</span> <span class="ex">openssl</span> sha256</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># both: 6f1329425fd7b20283a0be2f1bd09e207c6d002acc258130f68e54979952284a</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># both: 7a764e059181f774138b29119eab1ab71dce68e5829aba787c3a7f3fb9deecb0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Creating a key pair and request with OpenSSL (the key stays with you):</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openssl</span> req <span class="at">-new</span> <span class="at">-newkey</span> rsa:2048 <span class="at">-nodes</span> <span class="at">-keyout</span> server.key <span class="at">-out</span> server.csr <span class="dt">\</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">-subj</span> <span class="st">"/CN=squeakycurds.example"</span> <span class="at">-addext</span> <span class="st">"subjectAltName=DNS:squeakycurds.example"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -862,7 +862,7 @@ error training-leaf.pem: verification failed</code></pre>
 ------------------------------------
 Incomplete certificate chain
 Cannot find certificate:
-    CN=Squeaky Curd Root CA, O=Fictional Cheese Curd Authority, S=Wisconsin, C=US
+    CN=Squeaky Curd Root CA, O=Cheese Curd Authority, S=Wisconsin, C=US
 Cert is an End Entity certificate
 
 ERROR: Verifying leaf certificate revocation status returned The revocation function was unable to check revocation because the revocation server was offline. 0x80092013 (-2146885613 CRYPT_E_REVOCATION_OFFLINE)

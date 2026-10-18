@@ -163,6 +163,7 @@ NOTE: swap to site for entropy calculation
   - Alignment with SPF and/or DKIM
   - Strict versus relaxed alignment
   - DMARC policy and reporting
+  - The record's tags, so the audience can work the examples
 7. Work through email headers
   - Identify the different sender identities
   - Identify the SPF and DKIM results
@@ -190,6 +191,7 @@ NOTE: swap to site for entropy calculation
 1. Why PowerShell?
   - Administration, automation, and analysis
   - Turning a repetitive task into something repeatable
+  - Then, for people new to it: Verb-Noun command names; objects (properties and methods) for an audience that may not know object-oriented programming; Windows PowerShell 5.1 and PowerShell 7
 2. Finding commands
   - `Get-Command`, `Get-Help`
   - Find the parameters and figure out what a command returns
@@ -208,8 +210,10 @@ NOTE: swap to site for entropy calculation
   - Parameters instead of hard-coded values
   - Functions, `-Verbose`, `-WhatIf` where applicable
   - An example of automating part of the DFIR box build
+  - Deck: no `SupportsShouldProcess`; the site keeps it
 7. Your own module
   - A .psm1 in your Modules folder; PowerShell loads it for you
+  - Deck: the 5.1 and 7 module paths with an example, not a script
   - Collect the functions from this session in it
 8. Questions?
 
@@ -230,7 +234,8 @@ NOTE: swap to site for entropy calculation
 
 1. What we're building
   - A Windows analysis machine, not an evidence acquisition machine
-  - Evidence is already collected; memory acquisition is handled separately (Magnet in our workflow)
+  - Evidence is already collected; memory acquisition is handled separately (Magnet in our workflow; speaker notes only)
+  - Describe the build: disposable VM, evidence in read-only, output to the host, Server 2025 and the tools from an unattend file, offline during cases
 2. Disposable/nonpersistent virtual machine
   - Return the machine to a known state
   - Keep case data and analysis output separate from what gets reset
@@ -241,6 +246,7 @@ NOTE: swap to site for entropy calculation
   - Tools that need to run as administrator
   - UAC: normally I don't disable security features, but this is a disposable VM and reducing friction matters
   - Other Windows security settings as decisions specific to this machine, not general recommendations
+  - Deck: the UAC reason sits under the general-recommendations point; list the high-level changes
 5. Tools for analysis
   - Select the tools and versions
   - KAPE modules for processing already-collected artifacts

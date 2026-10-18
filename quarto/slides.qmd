@@ -197,7 +197,7 @@ RFC 5280, Internet X.509 PKI Certificate and CRL Profile: https://www.rfc-editor
 **Extensions**
 
 - Subject alternative name (SAN)
-- Key usage, extended key usage
+- Key usage, extended key usage (EKU)
 - Basic constraints: CA or end entity
 - CRL distribution points, authority information access
 :::
@@ -212,8 +212,8 @@ RFC 9525 section 2: "The Common Name RDN MUST NOT be used to identify a service.
 ## Our training certificate
 
 ```text
-Serial Number: 3e:23:6d:a6:5a:1d:83:f6:...:8e:0c
-Issuer:  O=Fictional Cheese Curd Authority, CN=Squeaky Curd Root CA
+Serial Number: 55:25:8b:df:e8:83:4d:47:...:68:17
+Issuer:  O=Cheese Curd Authority, CN=Squeaky Curd Root CA
 Not Before: Oct  1 00:00:00 2026 GMT
 Not After : Oct  1 00:00:00 2027 GMT
 Subject: L=Curdsville, O=Squeaky Curds Co-op, CN=squeakycurds.example
@@ -227,7 +227,7 @@ Inspect it with openssl x509, certutil -dump or XCA.
 
 Output trimmed and condensed from: openssl x509 -in training-leaf.pem -noout -text (OpenSSL 3.5). The full subject also has ST=Wisconsin, C=US.
 
-Fictional training certificates for the fictional Squeaky Curds Co-op; .example is reserved (RFC 2606), so the names do not exist. No private keys are included. Do not install the training root.
+Training certificates for the Squeaky Curds Co-op; .example is reserved (RFC 2606), so the names do not exist. No private keys are included. Do not install the training root.
 
 XCA, a graphical certificate and key manager: https://hohnstaedt.de/xca/
 :::
@@ -263,7 +263,7 @@ RFC 5280 section 6 (certification path validation).
 ::: notes
 RFC 7468 (PEM textual encodings), RFC 7292 (PKCS #12), RFC 5652 (CMS, the basis of .p7b), RFC 2986 (PKCS #10).
 
-training-leaf.pem and training-leaf.der are the same certificate: both have SHA-256 fingerprint D1:B7:D4:59:...:C0:E5. certutil -dump reads both.
+training-leaf.pem and training-leaf.der are the same certificate: both have SHA-256 fingerprint 56:6D:45:25:...:AE:67. certutil -dump reads both.
 
 OpenSSL on Windows: it comes with Git for Windows, or winget install ShiningLight.OpenSSL.Light (other builds: https://github.com/openssl/openssl/wiki/Binaries).
 :::
@@ -392,7 +392,7 @@ RFC 5322 section 3.6.2: From, Sender, Reply-To.
   - Trust the one your own boundary added
 - Which headers can be trusted?
   - Only those added by systems you control; everything below can be forged
-- Microsoft's Message Header Analyzer lays it all out
+- My preferred tool: Microsoft's Message Header Analyzer
 
 <!-- PROPOSED: the sub-points. -->
 
@@ -449,6 +449,26 @@ RFC 9989 (May 2026, Standards Track) obsoletes RFC 7489 and RFC 9091. Section 3.
 Changes: pct, rf and ri removed; t (test mode), np and psd added; organizational domain found by a DNS tree walk instead of a public suffix list.
 https://www.rfc-editor.org/rfc/rfc9989.html
 Aggregate reports: RFC 9990. Failure reports: RFC 9991.
+:::
+
+## DMARC record tags
+
+| Tag | Meaning | Default |
+|-----|---------|---------|
+| `v=DMARC1` | Version; must be the first tag | Required |
+| `p=` | Policy for the domain: `none`, `quarantine`, `reject` | `none` |
+| `sp=` | Policy for existing subdomains | `p` |
+| `np=` | Policy for non-existent subdomains | `sp`, then `p` |
+| `adkim=` | DKIM alignment: `r` relaxed, `s` strict | `r` |
+| `aspf=` | SPF alignment: `r` relaxed, `s` strict | `r` |
+| `t=y` | Test mode: apply one level below `p` (`quarantine` becomes `none`, `reject` becomes `quarantine`) | `n` |
+| `rua=` / `ruf=` | Where to send aggregate / failure reports | No reports |
+
+<!-- PROPOSED: slide added so the audience can work the examples. -->
+
+::: notes
+RFC 9989 section 4.7 defines every tag; fo= (failure report options) and psd= (public suffix domain flag) are the others. Unknown tags must be ignored.
+https://www.rfc-editor.org/rfc/rfc9989.html#section-4.7
 :::
 
 ## Work through it: example 1
@@ -544,7 +564,7 @@ Both domains share the organizational domain primary.com, which is why relaxed a
 - MTA-STS and TLS reporting (TLS-RPT)
   - MTA-STS: publish that your MX requires TLS with a valid certificate
   - TLS-RPT: receive reports when senders cannot negotiate TLS
-- Sender ID (briefly, for historical context)
+- Sender ID
   - Checked a "purported responsible address" taken from the headers; the experiment was concluded in favor of SPF (RFC 6686, 2012)
 
 ::: notes
@@ -567,6 +587,62 @@ RFC 6686 (Sender ID and SPF experiment resolution): https://www.rfc-editor.org/r
 
 ::: notes
 Get-Member shows the properties and methods of whatever a command returns.
+:::
+
+## Verb-Noun
+
+- Every command is named *Verb-Noun*: `Get-Process`, `Stop-Service`, `Export-Csv`
+- A short list of approved verbs: `Get`, `Set`, `New`, `Remove`, `Start`, `Stop`, `Export`...
+- Learn the noun, then guess the verb
+- Parameters follow: `-Name value`; Tab completes both
+
+```powershell
+Get-Verb                       # the approved verbs
+Get-Command -Noun Service      # every verb that works on services
+Get-Service -Name Spooler
+```
+
+<!-- PROPOSED: slide added for the PowerShell introduction. -->
+
+::: notes
+Approved verbs: https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands
+:::
+
+## Objects
+
+- An object is a thing with **properties** (data) and **methods** (actions)
+  - A file: `Name`, `Length`, `LastWriteTime`; `CopyTo()`, `Delete()`
+- Commands return objects, not text; the table on screen is only a view
+- Ask for a property by name instead of cutting columns out of text
+
+```powershell
+$File = Get-Item C:\Windows\notepad.exe
+$File.Length                  # a property: size in bytes
+$File.LastWriteTime.Year      # a property can be an object too
+$File | Get-Member            # every property and method
+```
+
+<!-- PROPOSED: slide added for the PowerShell introduction. -->
+
+::: notes
+about_Objects: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_objects
+:::
+
+## Windows PowerShell 5.1 and PowerShell 7
+
+| | Windows PowerShell 5.1 | PowerShell 7 |
+|---|---|---|
+| Comes from | Built into Windows | Installed alongside it: `winget install Microsoft.PowerShell` |
+| Starts with | `powershell.exe` | `pwsh.exe` |
+| Built on | .NET Framework | Current .NET; also runs on Linux and macOS |
+| Status | Maintained, not developed further | Where new features go |
+| Which am I in? | `$PSVersionTable.PSVersion` | `$PSVersionTable.PSVersion` |
+
+<!-- PROPOSED: slide added for the PowerShell introduction. -->
+
+::: notes
+Differences between Windows PowerShell 5.1 and PowerShell 7.x: https://learn.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell
+The ones that bite: default file encoding, Export-Csv's type line in 5.1, and modules folders in different places. The companion site has a table.
 :::
 
 ## Finding commands
@@ -664,40 +740,41 @@ Get-WinEvent: https://learn.microsoft.com/en-us/powershell/module/microsoft.powe
 
 ```powershell
 function New-CaseFolder {
-	[CmdletBinding(SupportsShouldProcess)]
-	param(
-		[Parameter(Mandatory)]
-		[string]$Path
-	)
-	if ($PSCmdlet.ShouldProcess($Path, 'Create case folder')) {
-		New-Item -Path $Path -ItemType Directory | Out-Null
+	[CmdletBinding()]
+	param([Parameter(Mandatory)][string]$Path)
+	'Collected', 'Output', 'Notes' | ForEach-Object {
+		Write-Verbose "Creating $Path\$_"
+		New-Item -Path "$Path\$_" -ItemType Directory -Force
 	}
 }
 ```
 
 ::: notes
-about_Functions_CmdletBindingAttribute and ShouldProcess: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute
-New-CaseFolder -Path E:\Cases\2026-0142 -WhatIf shows what would happen without doing it. The full version on the companion site creates Collected, Output and Notes.
+New-CaseFolder -Path E:\Cases\2026-0142 -Verbose
+[CmdletBinding()] is what makes -Verbose work. The version on the companion site also supports -WhatIf.
+about_Functions_CmdletBindingAttribute: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute
 :::
 
 ## Your own module
 
 - A `.psm1` file of functions, in a folder of the same name
-- In your `Documents\PowerShell\Modules` folder, PowerShell loads it for you
+- Put it in your personal Modules folder and PowerShell loads it for you
+- `$env:PSModulePath` lists every folder PowerShell searches
 
-```powershell
-$Docs = [Environment]::GetFolderPath('MyDocuments')
-$Folder = "$Docs\PowerShell\Modules\MyTools"
-New-Item -Path $Folder -ItemType Directory -Force
-notepad "$Folder\MyTools.psm1"     # paste functions, save
-Get-Command -Module MyTools
+```text
+PowerShell 7
+    Documents\PowerShell\Modules\MyTools\MyTools.psm1
+Windows PowerShell 5.1
+    Documents\WindowsPowerShell\Modules\MyTools\MyTools.psm1
+
+Get-Command -Module MyTools        # in a new window
 ```
 
 <!-- PROPOSED: slide added for the module item (outline 4.1 item 7). -->
 
 ::: notes
 about_Modules: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_modules
-Windows PowerShell 5.1 uses Documents\WindowsPowerShell\Modules instead. Every function on the companion site is in its own copyable block.
+Every function on the companion site is in its own copyable block, ready to paste into MyTools.psm1. The companion site walks through creating the folder and file.
 :::
 
 # Questions? {#powershell-questions}
@@ -708,10 +785,15 @@ Windows PowerShell 5.1 uses Documents\WindowsPowerShell\Modules instead. Every f
 
 - A Windows analysis machine, not an evidence acquisition machine
 - Evidence is already collected
-- Memory acquisition is handled separately (Magnet in our workflow)
+- A disposable VM that returns to a known state after every case
+- Evidence comes in read-only; output, logs and notes go back to the host
+- Windows Server 2025 and the common DFIR tools, built from an unattend file
+- Offline while working a case
+
+<!-- PROPOSED: the last four points. -->
 
 ::: notes
-Evidence arrives through the read-only Evidence shared folder; output goes to Cases. The VM stays off the internet during cases.
+Memory acquisition is handled separately (Magnet in our workflow).
 :::
 
 ## Disposable/nonpersistent virtual machine
@@ -758,13 +840,15 @@ Setup finds Autounattend.xml at the root of removable media: a second small ISO,
 ## Configuring Windows for analysis
 
 - Tools that need to run as administrator
-- UAC: normally I don't disable security features, but this is a disposable VM and reducing friction matters
-- Other Windows security settings as decisions specific to this machine, not general recommendations
-  - Defender removed, long paths on
+- Windows security settings as decisions specific to this machine, not general recommendations
+  - Normally I don't disable security features, but this is a disposable VM and reducing friction matters
+- The changes
+  - UAC off, Defender removed
+  - Long paths on, last-access updates off
   - File extensions and hidden files shown
-- Clock: UTC, or a second clock set to UTC
+  - Clock: UTC, or a second clock set to UTC
 
-<!-- PROPOSED: the clock bullet, from David's suggestion. -->
+<!-- PROPOSED: "The changes" grouping, the last-access item and the clock item. -->
 
 ::: notes
 UAC off: EnableLUA = 0. Defender: Uninstall-WindowsFeature -Name Windows-Defender. Long paths: LongPathsEnabled = 1. All of these are options in the unattend generator. Commands are on the companion site.
@@ -773,7 +857,7 @@ UAC off: EnableLUA = 0. Defender: Uninstall-WindowsFeature -Name Windows-Defende
 ## Tools for analysis
 
 - Select the tools and versions
-  - Eric Zimmerman's tools, KAPE, FTK Imager, Volatility 3, plaso
+  - Eric Zimmerman's tools, KAPE, FTK Imager, Volatility 3, Plaso
   - Chainsaw, Hayabusa, Autopsy, Office if licensed
 - Chocolatey installs most of them in one line
 - KAPE modules for processing already-collected artifacts
@@ -792,7 +876,7 @@ KAPE is free for CRT members; commercial use needs a Kroll enterprise license: h
 
 ## Suggested tool list
 
-- Parsing and timelines: Eric Zimmerman's tools, KAPE, Chainsaw, Hayabusa, plaso
+- Parsing and timelines: Eric Zimmerman's tools, KAPE, Chainsaw, Hayabusa, Plaso
 - Disk images and memory: FTK Imager, Arsenal Image Mounter, Autopsy, Volatility 3
 - Files, documents and network: CyberChef, ExifTool, pestudio, oletools, Wireshark
 - Basics: 7-Zip, Sysinternals, VS Code, PowerShell 7, Office if licensed
@@ -817,26 +901,4 @@ Read from the read-only Evidence share, write to Cases. Before power-off, confir
 
 # Questions? {#dfir-questions}
 
-# Wrap-Up
-
-## Key takeaways
-
-- **Passwords:** unique, long, checked against breaches, with MFA
-- **PKI:** a certificate binds a key to a name; validation checks name, dates, chain, trust and usage
-- **Email:** DMARC starts with the `From` domain and needs an aligned pass
-- **PowerShell:** objects in a pipeline turn a task into something repeatable
-- **DFIR box:** a disposable analysis VM with case data kept elsewhere
-
-<!-- PROPOSED: the takeaways. -->
-
-## References
-
-- NIST SP 800-63B-4: pages.nist.gov/800-63-4/sp800-63b.html
-- RFC 5280, RFC 9525, RFC 2986, RFC 8555 (PKI)
-- RFC 5321, RFC 6409, RFC 5322, RFC 7208, RFC 6376, RFC 9989, RFC 9990, RFC 9991 (email)
-- Microsoft Learn: about_Pipelines, about_Modules, Get-WinEvent, Export-Csv
-- Full list with links on the companion site
-
-**dzampino.github.io/crt-essentials-2026**
-
-# Questions
+# Thank you {#thank-you}

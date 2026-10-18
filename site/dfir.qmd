@@ -167,7 +167,7 @@ With `EnableLUA` = 0, Admin Approval Mode is off and administrators run everythi
 
 ### Clock {#clock}
 
-Analysis output is easier to read when the screen agrees with it. NTFS stores file times in UTC ([File Times](https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times)), and many forensic tools, including Eric Zimmerman's tools and plaso, report UTC, while Windows (Explorer, Event Viewer) shows times in the system's time zone. Either:
+Analysis output is easier to read when the screen agrees with it. NTFS stores file times in UTC ([File Times](https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times)), and many forensic tools, including Eric Zimmerman's tools and Plaso, report UTC, while Windows (Explorer, Event Viewer) shows times in the system's time zone. Either:
 
 - **Use UTC as the system time zone.** Everything on screen is UTC. In the unattend generator, set the time zone explicitly to *(UTC) Coordinated Universal Time*, or run `Set-TimeZone -Id 'UTC'` ([Set-TimeZone](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-timezone)).
 - **Keep local time and add a second clock set to UTC.** Control Panel → **Date and Time** → **Additional Clocks**: tick *Show this clock*, choose *(UTC) Coordinated Universal Time* and name it `UTC`. Hovering over the taskbar clock shows both.
@@ -209,7 +209,7 @@ The common Windows tools from DFIR distributions such as [FLARE-VM](https://gith
 | [KAPE](https://www.kroll.com/kape) | Running modules over a collection | Download from Kroll after registering; see licensing below |
 | [Chainsaw](https://github.com/WithSecureLabs/chainsaw) | Hunting through event logs with Sigma rules | Release zip from GitHub (Chocolatey's `chainsaw` is a different program) |
 | [Hayabusa](https://github.com/Yamato-Security/hayabusa) | Event log timelines and Sigma detections | Release zip from GitHub |
-| [log2timeline / plaso](https://plaso.readthedocs.io/) | Super timelines | In [WSL](#wsl), from the GIFT PPA as the [plaso documentation](https://plaso.readthedocs.io/en/latest/sources/user/Ubuntu-Packaged-Release.html) describes: `sudo add-apt-repository ppa:gift/stable`, then `sudo apt install plaso-tools` |
+| [log2timeline / Plaso](https://plaso.readthedocs.io/) | Super timelines | In [WSL](#wsl), from the GIFT PPA as the [Plaso documentation](https://plaso.readthedocs.io/en/latest/sources/user/Ubuntu-Packaged-Release.html) describes: `sudo add-apt-repository ppa:gift/stable`, then `sudo apt install plaso-tools` |
 | **Disk images and memory** | | |
 | [FTK Imager](https://www.exterro.com/digital-forensics-software/ftk-imager) | Mounting and browsing disk images, hashing | Download from Exterro |
 | [Arsenal Image Mounter](https://arsenalrecon.com/products/arsenal-image-mounter) | Mounting images as complete disks, so any Windows tool can read them; Free Mode includes temporary write support kept in separate differencing files | `choco install arsenalimagemounter` |
@@ -232,7 +232,7 @@ Record the version of every tool used for a case in the case notes.
 
 ### WSL {#wsl}
 
-The Windows Subsystem for Linux runs Linux command-line tools, such as plaso, next to the Windows tools, on the same files. Windows Server 2025 installs it with `wsl.exe --install` ([Microsoft Learn](https://learn.microsoft.com/en-us/windows/wsl/install-on-server)).
+The Windows Subsystem for Linux runs Linux command-line tools, such as Plaso, next to the Windows tools, on the same files. Windows Server 2025 installs it with `wsl.exe --install` ([Microsoft Learn](https://learn.microsoft.com/en-us/windows/wsl/install-on-server)).
 
 **Inside VMware Workstation, use WSL 1.** WSL 2 runs Linux in a lightweight virtual machine, so inside this VM it needs nested virtualization: **VM Settings → Processors → Virtualize Intel VT-x/EPT or AMD-V/RVI**. Workstation cannot provide that while the host itself runs Hyper-V or virtualization-based security, which Memory Integrity, Credential Guard, WSL 2 and Docker Desktop on the host all turn on ([Broadcom KB 389469](https://knowledge.broadcom.com/external/article/389469/virtualized-intel-vtxept-is-not-supporte.html)). On a Windows 11 host with virtualization-based security running, Workstation 25.0.1 refused to power on a VM with that option set: "Virtualized Intel VT-x/EPT is not supported on this platform." WSL 1 does not use virtualization, so it works whatever the host runs.
 

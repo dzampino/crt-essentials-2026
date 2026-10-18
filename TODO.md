@@ -104,6 +104,27 @@ The original request list (October 18, 2026) is preserved, reworded only to grou
 - [x] DFIR: suggested software list covering the common tools in DFIR distributions, including 7-Zip, FTK Imager, VS Code, Arsenal Image Mounter, Sysinternals, Wireshark, CyberChef, ExifTool, pestudio, log2timeline/plaso, Volatility 3, oletools.
   - Tool table grouped by job, with Chocolatey packages checked (`choco info`: package and project site). pestudio from Winitor (package flagged possibly broken); RegRipper, capa and FLOSS from GitHub (packages years behind); oletools via pip; plaso in WSL from the GIFT PPA. New deck slide "Suggested tool list" (PROPOSED).
 
+## 13. Fifth request list (October 18, 2026)
+
+- [x] Check whether WSL 2 works in VMware Workstation on Server 2025.
+  - Not on this PC, whatever the guest: Workstation refuses nested VT-x while the host runs VBS (tested in section 12; the guest OS never starts). With VBS and Hyper-V off on the host, Microsoft says WSL 2 runs in a VM with nested virtualization; not tested here, because turning VBS off would break WSL 2 and Docker on the host.
+- [x] Deck: "Extended Key Usage (EKU)".
+- [x] Drop "Fictional" from the sample certificates.
+  - Root regenerated as O=Cheese Curd Authority (new keys; leaf, DER and CSR reissued, keys deleted). Every value on the PKI page and deck re-run: serial 55:25:8b:df..., SHA-256 566D4525...AE67, thumbprint D3A4DAB5..., public key hash 7a764e05...; verify and certutil output re-captured. "Fictional" also dropped from the sample descriptions.
+- [x] Deck: replace "Microsoft's Message Header Analyzer lays it all out" with David's prose: it is his preferred tool.
+- [x] Deck: DMARC tag descriptions (not only policy and reporting) so the audience can solve the DMARC challenges.
+  - New "DMARC record tags" slide from RFC 9989 section 4.7 (PROPOSED).
+- [x] Drop "(briefly, for historical context)".
+- [x] Deck PowerShell section after the intro: Verb-Noun, objects (for people new to OOP), PowerShell 5.1 and 7.
+  - Three new slides (PROPOSED), code tested in 7.6.7 and 5.1.
+- [x] Deck: drop SupportsShouldProcess (keep on the site).
+- [x] Deck module slide: the 5.1 and 7 module paths with examples, not a script (site unchanged).
+- [x] Deck "What we're building": describe more; drop the memory acquisition line.
+- [x] Deck "Configuring Windows for analysis": itemize the high-level changes; the UAC reason goes under the general-recommendations point.
+- [x] Check tool name capitalization in the tool list.
+  - Plaso capitalized (project's own spelling); pestudio, oletools and capa are lowercase by their authors.
+- [x] Deck: drop Wrap-up and the slides after it; end with a thank-you slide.
+
 ## Open decisions
 
 - [ ] Review the `<!-- PROPOSED -->` wording in `quarto/slides.qmd` (wording that is not David's).

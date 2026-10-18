@@ -45,5 +45,5 @@ Windows Server 2025 · VMware Workstation · unattended install · tool list
 ## Downloads
 
 - [Slides (PowerPoint)](files/crt-essentials.pptx)
-- [PKI sample files](pki.qmd#sample-files): fictional training certificates and a CSR. No private keys are included. Do not install the training root.
+- [PKI sample files](pki.qmd#sample-files): training certificates and a CSR. No private keys are included. Do not install the training root.
 - Source for everything on this site: [github.com/dzampino/crt-essentials-2026](https://github.com/dzampino/crt-essentials-2026)
